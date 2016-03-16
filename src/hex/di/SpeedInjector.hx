@@ -208,7 +208,7 @@ class SpeedInjector implements IDependencyInjector
 	public function map( type : Class<Dynamic>, name : String = '' ) : InjectionMapping
 	{
 		var mappingID : String = Type.getClassName( type ) + '|' + name;
-trace("map:" + mappingID );
+
 		if ( this._mapping[ mappingID ] != null )
 		{
 			return this._mapping[ mappingID ];

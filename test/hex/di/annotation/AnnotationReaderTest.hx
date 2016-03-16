@@ -88,7 +88,6 @@ class AnnotationReaderTest
     public function testGetMethodAnnotation() : Void
     {
 		var data : InjectorClassVO = AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockSpeedInjectorContainer );
-		trace( data.methods );
 		
 		//beforeInit
 		var method0 = data.methods[ 0 ];
@@ -220,5 +219,4 @@ class AnnotationReaderTest
 		Assert.equals( 0, method9.order, "method execution order should equal 0" );
 		Assert.equals( 0, method9.args.length, "method args length should equal 0" );
 	}
-	
 }
