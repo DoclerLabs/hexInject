@@ -22,28 +22,28 @@ class MockSpeedInjectorContainer implements ISpeedInjectorContainer
 	public var property2 : String;
 	
 	@Inject( "name0", null, "name2" )
-	@Optional( false, false, true )
+	@Optional( false, null, true )
 	public function new( a0 : ILogger, a1 : Domain, a2 : String = "hello" ) 
 	{
 		
 	}
 	
-	@PostContruct( 2 )
+	@PostConstruct( 2 )
 	public function beforeInit( ) : Void
 	{
 		
 	}
 	
 	@Inject
-	@PostContruct( 0 )
+	@PostConstruct( 0 )
 	public function preInit( domain : Domain ) : Void
 	{
 		
 	}
 	
 	@Inject( "name0", null, "name2" )
-	@PostContruct( 1 )
-	@Optional( false, false, true )
+	@PostConstruct( 1 )
+	@Optional( false, null, true )
 	public function init( a0 : ILogger, a1 : Domain, a2 : String = "hello" ) : Void
 	{
 		
@@ -69,7 +69,7 @@ class MockSpeedInjectorContainer implements ISpeedInjectorContainer
 	
 	@Inject
 	@PreDestroy( 1 )
-	public function preDestroy() : Void
+	public function preDestroy( domain : Domain ) : Void
 	{
 		
 	}
@@ -78,6 +78,18 @@ class MockSpeedInjectorContainer implements ISpeedInjectorContainer
 	@PreDestroy( 0 )
 	@Optional( false, false, true )
 	public function destroy( a0 : ILogger, a1 : Domain, a2 : String = "hello" ) : Void
+	{
+		
+	}
+	
+	@PreDestroy
+	public function testDestroy() : Void
+	{
+		
+	}
+	
+	@PostConstruct
+	public function testConstruct() : Void
 	{
 		
 	}

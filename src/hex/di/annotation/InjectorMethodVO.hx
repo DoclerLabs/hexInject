@@ -8,5 +8,6 @@ typedef InjectorMethodVO =
 	name 			: String,
 	args			: Array<InjectorArgumentVO>,
 	isPost 			: Bool,
+	isPre 			: Bool,
 	order			: UInt
 }

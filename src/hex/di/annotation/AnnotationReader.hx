@@ -25,7 +25,7 @@ class AnnotationReader
 		var localClass = Context.getLocalClass().get();
 		
 		//parse annotations
-		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataName, [ "Inject", "PostConstruct", "Optional" ] );
+		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataName, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], true );
 		
 		//get data result
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
@@ -55,15 +55,15 @@ class AnnotationReader
 				var annotations = ctorAnn.annotationDatas;
 				
 				var inject = annotations.filter( function ( v ) { return v.annotationName == "Inject"; } );
-				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ i ] : null;
-				
+				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ i ] : "";
+
 				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ i ] : null;
+				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ i ] : false;
 				
-				ctorArgs.push( { type: ctorAnn.argumentDatas[ i ].argumentType, key:key, isOpt:isOpt!=null?true:false } );
+				ctorArgs.push( { type: ctorAnn.argumentDatas[ i ].argumentType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 			}
 		}
-		var ctor : InjectorMethodVO = { name: "new", args: ctorArgs, isPost: false, order: 0 };
+		var ctor : InjectorMethodVO = { name: "new", args: ctorArgs, isPre: false, isPost: false, order: 0 };
 
 		//properties parsing
 		var props : Array<InjectorPropertyVO> = [];
@@ -80,7 +80,7 @@ class AnnotationReader
 			var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
 			var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ 0 ] : false;
 			
-			props.push( { name: propAnn[ i ].propertyName, type: propAnn[ i ].propertyType, key:key, isOpt: isOpt } );
+			props.push( { name: propAnn[ i ].propertyName, type: propAnn[ i ].propertyType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 		}
 
 		//methods parsing
@@ -100,22 +100,25 @@ class AnnotationReader
 				var annotations = methAnn[ i ].annotationDatas;
 				
 				var inject = annotations.filter( function ( v ) { return v.annotationName == "Inject"; } );
-				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ j ] : null;
+				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ j ] : "";
 				
 				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ j ] : null;
+				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ j ] : false;
 				
-				args.push( { type: argData[ j ].argumentType, key: key, isOpt: isOpt!=null?true:false } );
+				args.push( { type: argData[ j ].argumentType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 			}
 			
 			//method building
 			var postConstruct = methAnn[ i ].annotationDatas.filter( function ( v ) { return v.annotationName == "PostConstruct"; } );
-			var order = postConstruct.length > 0 ? postConstruct[ 0 ].annotationKeys[ i ] : null;
-			methods.push( { name: methAnn[ i ].methodName, args: args, isPost: order!=null?true:false, order: order } );
+			var preDestroy = methAnn[ i ].annotationDatas.filter( function ( v ) { return v.annotationName == "PreDestroy"; } );
+			var order = 0;
+			if ( postConstruct.length > 0 ) order = postConstruct[ 0 ].annotationKeys[ 0 ];
+			if ( preDestroy.length > 0 ) order = preDestroy[ 0 ].annotationKeys[ 0 ];
+			methods.push( { name: methAnn[ i ].methodName, args: args, isPre: preDestroy.length>0, isPost: postConstruct.length>0, order: order==null?0:order } );
 		}
 	
 		//final building
-		//trace( { name:data.name, ctor:ctor, props:props, methods:methods } );
+		//trace( data.name, { name:data.name, ctor:ctor, props:props, methods:methods } );
 		return { name:data.name, ctor:ctor, props:props, methods:methods };
 	}
 }
