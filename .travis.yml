@@ -1,0 +1,36 @@
+language: haxe
+
+haxe:
+  - "3.2.1"
+  - development
+
+addons:
+  apt:
+    packages:
+      # Flash
+      - libcurl3:i386
+      - libglib2.0-0:i386
+      - libx11-6:i386
+      - libxext6:i386
+      - libxt6:i386
+      - libxcursor1:i386
+      - libnss3:i386
+      - libgtk2.0-0:i386
+
+install:
+  - git clone --recursive https://github.com/DoclerLabs/hexCore.git ./hexcore
+  - git clone --recursive https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
+  - git clone --recursive https://github.com/DoclerLabs/hexUnit.git ./hexunit
+  - export DISPLAY=:99.0;
+  - export AUDIODEV=null;
+  - haxe flash/install.hxml
+
+script:
+  - haxe build-js.hxml           && node bin/MainSpeedInjectTest.js
+  - haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainSpeedInjectTest.swf
+  
+notifications:
+  email:
+    recipients:
+      - francis_bourre@me.com
+      - peterphonix@gmail.com
