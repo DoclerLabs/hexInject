@@ -59,6 +59,7 @@ class MockClass implements ISpeedInjectorContainer
 }
 ```
 
+
 ## Constructor injections with one named and optional
 ```haxe
 class MockClass implements ISpeedInjectorContainer
@@ -66,12 +67,82 @@ class MockClass implements ISpeedInjectorContainer
 	var m_dependency 	: IModel;
 	var m_dependency2 	: String;
 
-	@Inject( null, "namedDependency2" )
+	@Inject( null, "name" )
 	@Optional( false, true )
 	public function new( dependency : IModel, dependency2 : String = "hello world" )
 	{
 		this.m_dependency 	= dependency;
 		this.m_dependency2 	= dependency2;
 	}
+}
+```
+
+
+## Method injections with named dependencies
+```haxe
+class MockClass implements ISpeedInjectorContainer
+{
+	var m_dependency 	: IModel;
+	var m_dependency2 	: String;
+
+	public function new()
+	{
+
+	}
+
+	@Inject( "name1", "name2" ) : Void
+	public function setDependencies( dependency : IModel, dependency2 : String )
+	{
+		this.m_dependency 	= dependency;
+		this.m_dependency2 	= dependency2;
+	}
+}
+```
+
+
+## Postconstruct methods
+```haxe
+class MockClass implements ISpeedInjectorContainer
+{
+	public function new()
+	{
+
+	}
+
+	@PostConstruct( 0 )
+	public function doSomething() : Void
+	{
+		//this method will be called after constructor
+	}
+
+	@PostConstruct( 1)
+    public function doSomethingMore() : Void
+    {
+        //this method will be called after 'doSomething' call
+    }
+}
+```
+
+
+## Predestroy methods
+```haxe
+class MockClass implements ISpeedInjectorContainer
+{
+	public function new()
+	{
+
+	}
+
+	@PreDestroy( 0 )
+	public function doSomething() : Void
+	{
+		//this method will be called when this instance will be destroyed
+	}
+
+	@PreDestroy( 1)
+    public function doSomethingMore() : Void
+    {
+        //this method will be called after 'doSomething' call
+    }
 }
 ```
