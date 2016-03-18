@@ -17,4 +17,9 @@ class ClassProvider implements IDependencyProvider
     {
         return injector.instantiateUnmapped( this._type );
     }
+	
+	public function destroy() : Void
+	{
+		//do nothing
+	}
 }

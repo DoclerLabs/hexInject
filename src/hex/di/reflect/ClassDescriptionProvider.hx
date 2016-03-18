@@ -4,6 +4,7 @@ import hex.collection.HashMap;
 import hex.di.IInjectable;
 import hex.di.annotation.IAnnotationDataProvider;
 import hex.di.annotation.InjectorClassVO;
+import hex.log.Stringifier;
 
 /**
  * ...
@@ -31,10 +32,13 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 
 		if ( classAnnotationData != null )
 		{
-			var injectable : Array<IInjectable> = [];
+			var injections 		: Array<IInjectable> 		= [];
+			var postConstruct 	: Array<OrderedInjection> 	= [];
+			var preDestroy 		: Array<OrderedInjection> 	= [];
+			
 			for ( prop in classAnnotationData.props )
 			{
-				injectable.push( new PropertyInjection( prop.name, prop.type, prop.key, prop.isOpt ) );
+				injections.push( new PropertyInjection( prop.name, prop.type, prop.key, prop.isOpt ) );
 			}
 
 			for ( method in classAnnotationData.methods )
@@ -44,7 +48,19 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 				{
 					arguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
 				}
-				injectable.push( new MethodInjection( method.name, arguments ) );
+				
+				if ( method.isPost )
+				{
+					postConstruct.push( new OrderedInjection( method.name, arguments, method.order ) );
+				}
+				else if ( method.isPre )
+				{
+					preDestroy.push( new OrderedInjection( method.name, arguments, method.order ) );
+				}
+				else
+				{
+					injections.push( new MethodInjection( method.name, arguments ) );
+				}
 			}
 
 			var ctor = classAnnotationData.ctor;
@@ -54,10 +70,8 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 				ctorArguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
 			}
 			var constructorInjection = new ConstructorInjection( ctorArguments );
-			
-			
 
-			var classDescription : ClassDescription = new ClassDescription( injectable, constructorInjection );
+			var classDescription : ClassDescription = new ClassDescription( constructorInjection, injections, postConstruct, preDestroy );
 			return classDescription;
 		}
 		else

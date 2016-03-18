@@ -7,4 +7,5 @@ package hex.di.provider;
 interface IDependencyProvider
 {
     function getResult( injector : SpeedInjector ) : Dynamic;
+	function destroy() : Void;
 }

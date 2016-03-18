@@ -1,26 +1,50 @@
 package hex.di.provider;
 
+import hex.di.error.InjectorException;
+
 /**
  * ...
  * @author Francis Bourre
  */
 class SingletonProvider implements IDependencyProvider
 {
-    var _type   : Class<Dynamic>;
-    var _value  : Dynamic;
+    var _isDestroyed    : Bool;
 
-    public function new( type : Class<Dynamic> )
+    var _type           : Class<Dynamic>;
+    var _value          : Dynamic;
+    var _injector       : SpeedInjector;
+
+    public function new( type : Class<Dynamic>, injector : SpeedInjector )
     {
-        this._type = type;
+        this._isDestroyed   = false;
+        this._type          = type;
+        this._injector      = injector;
     }
 
     public function getResult( injector : SpeedInjector ) : Dynamic
     {
-        if ( this._value == null )
+        if ( this._isDestroyed )
         {
-            this._value = injector.instantiateUnmapped( this._type );
+            throw new InjectorException( "Forbidden usage of unmapped singleton provider for type '" + Type.getClassName( this._value ) + "'" );
+        }
+        else if ( this._value == null )
+        {
+            this._value = this._injector.instantiateUnmapped( this._type );
         }
 
         return this._value;
     }
+	
+	public function destroy() : Void
+	{
+        this._isDestroyed = true;
+
+        if ( this._value != null )
+        {
+            this._injector.destroyInstance( this._value );
+        }
+
+        this._injector  = null;
+        this._value     = null;
+	}
 }

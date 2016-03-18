@@ -1,14 +1,16 @@
 package hex.di;
 
+import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
-import hex.di.error.InjectorException;
-import hex.di.mapping.InjectionMapping;
-import hex.di.reflect.ClassDescription;
-import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.annotation.AnnotationDataProvider;
+import hex.di.error.InjectorException;
+import hex.di.error.MissingMappingException;
+import hex.di.mapping.InjectionMapping;
+import hex.di.provider.IDependencyProvider;
+import hex.di.reflect.ClassDescription;
 import hex.di.reflect.ClassDescriptionProvider;
-import hex.event.EventDispatcher;
-import hex.event.IEventListener;
+import hex.di.reflect.IClassDescriptionProvider;
+import hex.event.LightweightClosureDispatcher;
 import hex.log.Stringifier;
 
 /**
@@ -17,24 +19,21 @@ import hex.log.Stringifier;
  */
 class SpeedInjector implements IDependencyInjector
 {
-	var _ed						: EventDispatcher<IEventListener, InjectionEvent>;
+	var _ed						: LightweightClosureDispatcher<InjectionEvent>;
 	var _mapping				: Map<String,InjectionMapping>;
 	var _processedMapping 		: Map<String,Bool>;
+	var _managedObjects			: Map<{}, {}>;
 	var _parentInjector			: SpeedInjector;
 	var _classDescriptor		: IClassDescriptionProvider;
-
-	static public function purgeCache() : Void
-	{
-
-	}
-
+	
 	public function new() 
 	{
 		this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( ISpeedInjectorContainer ) );
 
-		this._ed 				= new EventDispatcher<IEventListener, InjectionEvent>();
-		this._mapping 			= new Map<String,InjectionMapping>();
-		this._processedMapping 	= new Map<String,Bool>();
+		this._ed 				= new LightweightClosureDispatcher();
+		this._mapping 			= new Map();
+		this._processedMapping 	= new Map();
+		this._managedObjects 	= new Map();
 	}
 
 	public function createChildInjector() : SpeedInjector
@@ -77,7 +76,28 @@ class SpeedInjector implements IDependencyInjector
 
 		if ( this._mapping[ mappingID ] != null )
 		{
-			return mapping.provider.getResult( this );
+			return mapping.getResult();
+		}
+		else if ( this._parentInjector != null )
+		{
+			return this._parentInjector.getInstance( type, name );
+		}
+		else
+		{
+			throw new MissingMappingException( 	"'" + Stringifier.stringify( this ) + "' is missing a mapping to get instance with type '" +
+												Type.getClassName( type ) + "' inside instance of '" + Stringifier.stringify( this ) + 
+												"'. Target dependency: '" + mappingID + "'" );
+		}
+	}
+	
+	public function getProvider( type : Class<Dynamic>, name : String = '' ) : IDependencyProvider
+	{
+		var mappingID : String = Type.getClassName( type ) + '|' + name;
+		var mapping : InjectionMapping = this._mapping[ mappingID ];
+
+		if ( this._mapping[ mappingID ] != null )
+		{
+			return mapping.provider;
 		}
 		else if ( this._parentInjector != null )
 		{
@@ -93,7 +113,7 @@ class SpeedInjector implements IDependencyInjector
 	{
 		var classDescription : ClassDescription = this._classDescriptor.getClassDescription( type );
 
-		var instance : Dynamic;
+		var instance : Dynamic; 
 		if ( classDescription != null && classDescription.constructorInjection != null )
 		{
 			instance = classDescription.constructorInjection.createInstance( type, this );
@@ -115,7 +135,7 @@ class SpeedInjector implements IDependencyInjector
 
     public function getOrCreateNewInstance( type : Class<Dynamic> ) : Dynamic
 	{
-		return null;
+		return this.satisfies( type ) ? this.getInstance( type ) : this.instantiateUnmapped( type );
 	}
 	
 	public function hasMapping( type : Class<Dynamic>, name : String = '' ) : Bool
@@ -145,7 +165,7 @@ class SpeedInjector implements IDependencyInjector
 			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
 		}
 
-		//mapping.getProvider().destroy();
+		mapping.provider.destroy();
 		this._mapping.remove( mappingID );
 	}
 	
@@ -201,7 +221,16 @@ class SpeedInjector implements IDependencyInjector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		
+		this._managedObjects.remove( instance );
+
+		var classDescription = this._classDescriptor.getClassDescription( Type.getClass( instance ) );
+		if ( classDescription != null )
+		{
+			for ( preDestroy in classDescription.preDestroy )
+			{
+				preDestroy.applyInjection( instance, this );
+			}
+		}
 	}
 
 	//
@@ -217,6 +246,25 @@ class SpeedInjector implements IDependencyInjector
 		{
 			return this._createMapping( type, name, mappingID );
 		}
+	}
+
+	public function teardown() : Void
+	{
+		for ( mapping in this._mapping )
+		{
+			mapping.provider.destroy();
+		}
+
+		var it = this._managedObjects.iterator();
+		while ( it.hasNext() )
+		{
+			this.destroyInstance( it.next() );
+		}
+
+		this._mapping 						= new Map();
+		this._processedMapping 				= new Map();
+		this._managedObjects 				= new Map();
+		this._ed 							= new LightweightClosureDispatcher();
 	}
 
 	function _createMapping( type : Class<Dynamic>, name : String, mappingID : String ) : InjectionMapping
@@ -241,10 +289,10 @@ class SpeedInjector implements IDependencyInjector
 		
 		classDescription.applyInjection( target, this );
 		
-		/*if ( description.preDestroyMethods != null )
+		if ( classDescription.preDestroy.length > 0 )
 		{
-			this._managedObjects.put( target,  target );
-		}*/
+			this._managedObjects.set( target,  target );
+		}
 		
 		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.POST_CONSTRUCT, this, target, targetType ) );
 	}

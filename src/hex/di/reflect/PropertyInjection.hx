@@ -26,15 +26,14 @@ class PropertyInjection implements IInjectable
 	
 	public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
 	{
-		var instance = injector.getInstance( this.propertyType, this.injectionName );
+		var provider = injector.getProvider( this.propertyType, this.injectionName );
 
-		if ( instance == null )
+		if ( provider != null )
 		{
-			if ( this.isOptional )
-			{
-				return target;
-			}
-
+			Reflect.setProperty( target, this.propertyName, provider.getResult( injector ) );
+		}
+		else if ( !this.isOptional )
+		{
 			throw new MissingMappingException( "'" + Stringifier.stringify( injector ) + 
 												"' is missing a mapping to inject into property named '" + 
 												this.propertyName + "' with type '" + Type.getClassName( this.propertyType ) + 
@@ -43,7 +42,6 @@ class PropertyInjection implements IInjectable
 												+ "|" + this.injectionName + "'" );
 		}
 
-		Reflect.setProperty( target, this.propertyName, instance );
 		return target;
 	}
 }

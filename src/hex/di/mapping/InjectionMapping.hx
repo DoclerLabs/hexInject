@@ -4,6 +4,7 @@ import hex.di.provider.ClassProvider;
 import hex.di.provider.SingletonProvider;
 import hex.di.provider.ValueProvider;
 import hex.di.provider.IDependencyProvider;
+import hex.error.NullPointerException;
 
 /**
  * ...
@@ -33,7 +34,7 @@ class InjectionMapping
             return this.provider.getResult( this._injector );
         }
 
-        return null;
+        throw new NullPointerException( "can't retrieve result, mapping with id '" + this._mappingID + "' has no provider" );
     }
 
     public function asSingleton() : InjectionMapping
@@ -43,7 +44,7 @@ class InjectionMapping
 
     public function toSingleton( type : Class<Dynamic> ) : InjectionMapping
     {
-        return this._toProvider( new SingletonProvider( type ) );
+        return this._toProvider( new SingletonProvider( type, this._injector ) );
     }
 
     public function toType( type : Class<Dynamic> ) : InjectionMapping
@@ -53,7 +54,7 @@ class InjectionMapping
 
     public function toValue( value : Dynamic ) : InjectionMapping
     {
-        return this._toProvider( new ValueProvider(value) );
+        return this._toProvider( new ValueProvider( value, this._injector ) );
     }
 
     function _toProvider( provider : IDependencyProvider ) : InjectionMapping

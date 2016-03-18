@@ -1,5 +1,7 @@
 package hex.di.reflect;
 
+import haxe.ds.ArraySort;
+
 /**
  * ...
  * @author Francis Bourre
@@ -7,21 +9,51 @@ package hex.di.reflect;
 class ClassDescription implements IInjectable
 {
 	public var constructorInjection ( default, null ) 	: ConstructorInjection;
-	var _injectable 									: Array<IInjectable>;
 	
-	public function new( injectable : Array<IInjectable>, ?constructorInjection : ConstructorInjection )
+	public var injections ( default, null ) 			: Array<IInjectable>;
+	public var postConstruct ( default, null ) 			: Array<OrderedInjection>;
+	public var preDestroy ( default, null ) 			: Array<OrderedInjection>;
+	
+	
+	public function new( 	constructorInjection 	: ConstructorInjection, 
+							injections 				: Array<IInjectable>, 
+							postConstruct 			: Array<OrderedInjection>, 
+							preDestroy 				: Array<OrderedInjection> )
 	{
-		this._injectable 			= injectable;
 		this.constructorInjection 	= constructorInjection;
+		this.injections 			= injections;
+		this.postConstruct 			= postConstruct;
+		this.preDestroy 			= preDestroy;
+		
+		if ( this.postConstruct.length > 0 )
+		{
+			ArraySort.sort( this.postConstruct, this._sort );
+		}
+		
+		
+		if ( this.preDestroy.length > 0 )
+		{
+			ArraySort.sort( this.preDestroy, this._sort );
+		}
+	}
+	
+	function _sort( a : OrderedInjection, b : OrderedInjection ) : Int
+	{
+		return  a.order - b.order;
 	}
 	
 	public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
 	{
-		for ( injectable in this._injectable )
+		for ( injection in this.postConstruct )
 		{
-			injectable.applyInjection( target, injector );
+			injection.applyInjection( target, injector );
 		}
 		
+		for ( injection in this.injections )
+		{
+			injection.applyInjection( target, injector );
+		}
+
 		return target;
 	}
 }

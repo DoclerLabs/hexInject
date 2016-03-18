@@ -32,15 +32,19 @@ class MethodInjection implements IInjectable
         var args = [];
         for ( arg in this.args )
         {
-            var instance = injector.getInstance( arg.type, arg.injectionName );
-            if ( instance == null && !arg.isOptional )
-            {
-                this._throwMissingMappingException( target, arg.type, arg.injectionName, injector );
-            }
-            args.push( instance );
-        }
+			var provider = injector.getProvider( arg.type, arg.injectionName );
 
-        return args;
+			if ( provider != null )
+			{
+				args.push( provider.getResult( injector ) );
+			}
+			else if ( !arg.isOptional )
+			{
+				this._throwMissingMappingException( target, arg.type, arg.injectionName, injector );
+			}
+		}
+			
+		return args;
     }
 
     function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : SpeedInjector ) : Void
