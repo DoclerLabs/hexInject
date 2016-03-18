@@ -1,6 +1,5 @@
 package hex.di;
 
-import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
 import hex.di.annotation.AnnotationDataProvider;
 import hex.di.error.InjectorException;
