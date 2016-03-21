@@ -44,15 +44,16 @@ class ClassDescription implements IInjectable
 	
 	public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
 	{
+		for ( injection in this.injections )
+		{
+			injection.applyInjection( target, injector );
+		}
+		
 		for ( injection in this.postConstruct )
 		{
 			injection.applyInjection( target, injector );
 		}
 		
-		for ( injection in this.injections )
-		{
-			injection.applyInjection( target, injector );
-		}
 
 		return target;
 	}
