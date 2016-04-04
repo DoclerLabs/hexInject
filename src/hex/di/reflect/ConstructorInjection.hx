@@ -1,6 +1,6 @@
 package hex.di.reflect;
 
-import hex.di.SpeedInjector;
+import hex.di.Injector;
 import hex.di.reflect.ArgumentInjectionVO;
 import hex.di.error.MissingMappingException;
 import hex.log.Stringifier;
@@ -16,12 +16,12 @@ class ConstructorInjection extends MethodInjection
         super( "new", args );
     }
 
-    public function createInstance( type : Class<Dynamic>, injector : SpeedInjector ) : Dynamic
+    public function createInstance( type : Class<Dynamic>, injector : Injector ) : Dynamic
     {
         return Type.createInstance( type, this._gatherArgs( type, injector ) );
     }
 
-    override function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : SpeedInjector ) : Void
+    override function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : Injector ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
         "' is missing a mapping to inject argument" +

@@ -6,7 +6,7 @@ import hex.di.mock.types.Clazz;
  * ...
  * @author Francis Bourre
  */
-class ClassInjectee implements ISpeedInjectorContainer
+class ClassInjectee implements IInjectorContainer
 {
 	@Inject
 	public var property : Clazz;

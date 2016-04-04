@@ -31,7 +31,7 @@ class AnnotationReader
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
 		
 		//create Json
-		var json = Json.stringify( AnnotationReader._adaptToSpeedInject( data ) );
+		var json = Json.stringify( AnnotationReader._adaptToInject( data ) );
 		
 		//add Json as metadata
 		localClass.meta.add( metadataName, [ Context.parse( "'" + json + "'", localClass.pos ) ], localClass.pos );
@@ -39,7 +39,7 @@ class AnnotationReader
 		return fields;
 	}
 	
-	private static function _adaptToSpeedInject( data : ClassAnnotationData ) : InjectorClassVO
+	private static function _adaptToInject( data : ClassAnnotationData ) : InjectorClassVO
 	{
 		var length : Int;
 

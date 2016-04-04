@@ -1,12 +1,12 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class OrderedPostConstructInjectee implements ISpeedInjectorContainer
+class OrderedPostConstructInjectee implements IInjectorContainer
 {
 	public var loadOrder : Array<Int> = [];
 	

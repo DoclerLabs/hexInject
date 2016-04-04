@@ -1,13 +1,13 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Clazz;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class PostConstructWithArgInjectee implements ISpeedInjectorContainer
+class PostConstructWithArgInjectee implements IInjectorContainer
 {
 	public var property : Clazz;
 	

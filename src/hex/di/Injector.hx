@@ -16,18 +16,18 @@ import hex.log.Stringifier;
  * ...
  * @author Francis Bourre
  */
-class SpeedInjector implements IDependencyInjector
+class Injector implements IDependencyInjector
 {
 	var _ed						: LightweightClosureDispatcher<InjectionEvent>;
 	var _mapping				: Map<String,InjectionMapping>;
 	var _processedMapping 		: Map<String,Bool>;
 	var _managedObjects			: Map<{}, {}>;
-	var _parentInjector			: SpeedInjector;
+	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
 	public function new() 
 	{
-		this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( ISpeedInjectorContainer ) );
+		this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( IInjectorContainer ) );
 
 		this._ed 				= new LightweightClosureDispatcher();
 		this._mapping 			= new Map();
@@ -35,9 +35,9 @@ class SpeedInjector implements IDependencyInjector
 		this._managedObjects 	= new Map();
 	}
 
-	public function createChildInjector() : SpeedInjector
+	public function createChildInjector() : Injector
 	{
-		var injector 				= new SpeedInjector();
+		var injector 				= new Injector();
 		injector._parentInjector 	= this;
 		return injector;
 	}

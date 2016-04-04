@@ -1,6 +1,6 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
 
@@ -8,7 +8,7 @@ import hex.di.mock.types.Interface2;
  * ...
  * @author Francis Bourre
  */
-class MultipleSingletonsOfSameClassInjectee implements ISpeedInjectorContainer
+class MultipleSingletonsOfSameClassInjectee implements IInjectorContainer
 {
 	@Inject
 	public var property1 : Interface;

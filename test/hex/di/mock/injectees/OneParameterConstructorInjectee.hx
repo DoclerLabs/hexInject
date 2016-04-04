@@ -1,13 +1,13 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Clazz;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class OneParameterConstructorInjectee implements ISpeedInjectorContainer
+class OneParameterConstructorInjectee implements IInjectorContainer
 {
 	var m_dependency : Clazz;
 		

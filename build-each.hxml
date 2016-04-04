@@ -1,4 +1,4 @@
--main MainSpeedInjectTest
+-main MainInjectTest
 -cp src
 -cp test
 -cp hexcore/src

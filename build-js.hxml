@@ -1,2 +1,2 @@
 build-each.hxml
--js bin/MainSpeedInjectTest.js
+-js bin/MainInjectTest.js

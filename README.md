@@ -1,6 +1,6 @@
-# hexSpeedInject
+# hexInject
 
-[![TravisCI Build Status](https://travis-ci.org/DoclerLabs/hexSpeedInject.svg?branch=master)](https://travis-ci.org/DoclerLabs/hexSpeedInject)
+[![TravisCI Build Status](https://travis-ci.org/DoclerLabs/hexInject.svg?branch=master)](https://travis-ci.org/DoclerLabs/hexInject)
 Fast annotation driven IOC solution for Haxe based on hexAnnotation (annotation parsing at compile time)
 
 ## Dependencies
@@ -26,7 +26,7 @@ Fast annotation driven IOC solution for Haxe based on hexAnnotation (annotation 
 
 ## Simple example
 ```haxe
-var injector = new SpeedInjector;
+var injector = new Injector;
 
 //create a basic mapping:
 injector.map( Model ).toType( Model );
@@ -44,7 +44,7 @@ injector.map( IEventDispatcher ).toSingleton( EventDispatcher );
 
 ## Properties injection
 ```haxe
-class MockClass implements ISpeedInjectorContainer
+class MockClass implements IInjectorContainer
 {
 	@Inject
 	public var property1 : Interface;
@@ -62,7 +62,7 @@ class MockClass implements ISpeedInjectorContainer
 
 ## Constructor injections with one named and optional
 ```haxe
-class MockClass implements ISpeedInjectorContainer
+class MockClass implements IInjectorContainer
 {
 	var m_dependency 	: IModel;
 	var m_dependency2 	: String;
@@ -80,7 +80,7 @@ class MockClass implements ISpeedInjectorContainer
 
 ## Method injections with named dependencies
 ```haxe
-class MockClass implements ISpeedInjectorContainer
+class MockClass implements IInjectorContainer
 {
 	var m_dependency 	: IModel;
 	var m_dependency2 	: String;
@@ -102,7 +102,7 @@ class MockClass implements ISpeedInjectorContainer
 
 ## Postconstruct methods
 ```haxe
-class MockClass implements ISpeedInjectorContainer
+class MockClass implements IInjectorContainer
 {
 	public function new()
 	{
@@ -126,7 +126,7 @@ class MockClass implements ISpeedInjectorContainer
 
 ## Predestroy methods
 ```haxe
-class MockClass implements ISpeedInjectorContainer
+class MockClass implements IInjectorContainer
 {
 	public function new()
 	{

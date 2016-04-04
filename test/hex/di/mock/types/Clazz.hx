@@ -4,7 +4,7 @@ package hex.di.mock.types;
  * ...
  * @author Francis Bourre
  */
-class Clazz implements Interface implements Interface2 implements ISpeedInjectorContainer
+class Clazz implements Interface implements Interface2 implements IInjectorContainer
 {
 	public var preDestroyCalled : Bool = false;
 

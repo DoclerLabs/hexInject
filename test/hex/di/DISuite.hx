@@ -7,5 +7,5 @@ package hex.di;
 class DISuite
 {
 	@Suite( "DI suite" )
-    public var list : Array<Class<Dynamic>> = [ SpeedInjectorTest ];
+    public var list : Array<Class<Dynamic>> = [ InjectorTest ];
 }

@@ -1,11 +1,11 @@
 package hex.di.mock.injectees;
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class TwoParametersConstructorInjecteeWithConstructorInjectedDependencies implements ISpeedInjectorContainer
+class TwoParametersConstructorInjecteeWithConstructorInjectedDependencies implements IInjectorContainer
 {
 	private var m_dependency1 : OneParameterConstructorInjectee;
 	private var m_dependency2 : TwoParametersConstructorInjectee;

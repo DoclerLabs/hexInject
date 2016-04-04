@@ -1,12 +1,12 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class XMLInjectee implements ISpeedInjectorContainer
+class XMLInjectee implements IInjectorContainer
 {
 	@Inject
 	public var property : Xml;

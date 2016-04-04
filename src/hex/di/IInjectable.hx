@@ -5,5 +5,5 @@ package hex.di;
  */
 interface IInjectable 
 {
-	function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic;
+	function applyInjection( target : Dynamic, injector : Injector ) : Dynamic;
 }

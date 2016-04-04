@@ -6,7 +6,7 @@ import hex.di.IDependencyInjector;
  * ...
  * @author Francis Bourre
  */
-class InjectorInjectee implements ISpeedInjectorContainer
+class InjectorInjectee implements IInjectorContainer
 {
 	@Inject
 	public var injector : IDependencyInjector;

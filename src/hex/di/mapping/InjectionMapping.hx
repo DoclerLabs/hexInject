@@ -12,14 +12,14 @@ import hex.error.NullPointerException;
  */
 class InjectionMapping
 {
-    var _injector		        : SpeedInjector;
+    var _injector		        : Injector;
     var _type					: Class<Dynamic>;
     var _name					: String;
     var _mappingID				: String;
 
     public var provider	( default, null ) : IDependencyProvider;
 
-    public function new( injector : SpeedInjector, type : Class<Dynamic>, name : String, mappingID : String )
+    public function new( injector : Injector, type : Class<Dynamic>, name : String, mappingID : String )
     {
         this._injector			= injector;
         this._type 				= type;

@@ -1,12 +1,12 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class StringInjectee implements ISpeedInjectorContainer
+class StringInjectee implements IInjectorContainer
 {
 	@Inject
 	public var property : String;

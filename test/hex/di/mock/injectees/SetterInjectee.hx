@@ -1,13 +1,13 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Clazz;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class SetterInjectee implements ISpeedInjectorContainer
+class SetterInjectee implements IInjectorContainer
 {
 	@Inject
 	@:isVar 

@@ -1,7 +1,7 @@
 package hex.di.reflect;
 
 import hex.di.IInjectable;
-import hex.di.SpeedInjector;
+import hex.di.Injector;
 import hex.di.reflect.ArgumentInjectionVO;
 import hex.di.error.MissingMappingException;
 import hex.log.Stringifier;
@@ -21,13 +21,13 @@ class MethodInjection implements IInjectable
         this.args = args;
     }
 
-    public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
+    public function applyInjection( target : Dynamic, injector : Injector ) : Dynamic
     {
         Reflect.callMethod( target, Reflect.field( target, this.methodName ), this._gatherArgs( target, injector ) );
         return target;
     }
 
-    function _gatherArgs( target : Dynamic, injector : SpeedInjector ) : Array<Dynamic>
+    function _gatherArgs( target : Dynamic, injector : Injector ) : Array<Dynamic>
     {
         var args = [];
         for ( arg in this.args )
@@ -47,7 +47,7 @@ class MethodInjection implements IInjectable
 		return args;
     }
 
-    function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : SpeedInjector ) : Void
+    function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : Injector ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
         "' is missing a mapping to inject argument into method named '" +

@@ -1,6 +1,6 @@
 package;
 
-import hex.HexSpeedInjectSuite;
+import hex.HexInjectSuite;
 import hex.unittest.runner.ExMachinaUnitCore;
 import hex.unittest.runner.TestRunner;
 
@@ -14,7 +14,7 @@ import hex.unittest.notifier.ConsoleNotifier;
  * ...
  * @author Francis Bourre
  */
-class MainSpeedInjectTest
+class MainInjectTest
 {
 	static public function main() : Void
 	{
@@ -27,7 +27,7 @@ class MainSpeedInjectTest
 		emu.addListener( new ConsoleNotifier( false ) );
 		#end
 		
-        emu.addTest( HexSpeedInjectSuite );
+        emu.addTest( HexInjectSuite );
         emu.run();
 	}
 }

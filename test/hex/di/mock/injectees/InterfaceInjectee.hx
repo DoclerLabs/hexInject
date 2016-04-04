@@ -6,7 +6,7 @@ import hex.di.mock.types.Interface;
  * ...
  * @author Francis Bourre
  */
-class InterfaceInjectee implements ISpeedInjectorContainer
+class InterfaceInjectee implements IInjectorContainer
 {
 	@Inject
 	public var property : Interface;

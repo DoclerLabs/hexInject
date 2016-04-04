@@ -1,7 +1,7 @@
 package hex.di.reflect;
 
 import hex.di.IInjectable;
-import hex.di.SpeedInjector;
+import hex.di.Injector;
 import hex.di.error.MissingMappingException;
 import hex.log.Stringifier;
 
@@ -24,7 +24,7 @@ class PropertyInjection implements IInjectable
 		this.isOptional		= isOptional;
 	}
 	
-	public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
+	public function applyInjection( target : Dynamic, injector : Injector ) : Dynamic
 	{
 		var provider = injector.getProvider( this.propertyType, this.injectionName );
 

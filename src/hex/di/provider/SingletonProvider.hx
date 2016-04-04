@@ -12,16 +12,16 @@ class SingletonProvider implements IDependencyProvider
 
     var _type           : Class<Dynamic>;
     var _value          : Dynamic;
-    var _injector       : SpeedInjector;
+    var _injector       : Injector;
 
-    public function new( type : Class<Dynamic>, injector : SpeedInjector )
+    public function new( type : Class<Dynamic>, injector : Injector )
     {
         this._isDestroyed   = false;
         this._type          = type;
         this._injector      = injector;
     }
 
-    public function getResult( injector : SpeedInjector ) : Dynamic
+    public function getResult( injector : Injector ) : Dynamic
     {
         if ( this._isDestroyed )
         {

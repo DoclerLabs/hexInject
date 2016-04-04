@@ -1,13 +1,13 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Interface;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class OptionalOneRequiredParameterMethodInjectee implements ISpeedInjectorContainer
+class OptionalOneRequiredParameterMethodInjectee implements IInjectorContainer
 {
 	var m_dependency : Interface;
 

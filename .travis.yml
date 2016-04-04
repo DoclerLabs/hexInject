@@ -26,8 +26,8 @@ install:
   - haxe flash/install.hxml
 
 script:
-  - haxe build-js.hxml           && node bin/MainSpeedInjectTest.js
-  - haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainSpeedInjectTest.swf
+  - haxe build-js.hxml           && node bin/MainInjectTest.js
+  - haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf
   
 notifications:
   email:

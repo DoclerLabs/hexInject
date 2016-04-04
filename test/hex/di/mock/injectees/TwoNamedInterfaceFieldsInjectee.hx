@@ -1,13 +1,13 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Interface;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class TwoNamedInterfaceFieldsInjectee implements ISpeedInjectorContainer
+class TwoNamedInterfaceFieldsInjectee implements IInjectorContainer
 {
 	@Inject( "Name1" )
 	public var property1 : Interface;

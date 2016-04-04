@@ -1,6 +1,6 @@
 package hex.di.mock.injectees;
 
-import hex.di.ISpeedInjectorContainer;
+import hex.di.IInjectorContainer;
 import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Interface;
 
@@ -8,7 +8,7 @@ import hex.di.mock.types.Interface;
  * ...
  * @author Francis Bourre
  */
-class TwoNamedParametersMethodInjectee implements ISpeedInjectorContainer
+class TwoNamedParametersMethodInjectee implements IInjectorContainer
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: Interface;

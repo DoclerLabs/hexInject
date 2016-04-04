@@ -42,7 +42,7 @@ class ClassDescription implements IInjectable
 		return  a.order - b.order;
 	}
 	
-	public function applyInjection( target : Dynamic, injector : SpeedInjector ) : Dynamic
+	public function applyInjection( target : Dynamic, injector : Injector ) : Dynamic
 	{
 		for ( injection in this.injections )
 		{

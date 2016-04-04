@@ -41,15 +41,15 @@ import hex.unittest.assertion.Assert;
  * ...
  * @author Francis Bourre
  */
-class SpeedInjectorTest
+class InjectorTest
 {
-    var injector 				: SpeedInjector;
+    var injector 				: Injector;
     var receivedInjectorEvents 	: Array<Dynamic>;
 
     @Before
     public function runBeforeEachTest() : Void
     {
-        this.injector 				= new SpeedInjector();
+        this.injector 				= new Injector();
         this.receivedInjectorEvents = [];
     }
 

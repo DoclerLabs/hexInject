@@ -7,8 +7,8 @@ import hex.di.annotation.AnnotationSuite;
  * ...
  * @author Francis Bourre
  */
-class HexSpeedInjectSuite
+class HexInjectSuite
 {
-	@Suite( "HexSpeedInject suite" )
+	@Suite( "HexInject suite" )
     public var list : Array<Class<Dynamic>> = [ AnnotationSuite, DISuite ];
 }
