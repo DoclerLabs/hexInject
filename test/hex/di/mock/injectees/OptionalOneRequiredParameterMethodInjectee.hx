@@ -13,7 +13,7 @@ class OptionalOneRequiredParameterMethodInjectee implements IInjectorContainer
 
 	@Inject
 	@Optional( true )
-	public function setDependency( dependency : Interface ) : Void
+	public function setDependency( ?dependency : Interface ) : Void
 	{
 		this.m_dependency = dependency;
 	}

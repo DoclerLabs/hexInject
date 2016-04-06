@@ -321,7 +321,7 @@ class InjectorTest
 	public function testGetMappingResultWithoutProviderThrowsAnException() : Void
 	{
 		this.injector.map( Clazz );
-		Assert.methodCallThrows( NullPointerException, this.injector, this.injector.instantiateUnmapped, [], "" );
+		Assert.methodCallThrows( NullPointerException, this.injector, this.injector.instantiateUnmapped, [ null ], "" );
 	}
 	
 	@Test( "Test one parameter constructor injection" )
