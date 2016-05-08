@@ -5,5 +5,5 @@ package hex.di.mock.types;
  */
 interface Interface 
 {
-
+	var preDestroyCalled : Bool;
 }

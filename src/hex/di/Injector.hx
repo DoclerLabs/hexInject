@@ -68,7 +68,7 @@ class Injector implements IDependencyInjector
 		this.map( clazz, name ).toSingleton( type );
 	}
 
-    public function getInstance( type : Class<Dynamic>, name : String = '', targetType : Class<Dynamic> = null ) : Dynamic
+    public function getInstance<T>( type : Class<T>, name : String = '' ) : T
 	{
 		var mappingID : String = Type.getClassName( type ) + '|' + name;
 		var mapping : InjectionMapping = this._mapping[ mappingID ];
@@ -132,7 +132,7 @@ class Injector implements IDependencyInjector
 		return instance;
 	}
 
-    public function getOrCreateNewInstance( type : Class<Dynamic> ) : Dynamic
+    public function getOrCreateNewInstance<T>( type : Class<T> ) : T
 	{
 		return this.satisfies( type ) ? this.getInstance( type ) : this.instantiateUnmapped( type );
 	}

@@ -25,7 +25,7 @@ class AnnotationReader
 		var localClass = Context.getLocalClass().get();
 		
 		//parse annotations
-		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataName, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], true );
+		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataName, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
 		
 		//get data result
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
