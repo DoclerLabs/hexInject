@@ -9,5 +9,5 @@ package hex.di;
 #end
 interface IInjectorContainer
 {
-	//TODO Remove this interface implementation during compilation
+	
 }
