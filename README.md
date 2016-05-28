@@ -3,6 +3,8 @@
 [![TravisCI Build Status](https://travis-ci.org/DoclerLabs/hexInject.svg?branch=master)](https://travis-ci.org/DoclerLabs/hexInject)
 Fast annotation driven IOC solution for Haxe based on hexAnnotation (annotation parsing at compile time)
 
+*Find more information about hexMachina on [hexmachina.org](http://hexmachina.org/)*
+
 ## Dependencies
 
 * [hexCore](https://github.com/DoclerLabs/hexCore)
