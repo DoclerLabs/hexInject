@@ -21,7 +21,7 @@ class Injector implements IDependencyInjector
 	var _ed						: LightweightClosureDispatcher<InjectionEvent>;
 	var _mapping				: Map<String,InjectionMapping>;
 	var _processedMapping 		: Map<String,Bool>;
-	var _managedObjects			: Map<{}, {}>;
+	var _managedObjects			: Map<{}, Dynamic>;
 	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
