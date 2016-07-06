@@ -1,7 +1,5 @@
 package hex.di.annotation;
 
-import haxe.Json;
-import haxe.rtti.Meta;
 import hex.collection.HashMap;
 import hex.di.annotation.InjectorClassVO;
 
@@ -27,21 +25,14 @@ class AnnotationDataProvider implements IAnnotationDataProvider
 	
 	function _getClassAnnotationData( type : Class<Dynamic>)  : InjectorClassVO
     {
-        var meta = Reflect.field( Meta.getType( type ), this._metadataName );
-        if ( meta != null )
-        {
-			#if ( neko || php )
-			var jsonMeta = Json.parse( meta[0] ); //TODO: check if always the first element is the right one
-			#else
-			var jsonMeta = Json.parse( meta );
-			#end
-			
-            var classAnnotationData : InjectorClassVO = jsonMeta;
-            this._annotatedClasses.put( type, classAnnotationData );
-			
-            return jsonMeta;
-        }
-        else
+		var field : InjectorClassVO = Reflect.getProperty( type, "__INJECTION_DATA" );
+		
+		if ( field != null )
+		{
+			this._annotatedClasses.put( type, field );
+			return field;
+		}
+		else
         {
             return null;
         }

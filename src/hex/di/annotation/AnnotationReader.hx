@@ -1,13 +1,13 @@
 package hex.di.annotation;
 
-import haxe.Json;
 import haxe.macro.Context;
+import haxe.macro.Expr.Access;
 import haxe.macro.Expr.Field;
+import hex.annotation.ClassAnnotationData;
 import hex.di.annotation.InjectorArgumentVO;
 import hex.di.annotation.InjectorClassVO;
 import hex.di.annotation.InjectorMethodVO;
 import hex.di.annotation.InjectorPropertyVO;
-import hex.annotation.ClassAnnotationData;
 
 /**
  * ...
@@ -30,11 +30,17 @@ class AnnotationReader
 		//get data result
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
 		
-		//create Json
-		var json = Json.stringify( AnnotationReader._adaptToInject( data ) );
-		
-		//add Json as metadata
-		localClass.meta.add( metadataName, [ Context.parse( "'" + json + "'", localClass.pos ) ], localClass.pos );
+		//create expected value object
+		var vo = AnnotationReader._adaptToInject( data );
+
+		// append the expression as a field
+		fields.push(
+		{
+			name:  "__INJECTION_DATA",
+			access:  [ Access.APublic, Access.AStatic ],
+			kind: FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
+			pos: Context.currentPos(),
+		});
 		
 		return fields;
 	}
