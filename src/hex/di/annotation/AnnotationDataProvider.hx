@@ -30,10 +30,10 @@ class AnnotationDataProvider implements IAnnotationDataProvider
         var meta = Reflect.field( Meta.getType( type ), this._metadataName );
         if ( meta != null )
         {
-			#if !neko
-			var jsonMeta = Json.parse( meta );
-			#else
+			#if ( neko || php )
 			var jsonMeta = Json.parse( meta[0] ); //TODO: check if always the first element is the right one
+			#else
+			var jsonMeta = Json.parse( meta );
 			#end
 			
             var classAnnotationData : InjectorClassVO = jsonMeta;
