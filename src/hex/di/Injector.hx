@@ -1,5 +1,6 @@
 package hex.di;
 
+import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
 import hex.di.annotation.AnnotationDataProvider;
 import hex.di.error.InjectorException;
@@ -21,7 +22,7 @@ class Injector implements IDependencyInjector
 	var _ed						: LightweightClosureDispatcher<InjectionEvent>;
 	var _mapping				: Map<String,InjectionMapping>;
 	var _processedMapping 		: Map<String,Bool>;
-	var _managedObjects			: Map<{}, {}>;
+	var _managedObjects			: HashMap<Dynamic, Dynamic>;
 	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
@@ -32,7 +33,7 @@ class Injector implements IDependencyInjector
 		this._ed 				= new LightweightClosureDispatcher();
 		this._mapping 			= new Map();
 		this._processedMapping 	= new Map();
-		this._managedObjects 	= new Map();
+		this._managedObjects 	= new HashMap();
 	}
 
 	public function createChildInjector() : Injector
@@ -254,15 +255,15 @@ class Injector implements IDependencyInjector
 			mapping.provider.destroy();
 		}
 
-		var it = this._managedObjects.iterator();
-		while ( it.hasNext() )
+		var values = this._managedObjects.getValues();
+		for ( value in values )
 		{
-			this.destroyInstance( it.next() );
+			this.destroyInstance( value );
 		}
 
 		this._mapping 						= new Map();
 		this._processedMapping 				= new Map();
-		this._managedObjects 				= new Map();
+		this._managedObjects 				= new HashMap();
 		this._ed 							= new LightweightClosureDispatcher();
 	}
 
@@ -290,7 +291,7 @@ class Injector implements IDependencyInjector
 		
 		if ( classDescription.preDestroy.length > 0 )
 		{
-			this._managedObjects.set( target,  target );
+			this._managedObjects.put( target,  target );
 		}
 		
 		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.POST_CONSTRUCT, this, target, targetType ) );
