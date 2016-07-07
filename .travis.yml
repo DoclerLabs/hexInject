@@ -7,6 +7,8 @@ haxe:
 addons:
   apt:
     packages:
+      # PHP
+      - php5-cli
       # Flash
       - libcurl3:i386
       - libglib2.0-0:i386
@@ -26,6 +28,7 @@ install:
   - haxe flash/install.hxml
 
 script:
+  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-php.hxml && php bin/index.php; fi
   - haxe build-js.hxml           && node bin/MainInjectTest.js
   - haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf
   
@@ -34,3 +37,4 @@ notifications:
     recipients:
       - francis_bourre@me.com
       - peterphonix@gmail.com
+      - laurent@geturl.net
