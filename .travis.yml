@@ -29,6 +29,7 @@ install:
 
 script:
   - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-php.hxml && php bin/index.php; fi
+  - haxe build-neko.hxml         && neko bin/MainInjectTest.n
   - haxe build-js.hxml           && node bin/MainInjectTest.js
   - haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf
   
