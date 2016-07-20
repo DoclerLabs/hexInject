@@ -3,7 +3,6 @@ package hex.di.annotation;
 import haxe.macro.Context;
 import haxe.macro.Expr.Access;
 import haxe.macro.Expr.Field;
-import haxe.macro.Expr.FieldType;
 import hex.annotation.ClassAnnotationData;
 import hex.di.annotation.InjectorArgumentVO;
 import hex.di.annotation.InjectorClassVO;
