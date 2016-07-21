@@ -3,6 +3,7 @@ package hex.di.annotation;
 import haxe.macro.Context;
 import haxe.macro.Expr.Access;
 import haxe.macro.Expr.Field;
+import haxe.macro.Expr.FieldType;
 import hex.annotation.ClassAnnotationData;
 import hex.di.annotation.InjectorArgumentVO;
 import hex.di.annotation.InjectorClassVO;
@@ -38,7 +39,7 @@ class AnnotationReader
 		{
 			name:  "__INJECTION_DATA",
 			access:  [ Access.APublic, Access.AStatic ],
-			kind: haxe.macro.FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
+			kind: FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
 			pos: Context.currentPos(),
 		});
 		
