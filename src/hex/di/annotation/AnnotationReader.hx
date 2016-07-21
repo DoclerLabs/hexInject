@@ -38,7 +38,7 @@ class AnnotationReader
 		{
 			name:  "__INJECTION_DATA",
 			access:  [ Access.APublic, Access.AStatic ],
-			kind: FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
+			kind: haxe.macro.FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
 			pos: Context.currentPos(),
 		});
 		
