@@ -1,6 +1,7 @@
 package hex.di.annotation;
 
 import haxe.macro.Context;
+import haxe.macro.Expr;
 import haxe.macro.Expr.Access;
 import haxe.macro.Expr.Field;
 import haxe.macro.Expr.FieldType;
@@ -9,6 +10,7 @@ import hex.di.annotation.InjectorArgumentVO;
 import hex.di.annotation.InjectorClassVO;
 import hex.di.annotation.InjectorMethodVO;
 import hex.di.annotation.InjectorPropertyVO;
+import hex.error.PrivateConstructorException;
 
 /**
  * ...
@@ -16,17 +18,18 @@ import hex.di.annotation.InjectorPropertyVO;
  */
 class AnnotationReader
 {
-	function new() 
-	{
-		
-	}
-	
-	macro public static function readMetadata( metadataName : String ) : Array<Field>
+	/** @private */
+    function new()
+    {
+        throw new PrivateConstructorException( "This class can't be instantiated." );
+    }
+
+	macro public static function readMetadata( metadataExpr : Expr ) : Array<Field>
 	{
 		var localClass = Context.getLocalClass().get();
 		
 		//parse annotations
-		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataName, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
+		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataExpr, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
 		
 		//get data result
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
