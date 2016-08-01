@@ -12,6 +12,7 @@ class AnnotationDataProvider implements IAnnotationDataProvider
 	var _metadataName       : String;
     var _annotatedClasses   : HashMap<Class<Dynamic>, InjectorClassVO>;
 	
+	//TODO refactor to remove useless class type parameter
 	public function new( type : Class<Dynamic> )
     {
         this._metadataName      = Type.getClassName( type );
@@ -25,6 +26,7 @@ class AnnotationDataProvider implements IAnnotationDataProvider
 	
 	function _getClassAnnotationData( type : Class<Dynamic>)  : InjectorClassVO
     {
+		//TODO get/store annotation from a place that will never risk to collide
 		var field : InjectorClassVO = Reflect.getProperty( type, "__INJECTION_DATA" );
 		
 		if ( field != null )
