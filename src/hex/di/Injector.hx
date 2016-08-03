@@ -4,6 +4,7 @@ import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
 import hex.di.annotation.AnnotationDataProvider;
 import hex.di.error.InjectorException;
+import hex.di.error.MissingClassDescriptionException;
 import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
@@ -12,6 +13,7 @@ import hex.di.reflect.ClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.event.LightweightClosureDispatcher;
 import hex.log.Stringifier;
+import hex.util.ClassUtil;
 
 /**
  * ...
@@ -216,6 +218,13 @@ class Injector implements IDependencyInjector
 		if ( classDescription != null )
 		{
 			this._applyInjection( target, targetType, classDescription );
+		}
+		else
+		{
+			throw new MissingClassDescriptionException( "'" + Stringifier.stringify( this ) + 
+														"' is missing a class description to inject into an instance of '" +
+														ClassUtil.getClassName( target ) + 
+														"'. This class should implement IInjectorContainer" );
 		}
 	}
 
