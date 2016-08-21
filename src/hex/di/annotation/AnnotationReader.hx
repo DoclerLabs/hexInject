@@ -28,6 +28,11 @@ class AnnotationReader
 	{
 		var localClass = Context.getLocalClass().get();
 		
+		if ( Context.getLocalClass().get().isInterface )
+		{
+			return Context.getBuildFields();
+		}
+		
 		//parse annotations
 		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataExpr, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
 		
