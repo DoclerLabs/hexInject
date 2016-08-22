@@ -11,6 +11,7 @@ import hex.di.provider.IDependencyProvider;
 import hex.di.reflect.ClassDescription;
 import hex.di.reflect.ClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
+import hex.di.reflect.InjectionUtil;
 import hex.event.LightweightClosureDispatcher;
 import hex.log.Stringifier;
 import hex.util.ClassUtil;
@@ -118,7 +119,7 @@ class Injector implements IDependencyInjector
 		var instance : Dynamic; 
 		if ( classDescription != null && classDescription.constructorInjection != null )
 		{
-			instance = classDescription.constructorInjection.createInstance( type, this );
+			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.constructorInjection.args );
 		}
 		else
 		{
@@ -237,7 +238,7 @@ class Injector implements IDependencyInjector
 		{
 			for ( preDestroy in classDescription.preDestroy )
 			{
-				preDestroy.applyInjection( instance, this );
+				InjectionUtil.applyMethodInjection( instance, this, preDestroy.args, preDestroy.methodName );
 			}
 		}
 	}
@@ -295,9 +296,8 @@ class Injector implements IDependencyInjector
 	function _applyInjection( target : Dynamic, targetType : Class<Dynamic>, classDescription : ClassDescription ) : Void
 	{
 		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.PRE_CONSTRUCT, this, target, targetType ) );
-		
-		classDescription.applyInjection( target, this );
-		
+
+		InjectionUtil.applyClassInjection( target, this, classDescription );
 		if ( classDescription.preDestroy.length > 0 )
 		{
 			this._managedObjects.put( target,  target );
