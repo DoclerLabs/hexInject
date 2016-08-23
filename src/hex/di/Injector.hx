@@ -166,10 +166,12 @@ class Injector implements IDependencyInjector
 		var mappingID = this._getMappingID( type, name );
 		var mapping = this._mapping[ mappingID ];
 
+		#if debug
 		if ( mapping == null )
 		{
 			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
 		}
+		#end
 
 		mapping.provider.destroy();
 		this._mapping.remove( mappingID );
@@ -245,8 +247,7 @@ class Injector implements IDependencyInjector
 		}
 	}
 
-	//
-	inline public function map( type : Class<Dynamic>, name : String = '' ) : InjectionMapping
+	public function map( type : Class<Dynamic>, name : String = '' ) : InjectionMapping
 	{
 		var mappingID = this._getMappingID( type, name );
 

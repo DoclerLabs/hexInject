@@ -44,7 +44,7 @@ class FastAnnotationReader
 		
 		//create expected value object
 		var vo = FastAnnotationReader._adaptToInject( data );
-		var e = _getClassDescriptionExpr( vo );
+		var e = FastAnnotationReader._getClassDescriptionExpr( vo );
 
 		// append the expression as a field
 		fields.push(
@@ -56,83 +56,6 @@ class FastAnnotationReader
 		});
 		
 		return fields;
-	}
-	
-	static function _parseClassDescription( c : Expr )
-	{
-		
-		switch( c.expr )
-		{
-			case EObjectDecl( fields/*:Array<{field:String, expr:Expr}>*/ ):
-				for ( e  in fields )
-				{
-					switch( e.field )
-					{
-						case 'properties':
-							//trace( e.expr );
-							switch( e.expr.expr )
-							{
-								case EArrayDecl( values/*:Array<Expr>*/ ):
-									for ( value in values )
-									{
-										//trace( value );
-										switch( value.expr )
-										{
-											case EObjectDecl(fields /*: Array<{ field : String, expr : Expr }>*/):
-												for ( f in fields )
-												{
-													//trace( f );
-													switch( f.field )
-													{
-														case 'propertyName':
-														case 'propertyType':
-															//trace( f.expr );
-															//f.expr = macro (null : Interface);
-															var mac = macro $p{ MacroUtil.getPack( 'hex.di.mock.types.Clazz' ) };
-															f.expr = mac;
-															//trace( f );
-														case 'injectionName':
-														case 'isOptional':
-														case _:
-													}
-												}
-											case _:
-											
-										}
-									}
-								case _:
-							}
-						case 'constructorInjection':
-						
-						case 'methods':
-							
-						case 'postConstruct':
-							switch( e.expr.expr )
-							{
-								case EArrayDecl( values/*:Array<Expr>*/ ):
-									for ( value in values )
-									{
-										switch( value.expr )
-										{
-											case EObjectDecl(fields /*: Array<{ field : String, expr : Expr }>*/):
-												for ( f in fields )
-												{
-													//trace( f.field, f.expr );
-												}
-											case _:
-										}
-									}
-								case _:
-							}
-							
-						case 'preDestroy':
-						
-						case _:
-					}	
-						
-				}
-			case _:
-		}
 	}
 	
 	static function _getClassDescriptionExpr( classAnnotationData : InjectorClassVO )  : ExprOf<ClassDescription>
@@ -148,7 +71,6 @@ class FastAnnotationReader
 				{field: "isOptional", expr: macro $v{prop.isOpt}}
 			]);
 			propValues.push( {expr: eProp, pos:Context.currentPos()} );
-			//{ propertyName: prop.name, propertyType: Type.resolveClass( prop.type ), injectionName: prop.key, isOptional: prop.isOpt } 
 		}
 		
 		var postConstructValues: Array<Expr> = [];
@@ -167,7 +89,6 @@ class FastAnnotationReader
 					{field: "isOptional", expr: macro $v{arg.isOpt}}
 				]);
 				argValues.push( {expr: eArg, pos:Context.currentPos()} );
-				//{ type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt }
 			}
 
 			if ( method.isPost )
@@ -177,8 +98,6 @@ class FastAnnotationReader
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
 					{field: "order", expr: macro $v{method.order}}
 				]);
-				
-				//postConstruct.push( { methodName: method.name, args: arguments, order: method.order } );
 				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );
 			}
 			else if ( method.isPre )
@@ -188,8 +107,6 @@ class FastAnnotationReader
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
 					{field: "order", expr: macro $v{method.order}}
 				]);
-				
-				//preDestroy.push( { methodName: method.name, args: arguments, order: method.order } );
 				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );
 			}
 			else
@@ -199,13 +116,10 @@ class FastAnnotationReader
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
 				]);
 				
-				//methods.push( { methodName: method.name, args: arguments } );
 				methodValues.push( {expr: eMethod, pos: Context.currentPos()} );
 			}
 		}
-		
-		//TODO SORT
-		
+
 		if ( postConstructValues.length > 0 )
 		{
 			ArraySort.sort( postConstructValues, FastAnnotationReader._sortExpr );
@@ -230,7 +144,6 @@ class FastAnnotationReader
 				{field: "isOptional", expr: macro $v{arg.isOpt}}
 			]);
 			ctorArgValues.push( {expr: eCtorArg, pos:Context.currentPos()} );
-			//{ type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt }
 		}
 		
 		var ctor = EObjectDecl([
@@ -246,8 +159,7 @@ class FastAnnotationReader
 				{field: "postConstruct", expr: {expr: EArrayDecl(postConstructValues), pos: Context.currentPos()}},
 				{field: "preDestroy", expr: {expr: EArrayDecl(preDestroyValues), pos: Context.currentPos()}}
 			]);
-		//{ constructorInjection: constructorInjection, properties: properties, methods: methods, postConstruct: postConstruct, preDestroy: preDestroy };
-		
+
 		return {expr: classDescription, pos: Context.currentPos()};
 	}
 	
@@ -260,7 +172,7 @@ class FastAnnotationReader
 	{
 		switch( e.expr )
 		{
-			case EObjectDecl(fields /*: Array<{ field : String, expr : Expr }>*/):
+			case EObjectDecl( fields ):
 				for ( f in fields )
 				{
 					switch( f.field )
@@ -366,7 +278,6 @@ class FastAnnotationReader
 		}
 	
 		//final building
-		//trace( data.name, { name:data.name, ctor:ctor, props:props, methods:methods } );
 		return { name:data.name, ctor:ctor, props:props, methods:methods };
 	}
 }
