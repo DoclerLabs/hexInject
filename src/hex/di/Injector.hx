@@ -10,6 +10,7 @@ import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
 import hex.di.reflect.ClassDescription;
 import hex.di.reflect.ClassDescriptionProvider;
+import hex.di.reflect.FastClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionUtil;
 import hex.event.LightweightClosureDispatcher;
@@ -31,7 +32,8 @@ class Injector implements IDependencyInjector
 	
 	public function new() 
 	{
-		this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( IInjectorContainer ) );
+		//this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( IInjectorContainer ) );
+		this._classDescriptor	= new FastClassDescriptionProvider();
 
 		this._ed 				= new LightweightClosureDispatcher();
 		this._mapping 			= new Map();
@@ -114,7 +116,7 @@ class Injector implements IDependencyInjector
 
     public function instantiateUnmapped( type : Class<Dynamic> ) : Dynamic
 	{
-		var classDescription : ClassDescription = this._classDescriptor.getClassDescription( type );
+		var classDescription = this._classDescriptor.getClassDescription( type );
 
 		var instance : Dynamic; 
 		if ( classDescription != null && classDescription.constructorInjection != null )
@@ -164,10 +166,12 @@ class Injector implements IDependencyInjector
 		var mappingID = this._getMappingID( type, name );
 		var mapping = this._mapping[ mappingID ];
 
+		#if debug
 		if ( mapping == null )
 		{
 			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
 		}
+		#end
 
 		mapping.provider.destroy();
 		this._mapping.remove( mappingID );
@@ -215,7 +219,7 @@ class Injector implements IDependencyInjector
     public function injectInto( target : Dynamic ) : Void
 	{
 		var targetType : Class<Dynamic> = Type.getClass( target );
-		var classDescription : ClassDescription = this._classDescriptor.getClassDescription( targetType );
+		var classDescription = this._classDescriptor.getClassDescription( targetType );
 		if ( classDescription != null )
 		{
 			this._applyInjection( target, targetType, classDescription );
@@ -243,7 +247,6 @@ class Injector implements IDependencyInjector
 		}
 	}
 
-	//
 	public function map( type : Class<Dynamic>, name : String = '' ) : InjectionMapping
 	{
 		var mappingID = this._getMappingID( type, name );

@@ -27,12 +27,6 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 	
 	function _getClassDescription( type : Class<Dynamic>)  : ClassDescription
     {
-		/*
-		var classDescription = Reflect.getProperty( type, "__INJECTION_DATA" );
-		trace( classDescription );
-		return classDescription;
-		*/
-		
 		var classAnnotationData : InjectorClassVO = this._classAnnotationDataProvider.getClassAnnotationData( type );
 
 		if ( classAnnotationData != null )

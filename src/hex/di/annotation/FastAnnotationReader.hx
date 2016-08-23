@@ -11,13 +11,9 @@ import hex.di.annotation.InjectorArgumentVO;
 import hex.di.annotation.InjectorClassVO;
 import hex.di.annotation.InjectorMethodVO;
 import hex.di.annotation.InjectorPropertyVO;
-import hex.di.reflect.ArgumentInjectionVO;
 import hex.di.reflect.ClassDescription;
-import hex.di.reflect.ConstructorInjection;
-import hex.di.reflect.MethodInjection;
-import hex.di.reflect.OrderedInjection;
-import hex.di.reflect.PropertyInjection;
 import hex.error.PrivateConstructorException;
+import hex.util.MacroUtil;
 
 /**
  * ...
@@ -48,111 +44,159 @@ class FastAnnotationReader
 		
 		//create expected value object
 		var vo = FastAnnotationReader._adaptToInject( data );
-		var classDescription = FastAnnotationReader._getClassDescription( vo );
+		var e = FastAnnotationReader._getClassDescriptionExpr( vo );
 
 		// append the expression as a field
 		fields.push(
 		{
 			name:  "__INJECTION_DATA",
 			access:  [ Access.APublic, Access.AStatic ],
-			kind: FieldType.FVar(macro:hex.di.reflect.ClassDescription, macro $v{ classDescription } ), 
-			//kind: FieldType.FVar(macro:hex.di.annotation.InjectorClassVO, macro $v{ vo } ), 
+			kind: FieldType.FVar(macro:hex.di.reflect.ClassDescription, e ), 
 			pos: Context.currentPos(),
 		});
 		
 		return fields;
 	}
 	
-	static function _getClassDescription( classAnnotationData : InjectorClassVO )  : ClassDescription
+	static function _getClassDescriptionExpr( classAnnotationData : InjectorClassVO )  : ExprOf<ClassDescription>
     {
-		/*var injections 		: Array<IInjectable> 		= [];
-		var postConstruct 	: Array<OrderedInjection> 	= [];
-		var preDestroy 		: Array<OrderedInjection> 	= [];
-		
-		for ( prop in classAnnotationData.props )
+		var propValues: Array<Expr> = [];
+		for ( prop in classAnnotationData.props ) 
 		{
-			injections.push( new PropertyInjection( prop.name, prop.type, prop.key, prop.isOpt ) );
+			Context.getType( prop.type );
+			var eProp = EObjectDecl([
+				{field: "propertyName", expr: macro $v{prop.name}}, 
+				{field: "propertyType", expr: macro $p{ MacroUtil.getPack(prop.type) }},
+				{field: "injectionName", expr: macro $v{prop.key}},
+				{field: "isOptional", expr: macro $v{prop.isOpt}}
+			]);
+			propValues.push( {expr: eProp, pos:Context.currentPos()} );
 		}
-
+		
+		var postConstructValues: Array<Expr> = [];
+		var preDestroyValues: Array<Expr> = [];
+		var methodValues: Array<Expr> = [];
+		
 		for ( method in classAnnotationData.methods )
 		{
-			var arguments : Array<ArgumentInjectionVO> = [];
-			for ( arg in method.args )
+			var argValues: Array<Expr> = [];
+			for ( arg in method.args ) 
 			{
-				arguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
+				Context.getType( arg.type );
+				var eArg = EObjectDecl([
+					{field: "type", expr: macro $p{ MacroUtil.getPack( arg.type ) }},
+					{field: "injectionName", expr: macro $v{arg.key}},
+					{field: "isOptional", expr: macro $v{arg.isOpt}}
+				]);
+				argValues.push( {expr: eArg, pos:Context.currentPos()} );
 			}
-			
+
 			if ( method.isPost )
 			{
-				postConstruct.push( new OrderedInjection( method.name, arguments, method.order ) );
+				var eMethod = EObjectDecl([
+					{field: "methodName", expr: macro $v{method.name}},
+					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
+					{field: "order", expr: macro $v{method.order}}
+				]);
+				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );
 			}
 			else if ( method.isPre )
 			{
-				preDestroy.push( new OrderedInjection( method.name, arguments, method.order ) );
+				var eMethod = EObjectDecl([
+					{field: "methodName", expr: macro $v{method.name}},
+					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
+					{field: "order", expr: macro $v{method.order}}
+				]);
+				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );
 			}
 			else
 			{
-				injections.push( new MethodInjection( method.name, arguments ) );
+				var eMethod = EObjectDecl([
+					{field: "methodName", expr: macro $v{method.name}},
+					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
+				]);
+				
+				methodValues.push( {expr: eMethod, pos: Context.currentPos()} );
 			}
 		}
 
+		if ( postConstructValues.length > 0 )
+		{
+			ArraySort.sort( postConstructValues, FastAnnotationReader._sortExpr );
+		}
+		
+		if ( preDestroyValues.length > 0 )
+		{
+			ArraySort.sort( preDestroyValues, FastAnnotationReader._sortExpr );
+		}
+		
+		
 		var ctor = classAnnotationData.ctor;
-		var ctorArguments : Array<ArgumentInjectionVO> = [];
+		var newMethodName = 'new';
+		
+		var ctorArgValues: Array<Expr> = [];
 		for ( arg in ctor.args )
 		{
-			ctorArguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
+			Context.getType( arg.type );
+			var eCtorArg = EObjectDecl([
+				{field: "type", expr: macro $p{ MacroUtil.getPack( arg.type ) }},
+				{field: "injectionName", expr: macro $v{arg.key}},
+				{field: "isOptional", expr: macro $v{arg.isOpt}}
+			]);
+			ctorArgValues.push( {expr: eCtorArg, pos:Context.currentPos()} );
 		}
-		var constructorInjection = new ConstructorInjection( ctorArguments );
-
-		var classDescription : ClassDescription = new ClassDescription( constructorInjection, injections, postConstruct, preDestroy );
-		return classDescription;*/
 		
-		var properties 	= [ 
-			for ( prop in classAnnotationData.props ) 
-					{ propertyName: prop.name, propertyType: Type.resolveClass( prop.type ), injectionName: prop.key, isOptional: prop.isOpt } 
-			];
-		
-		var methods 		: Array<MethodInjection> 	= [];
-		var postConstruct 	: Array<OrderedInjection> 	= [];
-		var preDestroy 		: Array<OrderedInjection> 	= [];
-		
-		for ( method in classAnnotationData.methods )
-		{
-			var arguments = [ for ( arg in method.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
+		var ctor = EObjectDecl([
+				{field: "methodName", expr: macro $v{'new'}},
+				{field: "args", expr: {expr:EArrayDecl(ctorArgValues), pos: Context.currentPos()}}
+			]);
 			
-			if ( method.isPost )
-			{
-				postConstruct.push( { methodName: method.name, args: arguments, order: method.order } );
-			}
-			else if ( method.isPre )
-			{
-				preDestroy.push( { methodName: method.name, args: arguments, order: method.order } );
-			}
-			else
-			{
-				methods.push( { methodName: method.name, args: arguments } );
-			}
-		}
-		
-		if ( postConstruct.length > 0 )
-		{
-			ArraySort.sort( postConstruct, FastAnnotationReader._sort );
-		}
-		
-		if ( preDestroy.length > 0 )
-		{
-			ArraySort.sort( preDestroy, FastAnnotationReader._sort );
-		}
+			
+		var classDescription = EObjectDecl([
+				{field: "constructorInjection", expr: {expr: ctor, pos: Context.currentPos()}},
+				{field: "properties", expr: {expr: EArrayDecl(propValues), pos: Context.currentPos()}},
+				{field: "methods", expr: {expr: EArrayDecl(methodValues), pos: Context.currentPos()}},
+				{field: "postConstruct", expr: {expr: EArrayDecl(postConstructValues), pos: Context.currentPos()}},
+				{field: "preDestroy", expr: {expr: EArrayDecl(preDestroyValues), pos: Context.currentPos()}}
+			]);
 
-		var ctor = classAnnotationData.ctor;
-		var ctorArguments = [ for ( arg in ctor.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
-		var constructorInjection = { methodName: 'new', args: ctorArguments };
-		return { constructorInjection: constructorInjection, properties: properties, methods: methods, postConstruct: postConstruct, preDestroy: preDestroy };
-    }
+		return {expr: classDescription, pos: Context.currentPos()};
+	}
 	
-	inline static function _sort( a : OrderedInjection, b : OrderedInjection ) : Int
+	static function _sortExpr( a : Expr, b : Expr ) : Int
 	{
-		return  a.order - b.order;
+		return _getOrder( a ) - _getOrder( b );
+	}
+	
+	static function _getOrder( e : Expr ) : Int
+	{
+		switch( e.expr )
+		{
+			case EObjectDecl( fields ):
+				for ( f in fields )
+				{
+					switch( f.field )
+					{
+						case 'order':
+							switch( f.expr.expr )
+							{
+								case EConst( c ):
+									switch ( c )
+									{
+										case CInt( s ):
+											return  Std.parseInt( s );
+										case _:
+									}
+								case _:
+							}
+					}
+				}
+				return -1;
+			case _:
+				return -1;
+		}
+		
+		return -1;
 	}
 	
 	private static function _adaptToInject( data : ClassAnnotationData ) : InjectorClassVO
@@ -234,7 +278,6 @@ class FastAnnotationReader
 		}
 	
 		//final building
-		//trace( data.name, { name:data.name, ctor:ctor, props:props, methods:methods } );
 		return { name:data.name, ctor:ctor, props:props, methods:methods };
 	}
 }

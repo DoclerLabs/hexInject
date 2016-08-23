@@ -133,7 +133,6 @@ class AnnotationReader
 		}
 	
 		//final building
-		//trace( data.name, { name:data.name, ctor:ctor, props:props, methods:methods } );
 		return { name:data.name, ctor:ctor, props:props, methods:methods };
 	}
 }

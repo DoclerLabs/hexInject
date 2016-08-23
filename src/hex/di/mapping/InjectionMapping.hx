@@ -29,36 +29,39 @@ class InjectionMapping
 
     public function getResult() : Dynamic
     {
-        if ( this.provider != null )
+		#if debug
+        if ( this.provider == null )
         {
-            return this.provider.getResult( this._injector );
+			throw new NullPointerException( "can't retrieve result, mapping with id '" + this._mappingID + "' has no provider" );
         }
-
-        throw new NullPointerException( "can't retrieve result, mapping with id '" + this._mappingID + "' has no provider" );
+		#end
+		
+        return this.provider.getResult( this._injector );
     }
 
-    public function asSingleton() : InjectionMapping
+    inline public function asSingleton() : InjectionMapping
     {
         return this.toSingleton( this._type );
     }
 
-    public function toSingleton( type : Class<Dynamic> ) : InjectionMapping
+    inline public function toSingleton( type : Class<Dynamic> ) : InjectionMapping
     {
         return this._toProvider( new SingletonProvider( type, this._injector ) );
     }
 
-    public function toType( type : Class<Dynamic> ) : InjectionMapping
+    inline public function toType( type : Class<Dynamic> ) : InjectionMapping
     {
         return this._toProvider( new ClassProvider( type ) );
     }
 
-    public function toValue( value : Dynamic ) : InjectionMapping
+    inline public function toValue( value : Dynamic ) : InjectionMapping
     {
         return this._toProvider( new ValueProvider( value, this._injector ) );
     }
 
-    function _toProvider( provider : IDependencyProvider ) : InjectionMapping
+    inline function _toProvider( provider : IDependencyProvider ) : InjectionMapping
     {
+		#if debug
         if ( this.provider != null )
         {
             trace(  'Warning: Injector already has a mapping for ' + this._mappingID + '.\n ' +
@@ -66,7 +69,8 @@ class InjectionMapping
                     '"injector.unmap()" prior to your replacement mapping in order to ' +
                     'avoid seeing this message.' );
         }
-
+		#end
+		
         this.provider = provider;
         return this;
     }
