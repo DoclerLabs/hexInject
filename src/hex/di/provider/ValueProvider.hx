@@ -15,7 +15,7 @@ class ValueProvider implements IDependencyProvider
         this._injector  = injector;
     }
 
-    public function getResult( injector : Injector ) : Dynamic
+    inline public function getResult( injector : Injector ) : Dynamic
     {
         return this._value;
     }

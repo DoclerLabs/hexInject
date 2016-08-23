@@ -1,6 +1,5 @@
 package hex.di.annotation.mock;
 
-import hex.di.IInjectorContainer;
 import hex.domain.Domain;
 import hex.log.ILogger;
 
@@ -8,7 +7,7 @@ import hex.log.ILogger;
  * ...
  * @author Francis Bourre
  */
-class MockInjectorContainer implements IInjectorContainer
+class MockInjectorContainer implements IMockInjectorContainer
 {
 	@Inject( "name0" )
 	public var property0 : ILogger;
