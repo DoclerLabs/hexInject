@@ -9,9 +9,9 @@ import haxe.macro.Expr.FieldType;
 import hex.annotation.ClassAnnotationData;
 import hex.di.reflect.ClassDescription;
 import hex.error.PrivateConstructorException;
-import hex.util.ArrayUtil;
 import hex.util.MacroUtil;
 
+using hex.util.ArrayUtil;
 /**
  * ...
  * @author Francis Bourre
@@ -92,8 +92,8 @@ class FastAnnotationReader
 			var eProp = EObjectDecl([
 				{field: "propertyName", expr: macro $v{property.propertyName}}, 
 				{field: "propertyType", expr: macro $p{ MacroUtil.getPack(property.propertyType) }},
-				{field: "injectionName", expr: macro $v{key}},
-				{field: "isOptional", expr: macro $v{isOpt}}
+				{field: "injectionName", expr: macro $v{key==null?"":key}},
+				{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
 			]);
 			propValues.push( {expr: eProp, pos:Context.currentPos()} );
 		}
@@ -116,8 +116,8 @@ class FastAnnotationReader
 				
 				var eArg = EObjectDecl([
 					{field: "type", expr: macro $p{MacroUtil.getPack( argData[ j ].argumentType )}},
-					{field: "injectionName", expr: macro $v{key}},
-					{field: "isOptional", expr: macro $v{isOpt}}
+					{field: "injectionName", expr: macro $v{key==null?"":key}},
+					{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
 				]);
 				
 				argValues.push( { expr: eArg, pos:Context.currentPos() } );
@@ -134,7 +134,7 @@ class FastAnnotationReader
 				var eMethod = EObjectDecl([
 					{field: "methodName", expr: macro $v{method.methodName}},
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order}}
+					{field: "order", expr: macro $v{order==null?0:order}}
 				]);
 				
 				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );
@@ -145,7 +145,7 @@ class FastAnnotationReader
 				var eMethod = EObjectDecl([
 					{field: "methodName", expr: macro $v{method.methodName}},
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order}}
+					{field: "order", expr: macro $v{order==null?0:order}}
 				]);
 				
 				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );
@@ -179,8 +179,8 @@ class FastAnnotationReader
 				
 				var eCtorArg = EObjectDecl([
 					{field: "type", expr: macro $p{ MacroUtil.getPack( ctorAnn.argumentDatas[ i ].argumentType ) }},
-					{field: "injectionName", expr: macro $v{key}},
-					{field: "isOptional", expr: macro $v{isOpt}}
+					{field: "injectionName", expr: macro $v{key == null?"":key}},
+					{field: "isOptional", expr: macro $v{isOpt == null?false:isOpt}}
 				]);
 				
 				ctorArgValues.push( { expr: eCtorArg, pos:Context.currentPos() } );
