@@ -1,5 +1,6 @@
 package hex.di.annotation;
 
+import hex.di.annotation.mock.IMockInjectorContainer;
 import hex.di.annotation.mock.MockInjectorContainer;
 import hex.domain.Domain;
 import hex.log.ILogger;
@@ -16,7 +17,7 @@ class AnnotationReaderTest
     @BeforeClass
     public static function beforeClass() : Void
     {
-        AnnotationReaderTest._annotationProvider = new AnnotationDataProvider( IInjectorContainer );
+        AnnotationReaderTest._annotationProvider = new AnnotationDataProvider( IMockInjectorContainer );
     }
 
     @AfterClass

@@ -23,11 +23,14 @@ class SingletonProvider implements IDependencyProvider
 
     public function getResult( injector : Injector ) : Dynamic
     {
+		#if debug
         if ( this._isDestroyed )
         {
             throw new InjectorException( "Forbidden usage of unmapped singleton provider for type '" + Type.getClassName( this._value ) + "'" );
         }
-        else if ( this._value == null )
+        else 
+		#end
+		if ( this._value == null )
         {
             this._value = this._injector.instantiateUnmapped( this._type );
         }
