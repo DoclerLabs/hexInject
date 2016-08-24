@@ -9,6 +9,7 @@ import haxe.macro.Expr.FieldType;
 import hex.annotation.ClassAnnotationData;
 import hex.di.reflect.ClassDescription;
 import hex.error.PrivateConstructorException;
+import hex.util.ArrayUtil;
 import hex.util.MacroUtil;
 
 /**
@@ -26,7 +27,6 @@ class FastAnnotationReader
 	macro public static function readMetadata( metadataExpr : Expr ) : Array<Field>
 	{
 		var localClass = Context.getLocalClass().get();
-		
 		if ( Context.getLocalClass().get().isInterface )
 		{
 			return Context.getBuildFields();
@@ -43,7 +43,7 @@ class FastAnnotationReader
 		{
 			name:  "__INJECTION_DATA",
 			access:  [ Access.APublic, Access.AStatic ],
-			kind: FieldType.FVar(macro:hex.di.reflect.ClassDescription, FastAnnotationReader._getClassDescriptionExpression( data ) ), 
+			kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, FastAnnotationReader._getClassDescriptionExpression( data ) ), 
 			pos: Context.currentPos(),
 		});
 		
@@ -62,56 +62,46 @@ class FastAnnotationReader
 			case EObjectDecl( fields ):
 				for ( f in fields )
 				{
-					switch( f.field )
+					if ( f.field == 'order' )
 					{
-						case 'order':
-							switch( f.expr.expr )
-							{
-								case EConst( c ):
-									switch ( c )
-									{
-										case CInt( s ):
-											return  Std.parseInt( s );
-										case _:
-									}
-								case _:
-							}
+						switch( f.expr.expr )
+						{
+							case EConst( CInt( s ) ):
+									return Std.parseInt( s );
+							case _:
+						}
 					}
 				}
-				return -1;
 			case _:
-				return -1;
 		}
 		
 		return -1;
 	}
 	
-	static function _getClassDescriptionExpression( data : ClassAnnotationData ) /*: ExprOf<ClassDescription>*/
+	static function _getClassDescriptionExpression( data : ClassAnnotationData ) : ExprOf<ClassDescription>
     {
 		//properties parsing
 		var propValues: Array<Expr> = [];
 		for ( property in data.properties )
 		{
-			var annotations = property.annotationDatas;
-			
-			var inject = annotations.filter( function ( v ) { return v.annotationName == "Inject"; } );
-			var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ 0 ] : "";
-			var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-			var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ 0 ] : false;
+			var inject 		= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Inject" );
+			var key 		= inject != null ? inject.annotationKeys[ 0 ] : "";
+			var optional 	= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
+			var isOpt 		= optional != null ? optional.annotationKeys[ 0 ] : false;
 			
 			var eProp = EObjectDecl([
 				{field: "propertyName", expr: macro $v{property.propertyName}}, 
 				{field: "propertyType", expr: macro $p{ MacroUtil.getPack(property.propertyType) }},
-				{field: "injectionName", expr: macro $v{key==null?"":key}},
-				{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
+				{field: "injectionName", expr: macro $v{key}},
+				{field: "isOptional", expr: macro $v{isOpt}}
 			]);
 			propValues.push( {expr: eProp, pos:Context.currentPos()} );
 		}
 		
 		//methods parsing
-		var postConstructValues: Array<Expr> = [];
-		var preDestroyValues: Array<Expr> = [];
-		var methodValues: Array<Expr> = [];
+		var postConstructValues: 	Array<Expr> = [];
+		var preDestroyValues: 		Array<Expr> = [];
+		var methodValues: 			Array<Expr> = [];
 		
 		for ( method in data.methods )
 		{
@@ -119,44 +109,45 @@ class FastAnnotationReader
 			var argData = method.argumentDatas;
 			for ( j in 0...argData.length )
 			{
-				var annotations = method.annotationDatas;
-				var inject = annotations.filter( function ( v ) { return v.annotationName == "Inject"; } );
-				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ j ] : "";
-				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ j ] : false;
+				var inject 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Inject" );
+				var key 		= inject != null ? inject.annotationKeys[ j ] : "";
+				var optional 	= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt 		= optional != null ? optional.annotationKeys[ j ] : false;
 				
 				var eArg = EObjectDecl([
-					{field: "type", expr: macro $p{ MacroUtil.getPack( argData[ j ].argumentType ) }},
-					{field: "injectionName", expr: macro $v{key==null?"":key}},
-					{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
+					{field: "type", expr: macro $p{MacroUtil.getPack( argData[ j ].argumentType )}},
+					{field: "injectionName", expr: macro $v{key}},
+					{field: "isOptional", expr: macro $v{isOpt}}
 				]);
 				
-				argValues.push( {expr: eArg, pos:Context.currentPos()} );
+				argValues.push( { expr: eArg, pos:Context.currentPos() } );
 			}
 
 			//method building
-			var postConstruct = method.annotationDatas.filter( function ( v ) { return v.annotationName == "PostConstruct"; } );
-			var preDestroy = method.annotationDatas.filter( function ( v ) { return v.annotationName == "PreDestroy"; } );
-			var order = 0;
-			if ( postConstruct.length > 0 ) order = postConstruct[ 0 ].annotationKeys[ 0 ];
-			if ( preDestroy.length > 0 ) order = preDestroy[ 0 ].annotationKeys[ 0 ];
+			var postConstruct 	= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PostConstruct" );
+			var preDestroy 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PreDestroy" );
+			var order 			= 0;
 
-			if ( postConstruct.length>0 )
+			if ( postConstruct != null )
 			{
+				order = postConstruct.annotationKeys[ 0 ];
 				var eMethod = EObjectDecl([
 					{field: "methodName", expr: macro $v{method.methodName}},
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order==null?0:order}}
+					{field: "order", expr: macro $v{order}}
 				]);
+				
 				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );
 			}
-			else if ( preDestroy.length>0 )
+			else if ( preDestroy != null )
 			{
+				order = preDestroy.annotationKeys[ 0 ];
 				var eMethod = EObjectDecl([
 					{field: "methodName", expr: macro $v{method.methodName}},
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order==null?0:order}}
+					{field: "order", expr: macro $v{order}}
 				]);
+				
 				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );
 			}
 			else
@@ -166,20 +157,13 @@ class FastAnnotationReader
 					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
 				]);
 				
-				methodValues.push( {expr: eMethod, pos: Context.currentPos()} );
+				methodValues.push( { expr: eMethod, pos: Context.currentPos() } );
 			}
 		}
 		
-		if ( postConstructValues.length > 0 )
-		{
-			ArraySort.sort( postConstructValues, FastAnnotationReader._sortExpr );
-		}
-		
-		if ( preDestroyValues.length > 0 )
-		{
-			ArraySort.sort( preDestroyValues, FastAnnotationReader._sortExpr );
-		}
-		
+		if ( postConstructValues.length > 0 ) ArraySort.sort( postConstructValues, FastAnnotationReader._sortExpr );
+		if ( preDestroyValues.length > 0 ) ArraySort.sort( preDestroyValues, FastAnnotationReader._sortExpr );
+
 		//constructor parsing
 		var ctorArgValues: Array<Expr> = [];
 		var ctorAnn = data.constructorAnnotationData;
@@ -188,19 +172,18 @@ class FastAnnotationReader
 		{
 			for ( i in 0...ctorAnn.argumentDatas.length )
 			{
-				var annotations = ctorAnn.annotationDatas;
-				
-				var inject = annotations.filter( function ( v ) { return v.annotationName == "Inject"; } );
-				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ i ] : "";
-				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ i ] : false;
+				var inject 		= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Inject" );
+				var key 		= inject != null ? inject.annotationKeys[ i ] : "";
+				var optional 	= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt 		= optional != null ? optional.annotationKeys[ i ] : false;
 				
 				var eCtorArg = EObjectDecl([
 					{field: "type", expr: macro $p{ MacroUtil.getPack( ctorAnn.argumentDatas[ i ].argumentType ) }},
-					{field: "injectionName", expr: macro $v{key == null?"":key}},
-					{field: "isOptional", expr: macro $v{isOpt == null?false:isOpt}}
+					{field: "injectionName", expr: macro $v{key}},
+					{field: "isOptional", expr: macro $v{isOpt}}
 				]);
-				ctorArgValues.push( {expr: eCtorArg, pos:Context.currentPos()} );
+				
+				ctorArgValues.push( { expr: eCtorArg, pos:Context.currentPos() } );
 			}
 		}
 
@@ -210,7 +193,7 @@ class FastAnnotationReader
 			]);
 		
 			
-		//
+		//final expression
 		var classDescription = EObjectDecl([
 				{field: "constructorInjection", expr: {expr: ctor, pos: Context.currentPos()}},
 				{field: "properties", expr: {expr: EArrayDecl(propValues), pos: Context.currentPos()}},
@@ -219,6 +202,6 @@ class FastAnnotationReader
 				{field: "preDestroy", expr: {expr: EArrayDecl(preDestroyValues), pos: Context.currentPos()}}
 			]);
 
-		return {expr: classDescription, pos: Context.currentPos()};
+		return { expr: classDescription, pos: Context.currentPos() };
 	}
 }
