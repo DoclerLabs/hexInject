@@ -1,5 +1,6 @@
 package hex.di.mapping;
 
+import hex.di.IDependencyInjector;
 import hex.di.provider.ClassProvider;
 import hex.di.provider.SingletonProvider;
 import hex.di.provider.ValueProvider;
@@ -12,14 +13,14 @@ import hex.error.NullPointerException;
  */
 class InjectionMapping
 {
-    var _injector		        : Injector;
+    var _injector		        : IDependencyInjector;
     var _type					: Class<Dynamic>;
     var _name					: String;
     var _mappingID				: String;
 
     public var provider	( default, null ) : IDependencyProvider;
 
-    public function new( injector : Injector, type : Class<Dynamic>, name : String, mappingID : String )
+    public function new( injector : IDependencyInjector, type : Class<Dynamic>, name : String, mappingID : String )
     {
         this._injector			= injector;
         this._type 				= type;
