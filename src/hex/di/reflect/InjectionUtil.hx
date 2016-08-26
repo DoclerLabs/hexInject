@@ -15,7 +15,7 @@ class InjectionUtil
 		
 	}
 	
-	inline public static function applyClassInjection( target : Dynamic, injector : Injector, classDescription : ClassDescription ) : Dynamic
+	inline public static function applyClassInjection<T>( target : T, injector : Injector, classDescription : ClassDescription ) : T
 	{
 		for ( property in classDescription.properties )
 		{
