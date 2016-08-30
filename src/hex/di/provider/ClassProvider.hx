@@ -13,7 +13,7 @@ class ClassProvider implements IDependencyProvider
         this._type = type;
     }
 
-    public function getResult( injector : Injector ) : Dynamic
+    inline public function getResult( injector : IDependencyInjector ) : Dynamic
     {
         return injector.instantiateUnmapped( this._type );
     }
