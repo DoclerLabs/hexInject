@@ -1,10 +1,9 @@
 package hex.di.reflect;
 
+import haxe.ds.ArraySort;
 import hex.collection.HashMap;
-import hex.di.IInjectable;
 import hex.di.annotation.IAnnotationDataProvider;
 import hex.di.annotation.InjectorClassVO;
-import hex.log.Stringifier;
 
 /**
  * ...
@@ -32,52 +31,57 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 
 		if ( classAnnotationData != null )
 		{
-			var injections 		: Array<IInjectable> 		= [];
+			var properties 	= [ 
+				for ( prop in classAnnotationData.props ) 
+						{ propertyName: prop.name, propertyType: Type.resolveClass( prop.type ), injectionName: prop.key, isOptional: prop.isOpt } 
+				];
+			
+			var methods 		: Array<MethodInjection> 	= [];
 			var postConstruct 	: Array<OrderedInjection> 	= [];
 			var preDestroy 		: Array<OrderedInjection> 	= [];
 			
-			for ( prop in classAnnotationData.props )
-			{
-				injections.push( new PropertyInjection( prop.name, prop.type, prop.key, prop.isOpt ) );
-			}
-
 			for ( method in classAnnotationData.methods )
 			{
-				var arguments : Array<ArgumentInjectionVO> = [];
-				for ( arg in method.args )
-				{
-					arguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
-				}
+				var arguments = [ for ( arg in method.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
 				
 				if ( method.isPost )
 				{
-					postConstruct.push( new OrderedInjection( method.name, arguments, method.order ) );
+					postConstruct.push( { methodName: method.name, args: arguments, order: method.order } );
 				}
 				else if ( method.isPre )
 				{
-					preDestroy.push( new OrderedInjection( method.name, arguments, method.order ) );
+					preDestroy.push( { methodName: method.name, args: arguments, order: method.order } );
 				}
 				else
 				{
-					injections.push( new MethodInjection( method.name, arguments ) );
+					methods.push( { methodName: method.name, args: arguments } );
 				}
+			}
+			
+			if ( postConstruct.length > 0 )
+			{
+				ArraySort.sort( postConstruct, ClassDescriptionProvider._sort );
+			}
+			
+			if ( preDestroy.length > 0 )
+			{
+				ArraySort.sort( preDestroy, ClassDescriptionProvider._sort );
 			}
 
 			var ctor = classAnnotationData.ctor;
-			var ctorArguments : Array<ArgumentInjectionVO> = [];
-			for ( arg in ctor.args )
-			{
-				ctorArguments.push( new ArgumentInjectionVO( Type.resolveClass( arg.type ), arg.key, arg.isOpt ) );
-			}
-			var constructorInjection = new ConstructorInjection( ctorArguments );
-
-			var classDescription : ClassDescription = new ClassDescription( constructorInjection, injections, postConstruct, preDestroy );
-			return classDescription;
+			var ctorArguments = [ for ( arg in ctor.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
+			var constructorInjection = { methodName: 'new', args: ctorArguments };
+			return { constructorInjection: constructorInjection, properties: properties, methods: methods, postConstruct: postConstruct, preDestroy: preDestroy };
 		}
 		else
 		{
 			return null;
 		}
     }
+	
+	inline static function _sort( a : OrderedInjection, b : OrderedInjection ) : Int
+	{
+		return  a.order - b.order;
+	}
 }
 

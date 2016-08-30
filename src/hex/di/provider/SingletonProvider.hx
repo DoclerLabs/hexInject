@@ -12,22 +12,25 @@ class SingletonProvider implements IDependencyProvider
 
     var _type           : Class<Dynamic>;
     var _value          : Dynamic;
-    var _injector       : Injector;
+    var _injector       : IDependencyInjector;
 
-    public function new( type : Class<Dynamic>, injector : Injector )
+    public function new( type : Class<Dynamic>, injector : IDependencyInjector )
     {
         this._isDestroyed   = false;
         this._type          = type;
         this._injector      = injector;
     }
 
-    public function getResult( injector : Injector ) : Dynamic
+    public function getResult( injector : IDependencyInjector ) : Dynamic
     {
+		#if debug
         if ( this._isDestroyed )
         {
             throw new InjectorException( "Forbidden usage of unmapped singleton provider for type '" + Type.getClassName( this._value ) + "'" );
         }
-        else if ( this._value == null )
+        else 
+		#end
+		if ( this._value == null )
         {
             this._value = this._injector.instantiateUnmapped( this._type );
         }

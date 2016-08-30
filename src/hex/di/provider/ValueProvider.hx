@@ -7,15 +7,15 @@ package hex.di.provider;
 class ValueProvider implements IDependencyProvider
 {
     var _value      : Dynamic;
-    var _injector   : Injector;
+    var _injector   : IDependencyInjector;
 
-    public function new( value : Dynamic, injector : Injector )
+    public function new( value : Dynamic, injector : IDependencyInjector )
     {
         this._value     = value;
         this._injector  = injector;
     }
 
-    public function getResult( injector : Injector ) : Dynamic
+    inline public function getResult( injector : IDependencyInjector ) : Dynamic
     {
         return this._value;
     }
