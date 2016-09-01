@@ -7,6 +7,7 @@ package hex.di;
 @:remove
 //@:autoBuild( hex.di.annotation.AnnotationReader.readMetadata( hex.di.IInjectorContainer ) )
 @:autoBuild( hex.di.annotation.FastAnnotationReader.readMetadata( hex.di.IInjectorContainer ) )
+//@:autoBuild( hex.di.annotation.FastInjectionBuilder.readMetadata( hex.di.IInjectorContainer ) )
 #end
 interface IInjectorContainer
 {
