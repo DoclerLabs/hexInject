@@ -2,18 +2,13 @@ package hex.di;
 
 import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
-import hex.di.annotation.AnnotationDataProvider;
 import hex.di.error.InjectorException;
 import hex.di.error.MissingClassDescriptionException;
 import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
-import hex.di.reflect.ClassDescription;
-import hex.di.reflect.ClassDescriptionProvider;
-import hex.di.reflect.FastClassDescriptionProvider;
-import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionProcessor;
-import hex.di.reflect.InjectionUtil;
+import hex.error.NullPointerException;
 import hex.event.LightweightClosureDispatcher;
 import hex.log.Stringifier;
 import hex.util.ClassUtil;
@@ -113,6 +108,12 @@ class FastInjector implements IDependencyInjector
 	
 	inline function _getClassDescription( type : Class<Dynamic> ) : InjectionProcessor
 	{
+		#if debug
+		if ( type == null )
+		{
+			throw new NullPointerException( 'type should not be null' );
+		}
+		#end
 		return Reflect.getProperty( type, "__INJECTION" );
 	}
 
@@ -222,7 +223,7 @@ class FastInjector implements IDependencyInjector
 	{
 		var targetType : Class<Dynamic> = Type.getClass( target );
 		var injectionProcessor = this._getClassDescription( targetType );
-		if ( injectionProcessor != null )
+		if ( injectionProcessor != null /*&& injectionProcessor.applyClassInjection != null*/ )
 		{
 			this._applyInjection( target, targetType, injectionProcessor );
 		}

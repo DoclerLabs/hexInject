@@ -26,6 +26,33 @@ class FastInjectionBuilder
         throw new PrivateConstructorException( "This class can't be instantiated." );
     }
 	
+	static function _getMissingMappingPropertyException( propertyType : String, className : String, propertyName : String, injectionName : String = '' ) : String
+    {
+		return "Injector is missing a mapping to inject into property named '" + 
+			propertyName + "' with type '" + propertyType + 
+				"' inside instance of '" + className + 
+					"'. Target dependency: '" + propertyType +
+						"|" + injectionName + "'";
+	}
+	
+	static function _getMissingMappingMethodException( type : String, className : String, methodName : String, injectionName : String = '' ) : String
+    {
+        return "Injector is missing a mapping to inject argument into method named '" +
+			methodName + "' with type '" + type +
+				"' inside instance of '" + className +
+					"'. Target dependency: '" + type +
+						"|" + injectionName + "'";
+    }
+	
+	static function _getMissingMappingConstructorException( type : String, className : String, injectionName : String = '' ) : String
+    {
+		return "Injector is missing a mapping to inject argument" +
+			" with type '" + type +
+				"' into constructor of class '" + className +
+					"'. Target dependency: '" + type +
+						"|" + injectionName + "'";
+    }
+	
 	macro public static function readMetadata( metadataExpr : Expr ) : Array<Field>
 	{
 		var localClass = Context.getLocalClass().get();
@@ -82,39 +109,31 @@ class FastInjectionBuilder
 				var injectionName 	= key == null ? "" : key;
 				var isOptional 		= isOpt == null ? false : isOpt;
 				
-				/*var eCtorArg = EObjectDecl([
-					{field: "type", expr: macro $p{ MacroUtil.getPack( ctorAnn.argumentDatas[ i ].argumentType ) }},
-					{field: "injectionName", expr: macro $v{key == null?"":key}},
-					{field: "isOptional", expr: macro $v{isOpt == null?false:isOpt}}
-				]);
-				
-				ctorArgValues.push( { expr: eCtorArg, pos: Context.currentPos() } );*/
+				//build provider
+				var providerID 		= 'p' + consExpression.length;
+				var provider 		= macro $i { providerID };
+				consExpression.push( macro @:mergeBlock { var $providerID = injector.getProvider( $p{argType}, $v{injectionName} ); } );
 				
 				if ( isOptional )
 				{
-					ctorArgProvider.push( macro @:mergeBlock { cast injector.getProvider( $p{ argType }, $v{ injectionName } ) != null ? cast injector.getProvider( $p{ argType }, $v{ injectionName } ) : null;} );
+					ctorArgProvider.push( macro{ $provider != null ? $provider.getResult( injector ) : null;} );
+					
 				}
 				else
 				{
-					ctorArgProvider.push( macro @:mergeBlock { cast injector.getProvider( $p{ argType }, $v{ injectionName } );} );
+					#if debug
+					var errorMessage = _getMissingMappingConstructorException( ctorAnn.argumentDatas[ i ].argumentType, className, injectionName );
+					consExpression.push( macro @:mergeBlock { if ( $provider == null ) throw new hex.di.error.MissingMappingException( $v{errorMessage} ); } );
+					#end
+					ctorArgProvider.push( macro{ $provider.getResult( injector );} );
 				}
 			}
-			
-			//TODO make null provider
+
 			var tp = MacroUtil.getTypePath( className );
-			consExpression.push( macro @:mergeBlock { return new $tp( $a { ctorArgProvider } ); } );
+			consExpression.push( macro @:mergeBlock { return new $tp( $a{ctorArgProvider} ); } );
 			applyConstructorInjection = macro function f( type : Class<Dynamic>, injector : hex.di.IDependencyInjector ) : Dynamic { $b{ consExpression }; };
 		}
 
-		/*var ctor = EObjectDecl([
-				{field: "methodName", expr: macro $v{'new'}},
-				{field: "args", expr: {expr:EArrayDecl(ctorArgValues), pos: Context.currentPos()}}
-			]);*/
-			
-		
-		//Type.createInstance( type, InjectionUtil.gatherArgs( type, injector, arguments, 'new' ) );
-
-		
 		//properties parsing
 		var propValues: Array<Expr> = [];
 		for ( property in data.properties )
@@ -124,22 +143,14 @@ class FastInjectionBuilder
 			var optional 	= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
 			var isOpt 		= optional != null ? optional.annotationKeys[ 0 ] : false;
 			
-			/*var eProp = EObjectDecl([
-				{field: "propertyName", expr: macro $v{property.propertyName}}, 
-				{field: "propertyType", expr: macro $p{ MacroUtil.getPack(property.propertyType) }},
-				{field: "injectionName", expr: macro $v{key==null?"":key}},
-				{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
-			]);
-			propValues.push( {expr: eProp, pos:Context.currentPos()} );*/
-			
 			var propertyName 	= property.propertyName;
 			var propertyType 	= MacroUtil.getPack( property.propertyType );
 			var injectionName 	= key == null ? "" : key;
 			var isOptional 		= isOpt == null ? false : isOpt;
 			
+			//build provider
 			var providerID 		= 'p' + expressions.length;
 			var provider 		= macro $i { providerID };
-			
 			expressions.push( macro @:mergeBlock { var $providerID = injector.getProvider( $p { propertyType }, $v { injectionName } ); } );
 			
 			if ( isOptional )
@@ -148,7 +159,10 @@ class FastInjectionBuilder
 			}
 			else
 			{
-				//TODO make null provider
+				#if debug
+				var errorMessage = _getMissingMappingPropertyException( property.propertyType, className, propertyName, injectionName );
+				expressions.push( macro @:mergeBlock { if ( $provider == null ) throw new hex.di.error.MissingMappingException( $v{errorMessage} ); } );
+				#end
 				expressions.push( macro @:mergeBlock { $instance.$propertyName = $provider.getResult( injector ); } );
 			}
 		}
@@ -162,8 +176,7 @@ class FastInjectionBuilder
 		{
 			var argProviders 	= [];
 			var methodName 		= method.methodName;
-			
-			//var argValues: Array<Expr> = [];
+
 			var argData = method.argumentDatas;
 			for ( j in 0...argData.length )
 			{
@@ -176,21 +189,23 @@ class FastInjectionBuilder
 				var injectionName 	= key == null ? "" : key;
 				var isOptional 		= isOpt == null ? false : isOpt;
 				
-				/*var eArg = EObjectDecl([
-					{field: "type", expr: macro $p{MacroUtil.getPack( argData[ j ].argumentType )}},
-					{field: "injectionName", expr: macro $v{key==null?"":key}},
-					{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
-				]);
-				
-				argValues.push( { expr: eArg, pos:Context.currentPos() } );*/
+				//build provider
+				var providerID 		= 'p' + expressions.length;
+				var provider 		= macro $i { providerID };
+				expressions.push( macro @:mergeBlock { var $providerID = injector.getProvider( $p{argType}, $v{injectionName} ); } );
 				
 				if ( isOptional )
 				{
-					argProviders.push( macro{ injector.getProvider( $p{argType}, $v {injectionName} ) != null ? injector.getProvider( $p{argType}, $v{injectionName} ) : null;} );
+					argProviders.push( macro{ $provider != null ? $provider.getResult( injector ) : null;} );
 				}
 				else
 				{
-					argProviders.push( macro{ injector.getProvider( $p{argType}, $v{injectionName} );} );
+					#if debug
+					var errorMessage = _getMissingMappingMethodException( argData[ j ].argumentType, className, methodName, injectionName );
+					expressions.push( macro @:mergeBlock { if ( $provider == null ) throw new hex.di.error.MissingMappingException( $v{errorMessage} ); } );
+					#end
+					
+					argProviders.push( macro{ $provider.getResult( injector );} );
 				}
 			}
 
@@ -202,35 +217,15 @@ class FastInjectionBuilder
 			if ( postConstruct != null )
 			{
 				order = postConstruct.annotationKeys[ 0 ];
-				/*var eMethod = EObjectDecl([
-					{field: "methodName", expr: macro $v{method.methodName}},
-					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order==null?0:order}}
-				]);
-				
-				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );*/
 				postConstructExprs.push( macro @:mergeBlock @:order($v{order==null?0:order}) { $instance.$methodName( $a{argProviders} ); } );
 			}
 			else if ( preDestroy != null )
 			{
 				order = preDestroy.annotationKeys[ 0 ];
-				/*var eMethod = EObjectDecl([
-					{field: "methodName", expr: macro $v{method.methodName}},
-					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}},
-					{field: "order", expr: macro $v{order==null?0:order}}
-				]);
-				
-				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );*/
 				preDestroyExprs.push( macro @:mergeBlock @:order($v{order==null?0:order}) { $instance.$methodName( $a{argProviders} ); } );
 			}
 			else
 			{
-				/*var eMethod = EObjectDecl([
-					{field: "methodName", expr: macro $v{method.methodName}},
-					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
-				]);
-				
-				methodValues.push( { expr: eMethod, pos: Context.currentPos() } );*/
 				methodExprs.push( macro @:mergeBlock { $instance.$methodName( $a{argProviders} ); } );
 			}
 		}
@@ -253,7 +248,6 @@ class FastInjectionBuilder
 			applyPreDestroyInjection = macro function f( instance : Dynamic, injector : hex.di.IDependencyInjector ) : Dynamic { $b{ preDestroyExprs }; };
 		}
 
-		
 		expressions.push( macro @:mergeBlock { return $instance; } );
 		applyClassInjection = macro function f( instance : Dynamic, injector : hex.di.IDependencyInjector ) : Dynamic { $b { expressions }; };
 		
