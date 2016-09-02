@@ -9,13 +9,12 @@ import hex.di.annotation.InjectorClassVO;
  */
 class AnnotationDataProvider implements IAnnotationDataProvider
 {
-	var _metadataName       : String;
+	var _key       			: String;
     var _annotatedClasses   : HashMap<Class<Dynamic>, InjectorClassVO>;
 	
-	//TODO refactor to remove useless class type parameter
-	public function new( type : Class<Dynamic> )
+	public function new( key : String = "__INJECTION_DATA" )
     {
-        this._metadataName      = Type.getClassName( type );
+        this._key      			= key;
         this._annotatedClasses  = new HashMap();
     }
 	
@@ -27,7 +26,7 @@ class AnnotationDataProvider implements IAnnotationDataProvider
 	function _getClassAnnotationData( type : Class<Dynamic>)  : InjectorClassVO
     {
 		//TODO get/store annotation from a place that will never risk to collide
-		var field : InjectorClassVO = Reflect.getProperty( type, "__INJECTION_DATA" );
+		var field : InjectorClassVO = Reflect.getProperty( type, this._key );
 		
 		if ( field != null )
 		{

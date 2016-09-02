@@ -7,5 +7,5 @@ package hex.di.annotation;
 class AnnotationSuite
 {
 	@Suite( "Annotation suite" )
-    public var list : Array<Class<Dynamic>> = [AnnotationReaderTest];
+    public var list : Array<Class<Dynamic>> = [ AnnotationDataProviderTest ];
 }
