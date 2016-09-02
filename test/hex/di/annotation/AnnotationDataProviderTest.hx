@@ -10,36 +10,36 @@ import hex.unittest.assertion.Assert;
  * ...
  * @author Francis Bourre
  */
-class AnnotationReaderTest
+class AnnotationDataProviderTest
 {
 	static var _annotationProvider : IAnnotationDataProvider;
 
     @BeforeClass
     public static function beforeClass() : Void
     {
-        AnnotationReaderTest._annotationProvider = new AnnotationDataProvider( IMockInjectorContainer );
+        AnnotationDataProviderTest._annotationProvider = new AnnotationDataProvider( "__INJECTION_DATA" );
     }
 
     @AfterClass
     public static function afterClass() : Void
     {
-        AnnotationReaderTest._annotationProvider = null;
+        AnnotationDataProviderTest._annotationProvider = null;
     }
 
     @Test( "test get annotation data with class name" )
     public function testGetAnnotationDataWithClassName() : Void
     {
-        Assert.isNotNull( AnnotationReaderTest._annotationProvider, "annotation data map shouldn't be null" );
-        Assert.isNotNull( AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer ), "'MockInjectorContainer' class should be referenced" );
+        Assert.isNotNull( AnnotationDataProviderTest._annotationProvider, "annotation data map shouldn't be null" );
+        Assert.isNotNull( AnnotationDataProviderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer ), "'MockInjectorContainer' class should be referenced" );
 
-        var data : InjectorClassVO = AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
+        var data : InjectorClassVO = AnnotationDataProviderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
         Assert.equals( Type.getClassName( MockInjectorContainer ), data.name, "class name should be the same" );
     }
 	
 	@Test( "test get property annotation" )
     public function testGetPropertyAnnotation() : Void
     {
-		var data : InjectorClassVO = AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
+		var data : InjectorClassVO = AnnotationDataProviderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
 		
 		var property0 = data.props[ 0 ];
 		Assert.isFalse( property0.isOpt, "'isOpt' should equal false" );
@@ -63,7 +63,7 @@ class AnnotationReaderTest
 	@Test( "test get constructor annotation" )
     public function testGetConstructorAnnotation() : Void
     {
-		var data : InjectorClassVO = AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
+		var data : InjectorClassVO = AnnotationDataProviderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
 		Assert.equals( "new", data.ctor.name, "constructor's name should be 'new'" );
 		Assert.isFalse( data.ctor.isPost, "constructor can't be set to post constructor" );
 		Assert.isFalse( data.ctor.isPre, "constructor can't be set to pre destroy" );
@@ -88,7 +88,7 @@ class AnnotationReaderTest
 	@Test( "test get method annotation" )
     public function testGetMethodAnnotation() : Void
     {
-		var data : InjectorClassVO = AnnotationReaderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
+		var data : InjectorClassVO = AnnotationDataProviderTest._annotationProvider.getClassAnnotationData( MockInjectorContainer );
 		
 		//beforeInit
 		var method0 = data.methods[ 0 ];
