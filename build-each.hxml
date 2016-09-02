@@ -7,3 +7,4 @@
 -cp hexannotation/test
 -cp hexunit/src
 -cp hexunit/test
+-D debug=true
