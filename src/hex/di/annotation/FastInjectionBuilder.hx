@@ -100,10 +100,10 @@ class FastInjectionBuilder
 		{
 			for ( i in 0...ctorAnn.argumentDatas.length )
 			{
-				var inject 		= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Inject" );
-				var key 		= inject != null ? inject.annotationKeys[ i ] : "";
-				var optional 	= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Optional" );
-				var isOpt 		= optional != null ? optional.annotationKeys[ i ] : false;
+				var inject 				= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Inject" );
+				var key 				= inject != null ? inject.annotationKeys[ i ] : "";
+				var optional			= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt : Null<Bool> 	= optional != null ? optional.annotationKeys[ i ] : false;
 				
 				var argType 		= MacroUtil.getPack( ctorAnn.argumentDatas[ i ].argumentType );
 				var injectionName 	= key == null ? "" : key;
@@ -138,10 +138,10 @@ class FastInjectionBuilder
 		var propValues: Array<Expr> = [];
 		for ( property in data.properties )
 		{
-			var inject 		= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Inject" );
-			var key 		= inject != null ? inject.annotationKeys[ 0 ] : "";
-			var optional 	= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
-			var isOpt 		= optional != null ? optional.annotationKeys[ 0 ] : false;
+			var inject 				= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Inject" );
+			var key 				= inject != null ? inject.annotationKeys[ 0 ] : "";
+			var optional 			= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
+			var isOpt : Null<Bool> 	= optional != null ? optional.annotationKeys[ 0 ] : false;
 			
 			var propertyName 	= property.propertyName;
 			var propertyType 	= MacroUtil.getPack( property.propertyType );
@@ -180,14 +180,14 @@ class FastInjectionBuilder
 			var argData = method.argumentDatas;
 			for ( j in 0...argData.length )
 			{
-				var inject 			= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Inject" );
-				var key 			= inject != null ? inject.annotationKeys[ j ] : "";
-				var optional 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Optional" );
-				var isOpt 			= optional != null ? optional.annotationKeys[ j ] : false;
+				var inject 					= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Inject" );
+				var key 					= inject != null ? inject.annotationKeys[ j ] : "";
+				var optional 				= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt  : Null<Bool>		= optional != null ? optional.annotationKeys[ j ] : false;
 				
-				var argType 		= MacroUtil.getPack( argData[ j ].argumentType );
-				var injectionName 	= key == null ? "" : key;
-				var isOptional 		= isOpt == null ? false : isOpt;
+				var argType 				= MacroUtil.getPack( argData[ j ].argumentType );
+				var injectionName 			= key == null ? "" : key;
+				var isOptional				= isOpt == null ? false : isOpt;
 				
 				//build provider
 				var providerID 		= 'p' + expressions.length;
@@ -210,9 +210,9 @@ class FastInjectionBuilder
 			}
 
 			//method building
-			var postConstruct 	= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PostConstruct" );
-			var preDestroy 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PreDestroy" );
-			var order 			= 0;
+			var postConstruct 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PostConstruct" );
+			var preDestroy 			= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PreDestroy" );
+			var order : Null<Int>	= 0;
 
 			if ( postConstruct != null )
 			{

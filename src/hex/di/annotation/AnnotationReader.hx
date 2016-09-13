@@ -73,7 +73,7 @@ class AnnotationReader
 				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ i ] : "";
 
 				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ i ] : false;
+				var isOpt : Null<Bool> = optional.length > 0 ? optional[ 0 ].annotationKeys[ i ] : false;
 				
 				ctorArgs.push( { type: ctorAnn.argumentDatas[ i ].argumentType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 			}
@@ -93,7 +93,7 @@ class AnnotationReader
 			var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ 0 ] : "";
 
 			var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-			var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ 0 ] : false;
+			var isOpt : Null<Bool> = optional.length > 0 ? optional[ 0 ].annotationKeys[ 0 ] : false;
 			
 			props.push( { name: propAnn[ i ].propertyName, type: propAnn[ i ].propertyType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 		}
@@ -118,7 +118,7 @@ class AnnotationReader
 				var key = inject.length > 0 ? inject[ 0 ].annotationKeys[ j ] : "";
 				
 				var optional = annotations.filter( function ( v ) { return v.annotationName == "Optional"; } );
-				var isOpt = optional.length > 0 ? optional[ 0 ].annotationKeys[ j ] : false;
+				var isOpt : Null<Bool> = optional.length > 0 ? optional[ 0 ].annotationKeys[ j ] : false;
 				
 				args.push( { type: argData[ j ].argumentType, key: key==null?"":key, isOpt: isOpt==null?false:isOpt } );
 			}
@@ -126,7 +126,7 @@ class AnnotationReader
 			//method building
 			var postConstruct = methAnn[ i ].annotationDatas.filter( function ( v ) { return v.annotationName == "PostConstruct"; } );
 			var preDestroy = methAnn[ i ].annotationDatas.filter( function ( v ) { return v.annotationName == "PreDestroy"; } );
-			var order = 0;
+			var order : Null<Int> = 0;
 			if ( postConstruct.length > 0 ) order = postConstruct[ 0 ].annotationKeys[ 0 ];
 			if ( preDestroy.length > 0 ) order = preDestroy[ 0 ].annotationKeys[ 0 ];
 			methods.push( { name: methAnn[ i ].methodName, args: args, isPre: preDestroy.length>0, isPost: postConstruct.length>0, order: order==null?0:order } );
