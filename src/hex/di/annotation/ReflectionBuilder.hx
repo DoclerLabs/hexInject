@@ -59,10 +59,10 @@ class ReflectionBuilder
 		var propValues: Array<Expr> = [];
 		for ( property in data.properties )
 		{
-			var inject 		= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Inject" );
-			var key 		= inject != null ? inject.annotationKeys[ 0 ] : "";
-			var optional 	= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
-			var isOpt 		= optional != null ? optional.annotationKeys[ 0 ] : false;
+			var inject 				= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Inject" );
+			var key					= inject != null ? inject.annotationKeys[ 0 ] : "";
+			var optional 			= ArrayUtil.find( property.annotationDatas, e => e.annotationName == "Optional" );
+			var isOpt : Null<Bool> 	= optional != null ? optional.annotationKeys[ 0 ] : false;
 			
 			var eProp = EObjectDecl([
 				{field: "propertyName", expr: macro $v{property.propertyName}}, 
@@ -84,10 +84,10 @@ class ReflectionBuilder
 			var argData = method.argumentDatas;
 			for ( j in 0...argData.length )
 			{
-				var inject 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Inject" );
-				var key 		= inject != null ? inject.annotationKeys[ j ] : "";
-				var optional 	= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Optional" );
-				var isOpt 		= optional != null ? optional.annotationKeys[ j ] : false;
+				var inject 				= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Inject" );
+				var key 				= inject != null ? inject.annotationKeys[ j ] : "";
+				var optional 			= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt : Null<Bool> 	= optional != null ? optional.annotationKeys[ j ] : false;
 				
 				var eArg = EObjectDecl([
 					{field: "type", expr: macro $p{MacroUtil.getPack( argData[ j ].argumentType )}},
@@ -99,9 +99,9 @@ class ReflectionBuilder
 			}
 
 			//method building
-			var postConstruct 	= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PostConstruct" );
-			var preDestroy 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PreDestroy" );
-			var order 			= 0;
+			var postConstruct 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PostConstruct" );
+			var preDestroy	 		= ArrayUtil.find( method.annotationDatas, e => e.annotationName == "PreDestroy" );
+			var order : Null<Int> 	= 0;
 
 			if ( postConstruct != null )
 			{
@@ -147,10 +147,10 @@ class ReflectionBuilder
 		{
 			for ( i in 0...ctorAnn.argumentDatas.length )
 			{
-				var inject 		= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Inject" );
-				var key 		= inject != null ? inject.annotationKeys[ i ] : "";
-				var optional 	= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Optional" );
-				var isOpt 		= optional != null ? optional.annotationKeys[ i ] : false;
+				var inject 				= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Inject" );
+				var key 				= inject != null ? inject.annotationKeys[ i ] : "";
+				var optional 			= ArrayUtil.find( ctorAnn.annotationDatas, e => e.annotationName == "Optional" );
+				var isOpt : Null<Bool> 	= optional != null ? optional.annotationKeys[ i ] : false;
 				
 				var eCtorArg = EObjectDecl([
 					{field: "type", expr: macro $p{ MacroUtil.getPack( ctorAnn.argumentDatas[ i ].argumentType ) }},
