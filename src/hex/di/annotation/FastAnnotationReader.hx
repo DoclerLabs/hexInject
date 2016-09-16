@@ -37,14 +37,17 @@ class FastAnnotationReader
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
 
 		// append the expression as a field
-		fields.push(
+		var a = Lambda.find( fields, function ( f ) { return f.name == "__INJECTION_DATA"; } );
+		if ( a == null )
 		{
-			name:  "__INJECTION_DATA",
-			access:  [ Access.APublic, Access.AStatic ],
-			kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, ReflectionBuilder.getClassDescriptionExpression( data ) ), 
-			pos: Context.currentPos(),
-		});
-		
+			fields.push(
+			{
+				name:  "__INJECTION_DATA",
+				access:  [ Access.APublic, Access.AStatic ],
+				kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, ReflectionBuilder.getClassDescriptionExpression( data ) ), 
+				pos: Context.currentPos(),
+			});
+		}
 		return fields;
 	}
 }
