@@ -1,5 +1,7 @@
 package hex.di;
 
+import hex.di.reflect.FastClassDescriptionProviderTest;
+
 /**
  * ...
  * @author Francis Bourre
@@ -7,5 +9,5 @@ package hex.di;
 class DISuite
 {
 	@Suite( "DI suite" )
-    public var list : Array<Class<Dynamic>> = [ /*FastInjectorTest,*/ InjectorTest ];
+    public var list : Array<Class<Dynamic>> = [ FastClassDescriptionProviderTest, /*FastInjectorTest,*/ InjectorTest ];
 }
