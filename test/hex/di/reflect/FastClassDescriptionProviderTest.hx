@@ -20,6 +20,7 @@ class FastClassDescriptionProviderTest
 	@Test( "Test getClassDescription with null parameter" )
 	public function testGetClassDescriptionWithNullParameter() : Void
 	{
+		var provider = new FastClassDescriptionProvider();
 		Assert.methodCallThrows( NullPointerException, provider, provider.getClassDescription, [null], "'getClassDescription' should throw 'NullPointerException' when called with null argument" );
 	}
 	
