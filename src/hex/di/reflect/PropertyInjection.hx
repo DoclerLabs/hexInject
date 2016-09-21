@@ -7,7 +7,7 @@ package hex.di.reflect;
 typedef PropertyInjection =
 {
 	var propertyName 	: String;
-	var propertyType 	: Class<Dynamic>;
+	var propertyType 	: String;
 	var injectionName 	: String;
 	var isOptional 		: Bool;
 }

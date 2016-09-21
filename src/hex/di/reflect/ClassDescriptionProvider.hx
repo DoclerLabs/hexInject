@@ -33,7 +33,7 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 		{
 			var properties 	= [ 
 				for ( prop in classAnnotationData.props ) 
-						{ propertyName: prop.name, propertyType: Type.resolveClass( prop.type ), injectionName: prop.key, isOptional: prop.isOpt } 
+						{ propertyName: prop.name, propertyType: prop.type, injectionName: prop.key, isOptional: prop.isOpt } 
 				];
 			
 			var methods 		: Array<MethodInjection> 	= [];
@@ -42,7 +42,7 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 			
 			for ( method in classAnnotationData.methods )
 			{
-				var arguments = [ for ( arg in method.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
+				var arguments = [ for ( arg in method.args ) { type: arg.type, injectionName: arg.key, isOptional: arg.isOpt } ];
 				
 				if ( method.isPost )
 				{
@@ -69,8 +69,8 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 			}
 
 			var ctor = classAnnotationData.ctor;
-			var ctorArguments = [ for ( arg in ctor.args ) { type: Type.resolveClass( arg.type ), injectionName: arg.key, isOptional: arg.isOpt } ];
-			var constructorInjection = { methodName: 'new', args: ctorArguments };
+			var ctorArguments = [ for ( arg in ctor.args ) { type: arg.type, injectionName: arg.key, isOptional: arg.isOpt } ];
+			var constructorInjection = { args: ctorArguments };
 			return { constructorInjection: constructorInjection, properties: properties, methods: methods, postConstruct: postConstruct, preDestroy: preDestroy };
 		}
 		else
