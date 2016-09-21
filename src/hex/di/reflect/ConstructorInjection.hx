@@ -8,6 +8,5 @@ import hex.di.reflect.ArgumentInjectionVO;
  */
 typedef ConstructorInjection =
 {
-	public var methodName( default, null ) : String;
     public var args( default, null ) : Array<ArgumentInjectionVO>;
 }

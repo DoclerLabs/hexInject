@@ -9,7 +9,16 @@ import hex.error.NullPointerException;
  */
 class FastClassDescriptionProvider implements IClassDescriptionProvider
 {
-    public function new(){}
+	private var _data : Map<String, ClassDescription>;
+	
+    public function new()
+	{
+		var injectionDataClass = Type.resolveClass( "InjectionData" );
+		if ( injectionDataClass != null )
+		{
+			this._data = ( cast injectionDataClass ).data;
+		}
+	}
 
     inline public function getClassDescription( type : Class<Dynamic> ) : ClassDescription
     {
@@ -19,6 +28,7 @@ class FastClassDescriptionProvider implements IClassDescriptionProvider
 			throw new NullPointerException( 'type cannot be null' );
 		}
 		#end
-		return Reflect.getProperty( type, "__INJECTION_DATA" );
+		
+		return this._data.get( Type.getClassName( type ) );
     }
 }

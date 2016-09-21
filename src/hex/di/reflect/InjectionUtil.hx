@@ -41,13 +41,13 @@ class InjectionUtil
 	}
 	
 	inline public static function applyPropertyInjection( 	propertyName: String, 
-															propertyType: Class<Dynamic>, 
+															propertyType: String, 
 															injectionName: String = '', 
 															isOptional: Bool = false,
 															target : Dynamic, 
 															injector : Injector ) : Dynamic
 	{
-		var provider = injector.getProvider( propertyType, injectionName );
+		var provider = injector.getProvider( Type.resolveClass( propertyType ), injectionName );
 
 		if ( provider != null )
 		{
@@ -57,9 +57,9 @@ class InjectionUtil
 		{
 			throw new MissingMappingException( "'" + Stringifier.stringify( injector ) + 
 												"' is missing a mapping to inject into property named '" + 
-												propertyName + "' with type '" + Type.getClassName( propertyType ) + 
+												propertyName + "' with type '" + propertyType + 
 												"' inside instance of '" + Stringifier.stringify( target ) + 
-												"'. Target dependency: '" + Type.getClassName( propertyType ) 
+												"'. Target dependency: '" + propertyType 
 												+ "|" + injectionName + "'" );
 		}
 
@@ -77,7 +77,7 @@ class InjectionUtil
 		var args = [];
         for ( arg in arguments )
         {
-			var provider = injector.getProvider( arg.type, arg.injectionName );
+			var provider = injector.getProvider( Type.resolveClass( arg.type ), arg.injectionName );
 
 			if ( provider != null )
 			{
@@ -99,23 +99,23 @@ class InjectionUtil
 		return args;
 	}
 	
-	inline static function _throwMissingMappingException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : Injector, methodName : String ) : Void
+	inline static function _throwMissingMappingException( target : Dynamic, type : String, injectionName : String, injector : Injector, methodName : String ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
 			"' is missing a mapping to inject argument into method named '" +
-				methodName + "' with type '" + Type.getClassName( type ) +
+				methodName + "' with type '" + type +
 					"' inside instance of '" + Stringifier.stringify( target ) +
-						"'. Target dependency: '" + Type.getClassName( type ) +
+						"'. Target dependency: '" + type +
 							"|" + injectionName + "'" );
     }
 	
-	inline static function _throwMissingMappingConstructorException( target : Dynamic, type : Class<Dynamic>, injectionName : String, injector : Injector ) : Void
+	inline static function _throwMissingMappingConstructorException( target : Dynamic, type : String, injectionName : String, injector : Injector ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
 			"' is missing a mapping to inject argument" +
-				" with type '" + Type.getClassName( type ) +
+				" with type '" + type +
 					"' into constructor of class '" + Stringifier.stringify( target ) +
-						"'. Target dependency: '" + Type.getClassName( type ) +
+						"'. Target dependency: '" + type +
 							"|" + injectionName + "'" );
     }
 }
