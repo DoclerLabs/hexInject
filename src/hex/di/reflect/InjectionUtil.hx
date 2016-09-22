@@ -17,19 +17,19 @@ class InjectionUtil
 	
 	inline public static function applyClassInjection<T>( target : T, injector : Injector, classDescription : ClassDescription ) : T
 	{
-		for ( property in classDescription.properties )
+		for ( property in classDescription.p )
 		{
-			InjectionUtil.applyPropertyInjection( property.propertyName, property.propertyType, property.injectionName, property.isOptional, target, injector );
+			InjectionUtil.applyPropertyInjection( property.p, property.t, property.n, property.o, target, injector );
 		}
 		
-		for ( method in classDescription.methods )
+		for ( method in classDescription.m )
 		{
-			InjectionUtil.applyMethodInjection( target, injector, method.args, method.methodName );
+			InjectionUtil.applyMethodInjection( target, injector, method.a, method.m );
 		}
 		
-		for ( postConstruct in classDescription.postConstruct )
+		for ( postConstruct in classDescription.pc )
 		{
-			InjectionUtil.applyMethodInjection( target, injector, postConstruct.args, postConstruct.methodName );
+			InjectionUtil.applyMethodInjection( target, injector, postConstruct.a, postConstruct.m );
 		}
 
 		return target;
@@ -77,21 +77,21 @@ class InjectionUtil
 		var args = [];
         for ( arg in arguments )
         {
-			var provider = injector.getProvider( Type.resolveClass( arg.type ), arg.injectionName );
+			var provider = injector.getProvider( Type.resolveClass( arg.t ), arg.n );
 
 			if ( provider != null )
 			{
 				args.push( provider.getResult( injector ) );
 			}
-			else if ( !arg.isOptional )
+			else if ( !arg.o )
 			{
 				if ( methodName == 'new' )
 				{
-					InjectionUtil._throwMissingMappingConstructorException( target, arg.type, arg.injectionName, injector );
+					InjectionUtil._throwMissingMappingConstructorException( target, arg.t, arg.n, injector );
 				}
 				else 
 				{
-					InjectionUtil._throwMissingMappingException( target, arg.type, arg.injectionName, injector, methodName );
+					InjectionUtil._throwMissingMappingException( target, arg.t, arg.n, injector, methodName );
 				}
 			}
 		}

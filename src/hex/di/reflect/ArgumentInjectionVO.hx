@@ -2,7 +2,12 @@ package hex.di.reflect;
 
 typedef ArgumentInjectionVO =
 {
-    var type             : String;
-    var injectionName    : String;
-    var isOptional       : Bool;
+	//type
+    var t : String;
+	
+	//injectionName
+    var n : String;
+	
+	//isOptional
+    var o : Bool;
 }

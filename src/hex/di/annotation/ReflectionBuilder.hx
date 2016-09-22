@@ -33,7 +33,7 @@ class ReflectionBuilder
 			case EObjectDecl( fields ):
 				for ( f in fields )
 				{
-					if ( f.field == 'order' )
+					if ( f.field == 'o' )
 					{
 						switch( f.expr.expr )
 						{
@@ -62,13 +62,13 @@ class ReflectionBuilder
 			
 			var eProp = EObjectDecl([
 				//propertyName
-				{field: "propertyName", expr: macro $v { property.propertyName }}, 
+				{field: "p", expr: macro $v { property.propertyName }}, 
 				//propertyType
-				{field: "propertyType", expr: macro $v { property.propertyType }},
+				{field: "t", expr: macro $v { property.propertyType }},
 				//injectionName
-				{field: "injectionName", expr: macro $v { key == null?"":key }},
+				{field: "n", expr: macro $v { key == null?"":key }},
 				//isOptional
-				{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
+				{field: "o", expr: macro $v{isOpt==null?false:isOpt}}
 			]);
 			propValues.push( {expr: eProp, pos:Context.currentPos()} );
 		}
@@ -91,11 +91,11 @@ class ReflectionBuilder
 				
 				var eArg = EObjectDecl([
 					//type
-					{field: "type", expr: macro $v { argData[ j ].argumentType }},
+					{field: "t", expr: macro $v { argData[ j ].argumentType }},
 					//injectionName
-					{field: "injectionName", expr: macro $v { key == null?"":key }},
+					{field: "n", expr: macro $v { key == null?"":key }},
 					//isOptional
-					{field: "isOptional", expr: macro $v{isOpt==null?false:isOpt}}
+					{field: "o", expr: macro $v{isOpt==null?false:isOpt}}
 				]);
 				
 				argValues.push( { expr: eArg, pos:Context.currentPos() } );
@@ -111,11 +111,11 @@ class ReflectionBuilder
 				order = postConstruct.annotationKeys[ 0 ];
 				var eMethod = EObjectDecl([
 					//methodName
-					{field: "methodName", expr: macro $v { method.methodName }},
+					{field: "m", expr: macro $v { method.methodName }},
 					//args
-					{field: "args", expr: { expr:EArrayDecl(argValues), pos: Context.currentPos() }},
+					{field: "a", expr: { expr:EArrayDecl(argValues), pos: Context.currentPos() }},
 					//order
-					{field: "order", expr: macro $v{order==null?0:order}}
+					{field: "o", expr: macro $v{order==null?0:order}}
 				]);
 				
 				postConstructValues.push( { expr: eMethod, pos: Context.currentPos() } );
@@ -125,11 +125,11 @@ class ReflectionBuilder
 				order = preDestroy.annotationKeys[ 0 ];
 				var eMethod = EObjectDecl([
 					//methodName
-					{field: "methodName", expr: macro $v { method.methodName }},
+					{field: "m", expr: macro $v { method.methodName }},
 					//args
-					{field: "args", expr: { expr:EArrayDecl(argValues), pos: Context.currentPos() }},
+					{field: "a", expr: { expr:EArrayDecl(argValues), pos: Context.currentPos() }},
 					//order
-					{field: "order", expr: macro $v{order==null?0:order}}
+					{field: "o", expr: macro $v{order==null?0:order}}
 				]);
 				
 				preDestroyValues.push( {expr: eMethod, pos: Context.currentPos()} );
@@ -138,9 +138,9 @@ class ReflectionBuilder
 			{
 				var eMethod = EObjectDecl([
 					//methodName
-					{field: "methodName", expr: macro $v { method.methodName }},
+					{field: "m", expr: macro $v { method.methodName }},
 					//args
-					{field: "args", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
+					{field: "a", expr: {expr:EArrayDecl(argValues), pos: Context.currentPos()}}
 				]);
 				
 				methodValues.push( { expr: eMethod, pos: Context.currentPos() } );
@@ -165,11 +165,11 @@ class ReflectionBuilder
 				
 				var eCtorArg = EObjectDecl([
 					//type
-					{field: "type", expr: macro $v { ctorAnn.argumentDatas[ i ].argumentType }},
+					{field: "t", expr: macro $v { ctorAnn.argumentDatas[ i ].argumentType }},
 					//injectionName
-					{field: "injectionName", expr: macro $v { key == null?"":key }},
+					{field: "n", expr: macro $v { key == null?"":key }},
 					//isOptional
-					{field: "isOptional", expr: macro $v{isOpt == null?false:isOpt}}
+					{field: "o", expr: macro $v{isOpt == null?false:isOpt}}
 				]);
 				
 				ctorArgValues.push( { expr: eCtorArg, pos:Context.currentPos() } );
@@ -178,24 +178,29 @@ class ReflectionBuilder
 
 		var ctor = EObjectDecl([
 				//args
-				{field: "args", expr: {expr:EArrayDecl(ctorArgValues), pos: Context.currentPos()}}
+				{field: "a", expr: {expr:EArrayDecl(ctorArgValues), pos: Context.currentPos()}}
 			]);
 		
 			
-		//final expression
-		var classDescription = EObjectDecl([
-				//constructorInjection
-				{field: "constructorInjection", expr: { expr: ctor, pos: Context.currentPos() }},
-				//properties
-				{field: "properties", expr: { expr: EArrayDecl(propValues), pos: Context.currentPos() }},
-				//methods
-				{field: "methods", expr: { expr: EArrayDecl(methodValues), pos: Context.currentPos() }},
-				//postConstruct
-				{field: "postConstruct", expr: { expr: EArrayDecl(postConstructValues), pos: Context.currentPos() }},
-				//preDestroy
-				{field: "preDestroy", expr: {expr: EArrayDecl(preDestroyValues), pos: Context.currentPos()}}
-			]);
+		var finalExpressions = [];
+		
+		//constructorInjection
+		finalExpressions.push( {field: "c", expr: { expr: ctor, pos: Context.currentPos() }} );
 
+		//properties
+		finalExpressions.push( {field: "p", expr: { expr: EArrayDecl(propValues), pos: Context.currentPos() }} );
+
+		//methods
+		finalExpressions.push( {field: "m", expr: { expr: EArrayDecl(methodValues), pos: Context.currentPos() }} );
+
+		//postConstruct
+		finalExpressions.push( {field: "pc", expr: { expr: EArrayDecl(postConstructValues), pos: Context.currentPos() }} );
+
+		//preDestroy
+		finalExpressions.push( {field: "pd", expr: {expr: EArrayDecl(preDestroyValues), pos: Context.currentPos()}} );
+
+		//final expression
+		var classDescription = EObjectDecl( finalExpressions );
 		return { expr: classDescription, pos: Context.currentPos() };
 	}
 }

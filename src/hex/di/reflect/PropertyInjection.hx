@@ -6,8 +6,15 @@ package hex.di.reflect;
  */
 typedef PropertyInjection =
 {
-	var propertyName 	: String;
-	var propertyType 	: String;
-	var injectionName 	: String;
-	var isOptional 		: Bool;
+	//propertyName
+	var p : String;
+	
+	//propertyType
+	var t : String;
+	
+	//injectionName
+	var n : String;
+	
+	//isOptional
+	var o : Bool;
 }
