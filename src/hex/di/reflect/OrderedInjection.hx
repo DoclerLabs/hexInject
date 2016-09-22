@@ -6,7 +6,12 @@ package hex.di.reflect;
  */
 typedef OrderedInjection =
 {
-	public var methodName : String;
-    public var args : Array<ArgumentInjectionVO>;
-	public var order : Int;
+	//methodName
+	public var m : String;
+	
+	//args
+    public var a : Array<ArgumentInjectionVO>;
+	
+	//order
+	public var o : Int;
 }
