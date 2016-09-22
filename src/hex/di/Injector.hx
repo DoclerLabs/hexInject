@@ -118,9 +118,9 @@ class Injector implements IDependencyInjector
 		var classDescription = this._classDescriptor.getClassDescription( type );
 
 		var instance : Dynamic; 
-		if ( classDescription != null && classDescription.constructorInjection != null )
+		if ( classDescription != null && classDescription.c != null )
 		{
-			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.constructorInjection.args );
+			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a );
 		}
 		else
 		{
@@ -239,9 +239,9 @@ class Injector implements IDependencyInjector
 		var classDescription = this._classDescriptor.getClassDescription( Type.getClass( instance ) );
 		if ( classDescription != null )
 		{
-			for ( preDestroy in classDescription.preDestroy )
+			for ( preDestroy in classDescription.pd )
 			{
-				InjectionUtil.applyMethodInjection( instance, this, preDestroy.args, preDestroy.methodName );
+				InjectionUtil.applyMethodInjection( instance, this, preDestroy.a, preDestroy.m );
 			}
 		}
 	}
@@ -300,7 +300,7 @@ class Injector implements IDependencyInjector
 		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.PRE_CONSTRUCT, this, target, targetType ) );
 
 		InjectionUtil.applyClassInjection( target, this, classDescription );
-		if ( classDescription.preDestroy.length > 0 )
+		if ( classDescription.pd.length > 0 )
 		{
 			this._managedObjects.put( target,  target );
 		}

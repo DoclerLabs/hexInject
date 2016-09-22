@@ -6,9 +6,18 @@ package hex.di.reflect;
  */
 typedef ClassDescription =
 {
-	public var constructorInjection : ConstructorInjection;
-	public var properties 			: Array<PropertyInjection>;
-	public var methods 				: Array<MethodInjection>;
-	public var postConstruct 		: Array<OrderedInjection>;
-	public var preDestroy 			: Array<OrderedInjection>;
+	//constructorInjection
+	public var c : ConstructorInjection;
+	
+	//properties
+	public var p : Array<PropertyInjection>;
+	
+	//methods
+	public var m : Array<MethodInjection>;
+	
+	//postConstruct
+	public var pc : Array<OrderedInjection>;
+	
+	//preDestroy
+	public var pd : Array<OrderedInjection>;
 }

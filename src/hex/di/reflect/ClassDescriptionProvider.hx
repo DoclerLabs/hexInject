@@ -33,7 +33,7 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 		{
 			var properties 	= [ 
 				for ( prop in classAnnotationData.props ) 
-						{ propertyName: prop.name, propertyType: prop.type, injectionName: prop.key, isOptional: prop.isOpt } 
+						{ p: prop.name, t: prop.type, n: prop.key, o: prop.isOpt } 
 				];
 			
 			var methods 		: Array<MethodInjection> 	= [];
@@ -42,19 +42,19 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 			
 			for ( method in classAnnotationData.methods )
 			{
-				var arguments = [ for ( arg in method.args ) { type: arg.type, injectionName: arg.key, isOptional: arg.isOpt } ];
+				var arguments = [ for ( arg in method.args ) { t: arg.type, n: arg.key, o: arg.isOpt } ];
 				
 				if ( method.isPost )
 				{
-					postConstruct.push( { methodName: method.name, args: arguments, order: method.order } );
+					postConstruct.push( { m: method.name, a: arguments, o: method.order } );
 				}
 				else if ( method.isPre )
 				{
-					preDestroy.push( { methodName: method.name, args: arguments, order: method.order } );
+					preDestroy.push( { m: method.name, a: arguments, o: method.order } );
 				}
 				else
 				{
-					methods.push( { methodName: method.name, args: arguments } );
+					methods.push( { m: method.name, a: arguments } );
 				}
 			}
 			
@@ -69,9 +69,9 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 			}
 
 			var ctor = classAnnotationData.ctor;
-			var ctorArguments = [ for ( arg in ctor.args ) { type: arg.type, injectionName: arg.key, isOptional: arg.isOpt } ];
-			var constructorInjection = { args: ctorArguments };
-			return { constructorInjection: constructorInjection, properties: properties, methods: methods, postConstruct: postConstruct, preDestroy: preDestroy };
+			var ctorArguments = [ for ( arg in ctor.args ) { t: arg.type, n: arg.key, o: arg.isOpt } ];
+			var constructorInjection = { a: ctorArguments };
+			return { c: constructorInjection, p: properties, m: methods, pc: postConstruct, pd: preDestroy };
 		}
 		else
 		{
@@ -81,7 +81,7 @@ class ClassDescriptionProvider implements IClassDescriptionProvider
 	
 	inline static function _sort( a : OrderedInjection, b : OrderedInjection ) : Int
 	{
-		return  a.order - b.order;
+		return  a.o - b.o;
 	}
 }
 
