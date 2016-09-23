@@ -10,6 +10,7 @@ import hex.di.mock.injectees.MixedParametersMethodInjectee;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
 import hex.di.mock.injectees.NamedArrayCollectionInjectee;
 import hex.di.mock.injectees.NamedClassInjectee;
+import hex.di.mock.injectees.NamedClassInjecteeWithClassName;
 import hex.di.mock.injectees.NamedInterfaceInjectee;
 import hex.di.mock.injectees.OneNamedParameterConstructorInjectee;
 import hex.di.mock.injectees.OneNamedParameterMethodInjectee;
@@ -779,5 +780,18 @@ class InjectorTest
 		var injectee = this.injector.instantiateUnmapped( TwoParametersConstructorInjecteeWithConstructorInjectedDependencies );
 		Assert.isNotNull("Instance of Class should have been injected for OneParameterConstructorInjectee parameter", injectee.getDependency1() );
 		Assert.isNotNull("Instance of Class should have been injected for TwoParametersConstructorInjectee parameter", injectee.getDependency2() );
+	}
+	
+	@Test( "Test named class injectee with class name" )
+	public function testNamedClassInjecteeWithClassName() : Void
+	{
+		var clazzInstance = new Clazz();
+		injector.map( Clazz, 'Clazz' ).toValue( clazzInstance );
+		
+		injector.map( NamedClassInjecteeWithClassName, 'NamedClassInjecteeWithClassName' ).toType( NamedClassInjecteeWithClassName );
+		var instance = injector.getInstance( NamedClassInjecteeWithClassName, 'NamedClassInjecteeWithClassName' );
+
+		Assert.isInstanceOf( instance, NamedClassInjecteeWithClassName, "instance should be an instance of 'NamedClassInjecteeWithClassName'" );
+		Assert.equals( clazzInstance, instance.property, "Named value should have been injected" );
 	}
 }
