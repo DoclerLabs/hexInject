@@ -46,7 +46,7 @@ class FastAnnotationReader
 		{
 			//get reflection data
 			var reflectionData = ReflectionBuilder.getClassDescriptionExpression( data );
-			FastAnnotationReader._map.setasasdasd( className, reflectionData );
+			FastAnnotationReader._map.set( className, reflectionData );
 			
 			// append the expression as a field
 			fields.push(
