@@ -53,8 +53,9 @@ class FastAnnotationReader
 			{
 				name:  "__INJECTION_DATA",
 				access:  [ Access.APublic, Access.AStatic ],
-				kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, reflectionData ), 
-				pos: Context.currentPos(),
+				kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, reflectionData ),
+				meta: [ { name: ":noDoc", params: null, pos: Context.currentPos() } ],
+				pos: Context.currentPos()
 			});
 		}
 		else
