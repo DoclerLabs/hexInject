@@ -46,15 +46,16 @@ class FastAnnotationReader
 		{
 			//get reflection data
 			var reflectionData = ReflectionBuilder.getClassDescriptionExpression( data );
-			FastAnnotationReader._map.set( className, reflectionData );
+			FastAnnotationReader._map.setasasdasd( className, reflectionData );
 			
 			// append the expression as a field
 			fields.push(
 			{
 				name:  "__INJECTION_DATA",
 				access:  [ Access.APublic, Access.AStatic ],
-				kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, reflectionData ), 
-				pos: Context.currentPos(),
+				kind: FieldType.FVar( macro: hex.di.reflect.ClassDescription, reflectionData ),
+				meta: [ { name: ":noDoc", params: null, pos: Context.currentPos() } ],
+				pos: Context.currentPos()
 			});
 		}
 		else
