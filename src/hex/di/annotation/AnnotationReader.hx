@@ -13,7 +13,11 @@ import hex.di.annotation.InjectorPropertyVO;
 import hex.error.PrivateConstructorException;
 
 /**
- * ...
+ * Latest version of the framework doesn't use
+ * this reader anymore.
+ * FastAnnotationReader is used instead to get 
+ * better performance.
+ * 
  * @author Francis Bourre
  */
 class AnnotationReader
@@ -34,7 +38,7 @@ class AnnotationReader
 		}
 		
 		//parse annotations
-		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataExpr, [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
+		var fields : Array<Field> = hex.annotation.AnnotationReader.parseMetadata( metadataExpr, Context.getBuildFields(), [ "Inject", "PostConstruct", "Optional", "PreDestroy" ], false );
 		
 		//get data result
 		var data = hex.annotation.AnnotationReader._static_classes[ hex.annotation.AnnotationReader._static_classes.length - 1 ];
