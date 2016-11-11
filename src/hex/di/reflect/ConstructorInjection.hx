@@ -1,7 +1,5 @@
 package hex.di.reflect;
 
-import hex.di.reflect.ArgumentInjectionVO;
-
 /**
  * ...
  * @author Francis Bourre
@@ -9,5 +7,5 @@ import hex.di.reflect.ArgumentInjectionVO;
 typedef ConstructorInjection =
 {
 	//args
-    public var a( default, null ) : Array<ArgumentInjectionVO>;
+    public var a( default, null ) : Array<ArgumentInjection>;
 }

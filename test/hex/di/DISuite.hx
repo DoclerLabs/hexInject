@@ -1,6 +1,7 @@
 package hex.di;
 
 import hex.di.reflect.FastClassDescriptionProviderTest;
+import hex.di.util.InjectionUtilTest;
 
 /**
  * ...
@@ -9,5 +10,5 @@ import hex.di.reflect.FastClassDescriptionProviderTest;
 class DISuite
 {
 	@Suite( "DI suite" )
-    public var list : Array<Class<Dynamic>> = [ FastClassDescriptionProviderTest, /*FastInjectorTest,*/ InjectorTest ];
+    public var list : Array<Class<Dynamic>> = [ FastClassDescriptionProviderTest, InjectorTest, InjectionUtilTest ];
 }

@@ -1,7 +1,5 @@
 package hex.di.reflect;
 
-import hex.di.reflect.ArgumentInjectionVO;
-
 /**
  * ...
  * @author Francis Bourre
@@ -12,5 +10,5 @@ typedef MethodInjection =
     public var m : String;
 	
 	//args
-    public var a : Array<ArgumentInjectionVO>;
+    public var a : Array<ArgumentInjection>;
 }
