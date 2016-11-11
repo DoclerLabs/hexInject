@@ -35,7 +35,7 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyConstructorInjection( type : Class<Dynamic>, injector : Injector, arguments : Array<ArgumentInjectionVO> ) : Dynamic
+	inline public static function applyConstructorInjection( type : Class<Dynamic>, injector : Injector, arguments : Array<ArgumentInjection> ) : Dynamic
 	{
 		return Type.createInstance( type, InjectionUtil.gatherArgs( type, injector, arguments, 'new' ) );
 	}
@@ -47,7 +47,7 @@ class InjectionUtil
 															target : Dynamic, 
 															injector : Injector ) : Dynamic
 	{
-		var provider = injector.getProvider( Type.resolveClass( propertyType ), injectionName );
+		var provider = injector.getProvider( propertyType, injectionName );
 
 		if ( provider != null )
 		{
@@ -66,18 +66,18 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyMethodInjection( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjectionVO>, methodName : String ) : Dynamic
+	inline public static function applyMethodInjection( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String ) : Dynamic
 	{
 		Reflect.callMethod( target, Reflect.field( target, methodName ), InjectionUtil.gatherArgs( target, injector, arguments, methodName ) );
         return target;
 	}
 	
-	inline static function gatherArgs( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjectionVO>, methodName : String ) : Array<Dynamic>
+	inline static function gatherArgs( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String ) : Array<Dynamic>
 	{
 		var args = [];
         for ( arg in arguments )
         {
-			var provider = injector.getProvider( Type.resolveClass( arg.t ), arg.n );
+			var provider = injector.getProvider( arg.t, arg.n );
 
 			if ( provider != null )
 			{

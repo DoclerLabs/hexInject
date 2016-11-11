@@ -1,6 +1,6 @@
 package hex.di.reflect;
 
-typedef ArgumentInjectionVO =
+typedef ArgumentInjection =
 {
 	//type
     var t : String;

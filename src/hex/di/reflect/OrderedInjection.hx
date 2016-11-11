@@ -10,7 +10,7 @@ typedef OrderedInjection =
 	public var m : String;
 	
 	//args
-    public var a : Array<ArgumentInjectionVO>;
+    public var a : Array<ArgumentInjection>;
 	
 	//order
 	public var o : Int;
