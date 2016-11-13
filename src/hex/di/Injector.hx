@@ -8,7 +8,6 @@ import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
 import hex.di.reflect.ClassDescription;
-import hex.di.reflect.ClassDescriptionProvider;
 import hex.di.reflect.FastClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionUtil;
@@ -31,7 +30,6 @@ class Injector implements IDependencyInjector
 	
 	public function new() 
 	{
-		//this._classDescriptor	= new ClassDescriptionProvider( new AnnotationDataProvider( IInjectorContainer ) );
 		this._classDescriptor	= new FastClassDescriptionProvider();
 
 		this._ed 				= new LightweightClosureDispatcher();
@@ -42,9 +40,15 @@ class Injector implements IDependencyInjector
 
 	public function createChildInjector() : Injector
 	{
-		var injector 				= new Injector();
-		injector._parentInjector 	= this;
+		var injector = new Injector();
+		injector.setParent( this );
 		return injector;
+	}
+	
+	//TODO write test
+	public function setParent( injector : Injector ) : Void
+	{
+		this._parentInjector = injector;
 	}
 
 	//
@@ -94,9 +98,9 @@ class Injector implements IDependencyInjector
 		}
 	}
 	
-	public function getProvider( type : Class<Dynamic>, name : String = '' ) : IDependencyProvider
+	public function getProvider( className : String, name : String = '' ) : IDependencyProvider
 	{
-		var mappingID = this._getMappingID( type, name );
+		var mappingID = className + '|' + name;
 		var mapping : InjectionMapping = this._mapping[ mappingID ];
 
 		if ( this._mapping[ mappingID ] != null )
@@ -105,7 +109,7 @@ class Injector implements IDependencyInjector
 		}
 		else if ( this._parentInjector != null )
 		{
-			return this._parentInjector.getInstance( type, name );
+			return this._parentInjector.getInstance( Type.resolveClass( className.split( '<' )[ 0 ] ), name );
 		}
 		else
 		{
@@ -162,18 +166,12 @@ class Injector implements IDependencyInjector
 	
 	public function unmap( type : Class<Dynamic>, name : String = '' ) : Void
 	{
-		var mappingID = this._getMappingID( type, name );
-		var mapping = this._mapping[ mappingID ];
-
-		#if debug
-		if ( mapping == null )
-		{
-			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
-		}
-		#end
-
-		mapping.provider.destroy();
-		this._mapping.remove( mappingID );
+		this._unmap( this._getMappingID( type, name ) );
+	}
+	
+	public function unmapClassName( className : String, name : String = '' ) : Void
+	{
+		this._unmap( className + '|' + name );
 	}
 	
 	public function hasDirectMapping( type : Class<Dynamic>, name : String = '' ) : Bool
@@ -278,6 +276,52 @@ class Injector implements IDependencyInjector
 		this._managedObjects 				= new HashMap();
 		this._ed 							= new LightweightClosureDispatcher();
 	}
+	
+	public function mapClassName( className : String, name : String = '' ) : InjectionMapping
+	{
+		var type = Type.resolveClass( className.split( '<' )[ 0 ] );
+		var mappingID = className + '|' + name;
+		
+		if ( this._mapping[ mappingID ] != null )
+		{
+			return this._mapping[ mappingID ];
+		}
+		else
+		{
+			return this._createMapping( type, name, mappingID );
+		}
+	}
+	
+	public function mapClassNameToValue( className : String, value : Dynamic, ?name : String = '' ) : Void
+	{
+		this.mapClassName( className, name ).toValue( value );
+	}
+
+    public function mapClassNameToType( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+	{
+		this.mapClassName( className, name ).toType( type );
+	}
+
+    public function mapClassNameToSingleton( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+	{
+		this.mapClassName( className, name ).toSingleton( type );
+	}
+	
+	//
+	inline function _unmap( mappingID : String ): Void
+	{
+		var mapping = this._mapping[ mappingID ];
+
+		#if debug
+		if ( mapping == null )
+		{
+			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
+		}
+		#end
+
+		mapping.provider.destroy();
+		this._mapping.remove( mappingID );
+	}
 
 	function _createMapping( type : Class<Dynamic>, name : String, mappingID : String ) : InjectionMapping
 	{
@@ -308,7 +352,6 @@ class Injector implements IDependencyInjector
 		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.POST_CONSTRUCT, this, target, targetType ) );
 	}
 	
-	//
 	inline function _getMappingID( type : Class<Dynamic>, name : String = '' ) : String
 	{
 		#if neko

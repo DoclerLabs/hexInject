@@ -27,6 +27,7 @@ addons:
 
 install:
   - git clone --recursive https://github.com/DoclerLabs/hexCore.git ./hexcore
+  - git clone --recursive https://github.com/DoclerLabs/hexReflection.git ./hexreflection
   - git clone --recursive https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - git clone --recursive https://github.com/DoclerLabs/hexUnit.git ./hexunit
   - export DISPLAY=:99.0;

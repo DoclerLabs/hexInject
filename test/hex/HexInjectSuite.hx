@@ -1,7 +1,6 @@
 package hex;
 
 import hex.di.DISuite;
-import hex.di.annotation.AnnotationSuite;
 
 /**
  * ...
@@ -10,5 +9,5 @@ import hex.di.annotation.AnnotationSuite;
 class HexInjectSuite
 {
 	@Suite( "HexInject suite" )
-    public var list : Array<Class<Dynamic>> = [ AnnotationSuite, DISuite ];
+    public var list : Array<Class<Dynamic>> = [ DISuite ];
 }

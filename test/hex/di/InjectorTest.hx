@@ -5,6 +5,7 @@ import hex.di.mock.injectees.ClassInjectee;
 import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
+import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
 import hex.di.mock.injectees.MixedParametersConstructorInjectee;
 import hex.di.mock.injectees.MixedParametersMethodInjectee;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
@@ -28,10 +29,13 @@ import hex.di.mock.injectees.TwoNamedParametersConstructorInjectee;
 import hex.di.mock.injectees.TwoNamedParametersMethodInjectee;
 import hex.di.mock.injectees.TwoParametersConstructorInjectee;
 import hex.di.mock.injectees.TwoParametersConstructorInjecteeWithConstructorInjectedDependencies;
+import hex.di.mock.injectees.TwoParametersConstructorInjecteeWithGeneric;
 import hex.di.mock.injectees.TwoParametersMethodInjectee;
+import hex.di.mock.injectees.TwoParametersMethodInjecteeWithGeneric;
 import hex.di.mock.injectees.XMLInjectee;
 import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Clazz2;
+import hex.di.mock.types.ClazzWithGeneric;
 import hex.di.mock.types.ComplexClazz;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
@@ -93,6 +97,29 @@ class InjectorTest
 		this.injector.map( Interface ).toValue( value );
 		this.injector.injectInto( injectee );
 		Assert.equals( value, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapToValue' with interface fully qualified name parameter" )
+	public function testMapToValueWithInterfaceFullyQualifiedNameParameter() : Void
+	{
+		var injectee = new InterfaceInjectee();
+		var value = new Clazz();
+		this.injector.mapClassName( "hex.di.mock.types.Interface" ).toValue( value );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapToValue' with interface fully qualified name parameter and generic" )
+	public function testMapToValueWithInterfaceFullyQualifiedNameParameterAndGeneric() : Void
+	{
+		var injectee = new InterfaceInjecteeWithGeneric();
+		var s = new ClazzWithGeneric<String>();
+		var i = new ClazzWithGeneric<Int>();
+		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<String>" ).toValue( s );
+		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<Int>" ).toValue( i );
+		this.injector.injectInto( injectee );
+		Assert.equals( s, injectee.stringProperty, "Value should have been injected" );
+		Assert.equals( i, injectee.intProperty, "Value should have been injected" );
 	}
 	
 	@Test( "Test 'mapToValue' with named class parameter" )
@@ -285,6 +312,21 @@ class InjectorTest
 		Assert.notEquals( injectee.getDependency2(), injectee2.getDependency2(), "Injected values for Interface should be different" );
 	}
 	
+	@Test( "Test two parameters method injection with generic" )
+	public function testTwoParametersMethodInjectionWithGeneric() : Void
+	{
+		var injectee = new TwoParametersMethodInjecteeWithGeneric();
+		var injectee2 = new TwoParametersMethodInjecteeWithGeneric();
+		this.injector.mapClassName( "hex.di.mock.types.ClazzWithGeneric<String>" ).toType( ClazzWithGeneric );
+		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<Int>" ).toType( ClazzWithGeneric );
+		this.injector.injectInto( injectee );
+		Assert.isNotNull( injectee.getDependency(), "Instance of ClazzWithGeneric should have been injected for 1st parameter" );
+		Assert.isNotNull( injectee.getDependency2(), "Instance of ClazzWithGeneric should have been injected for 2nd parameter" );
+		this.injector.injectInto( injectee2 );
+		Assert.notEquals( injectee.getDependency(), injectee2.getDependency(), "Injected values should be different" );
+		Assert.notEquals( injectee.getDependency2(), injectee2.getDependency2(), "Injected values for Interface should be different" );
+	}
+	
 	@Test( "Test two named parameters method injection" )
 	public function testTwoNamedParametersMethodInjection() : Void
 	{
@@ -343,6 +385,17 @@ class InjectorTest
 		Assert.equals( 'stringDependency', injectee.getDependency2(), "The String 'stringDependency' should have been injected for String parameter" );
 	}
 	
+	@Test( "Test two parameters constructor injection with generic" )
+	public function testTwoParametersConstructorInjectionWithGeneric() : Void
+	{
+		this.injector.mapClassName( "hex.di.mock.types.ClazzWithGeneric<String>" ).toType( ClazzWithGeneric );
+		var value = new ClazzWithGeneric<Int>();
+		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<Int>" ).toValue( value );
+		var injectee = injector.instantiateUnmapped( TwoParametersConstructorInjecteeWithGeneric );
+		Assert.isNotNull( injectee.getDependency(), "Instance of 'ClazzWithGeneric' should have been injected for 1st parameter" );
+		Assert.equals( value, injectee.getDependency2(), "'value' should have been injected for 2nd parameter" );
+	}
+	
 	@Test( "Test one named parameter constructor injection" )
 	public function testOneNamedParameterConstructorInjection() : Void
 	{
@@ -377,7 +430,7 @@ class InjectorTest
 	public function testNamedArrayInjection() : Void
 	{
 		var ac = new Array<Dynamic>();
-		this.injector.map( Array, "namedCollection" ).toValue( ac );
+		this.injector.mapClassName( "Array<Dynamic>", "namedCollection" ).toValue( ac );
 		var injectee = injector.instantiateUnmapped( NamedArrayCollectionInjectee );
 		Assert.isNotNull( injectee.ac, "Instance 'ac' should have been injected for named ArrayCollection parameter" );
 		Assert.equals( ac, injectee.ac, "Instance field 'ac' should be identical to local variable 'ac'" );

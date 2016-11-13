@@ -11,6 +11,7 @@
   "dependencies": 
   {
 	"hexcore": "git:https://github.com/DoclerLabs/hexCore.git",
+	"hexreflection": "git:https://github.com/DoclerLabs/hexReflection.git",
 	"hexannotation": "git:https://github.com/DoclerLabs/hexAnnotation.git"
   }
 }
