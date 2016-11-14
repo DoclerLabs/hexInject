@@ -80,9 +80,9 @@ class Injector implements IDependencyInjector
     public function getInstance<T>( type : Class<T>, name : String = '' ) : T
 	{
 		var mappingID = this._getMappingID( type, name );
-		var mapping : InjectionMapping = this._mapping[ mappingID ];
+		var mapping = this._mapping[ mappingID ];
 
-		if ( this._mapping[ mappingID ] != null )
+		if ( mapping != null )
 		{
 			return mapping.getResult();
 		}
@@ -94,6 +94,27 @@ class Injector implements IDependencyInjector
 		{
 			throw new MissingMappingException( 	"'" + Stringifier.stringify( this ) + "' is missing a mapping to get instance with type '" +
 												Type.getClassName( type ) + "' inside instance of '" + Stringifier.stringify( this ) + 
+												"'. Target dependency: '" + mappingID + "'" );
+		}
+	}
+	
+	public function getInstanceWithClassName<T>( className : String, name : String = '' ) : T
+	{
+		var mappingID = className + '|' + name;
+		var mapping = this._mapping[ mappingID ];
+		
+		if ( this._mapping[ mappingID ] != null )
+		{
+			return mapping.getResult();
+		}
+		else if ( this._parentInjector != null )
+		{
+			return this._parentInjector.getInstanceWithClassName( className, name );
+		}
+		else
+		{
+			throw new MissingMappingException( 	"'" + Stringifier.stringify( this ) + "' is missing a mapping to get instance with type '" +
+												className + "' inside instance of '" + Stringifier.stringify( this ) + 
 												"'. Target dependency: '" + mappingID + "'" );
 		}
 	}
