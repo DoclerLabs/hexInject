@@ -115,8 +115,10 @@ class InjectorTest
 		var injectee = new InterfaceInjecteeWithGeneric();
 		var s = new ClazzWithGeneric<String>();
 		var i = new ClazzWithGeneric<Int>();
+		var o = new ClazzWithGeneric<{}>();
 		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<String>" ).toValue( s );
 		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<Int>" ).toValue( i );
+		this.injector.mapClassName( "hex.di.mock.types.InterfaceWithGeneric<{}>" ).toValue( o );
 		this.injector.injectInto( injectee );
 		Assert.equals( s, injectee.stringProperty, "Value should have been injected" );
 		Assert.equals( i, injectee.intProperty, "Value should have been injected" );
