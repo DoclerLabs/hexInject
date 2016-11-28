@@ -25,11 +25,18 @@ addons:
       - libnss3:i386
       - libgtk2.0-0:i386
 
+before_install:
+  - echo $TRAVIS_BRANCH
+  - if [[ "$TRAVIS_BRANCH" != "master" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=master; fi
+  - echo $TRAVIS_TAG
+  - if [[ "$TRAVIS_TAG" != "" ]]; then export DEPENDENCIES_BRANCH=$TRAVIS_TAG; fi
+  - echo $DEPENDENCIES_BRANCH
+
 install:
-  - git clone --recursive https://github.com/DoclerLabs/hexCore.git ./hexcore
-  - git clone --recursive https://github.com/DoclerLabs/hexReflection.git ./hexreflection
-  - git clone --recursive https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
-  - git clone --recursive https://github.com/DoclerLabs/hexUnit.git ./hexunit
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexCore.git ./hexcore
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
   - export DISPLAY=:99.0;
   - export AUDIODEV=null;
   - haxe flash/install.hxml
