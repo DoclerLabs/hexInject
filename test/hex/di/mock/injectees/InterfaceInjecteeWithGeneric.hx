@@ -14,6 +14,9 @@ class InterfaceInjecteeWithGeneric implements IInjectorContainer
 	@Inject
 	public var intProperty : InterfaceWithGeneric<Int>;
 	
+	@Inject
+	public var objectProperty : InterfaceWithGeneric<{}>;
+	
 	public function new() 
 	{
 		
