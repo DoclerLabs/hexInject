@@ -62,17 +62,17 @@ class Injector implements IDependencyInjector
 		return this._ed.removeEventListener( eventType, callback );
 	}
 
-	public function mapToValue( clazz : Class<Dynamic>, value : Dynamic, name : String = '' ) : Void
+	public function mapToValue<T>( clazz : Class<T>, value : T, ?name : String = '' ) : Void
 	{
 		this.map( clazz, name ).toValue( value );
 	}
 
-	public function mapToType( clazz : Class<Dynamic>, type : Class<Dynamic>, name:String = '' ) : Void
+	public function mapToType<T>( clazz : Class<T>, type : Class<T>, name:String = '' ) : Void
 	{
 		this.map( clazz, name ).toType( type );
 	}
 
-	public function mapToSingleton( clazz : Class<Dynamic>, type : Class<Dynamic>, name:String = '' ) : Void
+	public function mapToSingleton<T>( clazz : Class<T>, type : Class<T>, name:String = '' ) : Void
 	{
 		this.map( clazz, name ).toSingleton( type );
 	}
@@ -138,7 +138,7 @@ class Injector implements IDependencyInjector
 		}
 	}
 
-    public function instantiateUnmapped( type : Class<Dynamic> ) : Dynamic
+    public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
 		var classDescription = this._classDescriptor.getClassDescription( type );
 
@@ -167,7 +167,7 @@ class Injector implements IDependencyInjector
 		return this.satisfies( type ) ? this.getInstance( type ) : this.instantiateUnmapped( type );
 	}
 	
-	public function hasMapping( type : Class<Dynamic>, name : String = '' ) : Bool
+	public function hasMapping<T>( type : Class<T>, name : String = '' ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
 		
@@ -185,7 +185,7 @@ class Injector implements IDependencyInjector
 		}
 	}
 	
-	public function unmap( type : Class<Dynamic>, name : String = '' ) : Void
+	public function unmap<T>( type : Class<T>, name : String = '' ) : Void
 	{
 		this._unmap( this._getMappingID( type, name ) );
 	}
@@ -313,17 +313,17 @@ class Injector implements IDependencyInjector
 		}
 	}
 	
-	public function mapClassNameToValue( className : String, value : Dynamic, ?name : String = '' ) : Void
+	public function mapClassNameToValue<T>( className : String, value : T, ?name : String = '' ) : Void
 	{
 		this.mapClassName( className, name ).toValue( value );
 	}
 
-    public function mapClassNameToType( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+    public function mapClassNameToType<T>( className : String, type : Class<T>, name:String = '' ) : Void
 	{
 		this.mapClassName( className, name ).toType( type );
 	}
 
-    public function mapClassNameToSingleton( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+    public function mapClassNameToSingleton<T>( className : String, type : Class<T>, name:String = '' ) : Void
 	{
 		this.mapClassName( className, name ).toSingleton( type );
 	}

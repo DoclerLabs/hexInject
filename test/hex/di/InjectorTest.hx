@@ -833,8 +833,8 @@ class InjectorTest
 		injector.map( String ).toValue( 'stringDependency' );
 
 		var injectee = this.injector.instantiateUnmapped( TwoParametersConstructorInjecteeWithConstructorInjectedDependencies );
-		Assert.isNotNull("Instance of Class should have been injected for OneParameterConstructorInjectee parameter", injectee.getDependency1() );
-		Assert.isNotNull("Instance of Class should have been injected for TwoParametersConstructorInjectee parameter", injectee.getDependency2() );
+		Assert.isNotNull( injectee.getDependency1(), "Instance of Class should have been injected for OneParameterConstructorInjectee parameter" );
+		Assert.isNotNull( injectee.getDependency2(), "Instance of Class should have been injected for TwoParametersConstructorInjectee parameter" );
 	}
 	
 	@Test( "Test named class injectee with class name" )

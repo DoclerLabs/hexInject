@@ -15,8 +15,9 @@ class InjectionUtil
 		
 	}
 	
-	macro public static function map( injector : IDependencyInjector, e : Expr ) : Void
+	macro public static function map( injector : ExprOf<IDependencyInjector>, clazz : Expr ) : Expr
 	{
-		
+		trace( clazz );
+		return macro true;
 	}
 }
