@@ -1,5 +1,6 @@
 package hex.di.util;
 
+import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.di.InjectionEvent;
 import hex.di.provider.IDependencyProvider;
@@ -13,19 +14,76 @@ using hex.di.util.InjectionUtil;
  */
 class InjectionUtilTest 
 {
-	@Test( "test map method" )
-	public function testMapMethod() : Void
+	var _injector : MockDependencyInjector;
+	
+	@Before
+	public function setUp() : Void
 	{
-		var injector = new MockDependencyInjector();
+		this._injector = new MockDependencyInjector();
+	}
+	
+	@Test( "test get dependency instance" )
+	public function testgetDependencyInstance() : Void
+	{
+		this._injector.getDependencyInstance( new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>() );
+	
+		var mapping = this._injector.instanceWithClassName;
+		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to value" )
+	public function testMapDependencyToValue() : Void
+	{
+		var o = new MockClassWithTypeParams<String, MockClassWithTypeParams<String, Int>>( "hello", new MockClassWithTypeParams<String, Int>( "yo", 3 ) );
 		
-		//This fails badly because the compiler is not able to understand this expression
-		//injector.map( Array<String> );
-		Assert.isTrue( true );
+		this._injector.mapDependencyToValue( 
+			new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>(), 
+			o 
+		);
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
+		Assert.equals( o, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to type" )
+	public function testMapDependencyToType() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>(), 
+			new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>()
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
+		Assert.equals( MockClassWithTypeParams, mapping.type );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to singleton" )
+	public function testMapDependencyToSingleton() : Void
+	{
+		this._injector.mapDependencyToSingleton( 
+			new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>(), 
+			new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>()
+		);
+		
+		var mapping = this._injector.mappedSingleton;
+		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
+		Assert.equals( MockClassWithTypeParams, mapping.type );
+		Assert.equals( "", mapping.name );
 	}
 }
 
 private class MockDependencyInjector implements IDependencyInjector
 {
+	public var instanceWithClassName 	: { className : String, ?name : String };
+	public var mappedValue 				: { className : String, value : Dynamic, ?name : String };
+	public var mappedType 				: { className : String, type : Class<Dynamic>, ?name : String };
+	public var mappedSingleton 			: { className : String, type : Class<Dynamic>, ?name : String };
+	
 	public function new() 
 	{
 		
@@ -58,6 +116,7 @@ private class MockDependencyInjector implements IDependencyInjector
 	
 	public function getInstanceWithClassName<T>( className : String, name : String = '' ) : T
 	{
+		this.instanceWithClassName = { className: className, name: name };
 		return null;
 	}
 	
@@ -76,17 +135,17 @@ private class MockDependencyInjector implements IDependencyInjector
 		
 	}
 	
-	public function mapToValue( clazz : Class<Dynamic>, value : Dynamic, ?name : String = '' ) : Void 
+	public function mapToValue<T>( clazz : Class<T>, value : T, ?name : String = '' ) : Void 
 	{
 		
 	}
 	
-	public function mapToType( clazz : Class<Dynamic>, type : Class<Dynamic>, name : String = '' ) : Void 
+	public function mapToType<T>( clazz : Class<T>, type : Class<T>, name : String = '' ) : Void 
 	{
 		
 	}
 	
-	public function mapToSingleton( clazz : Class<Dynamic>, type : Class<Dynamic>, name : String = '' ) : Void 
+	public function mapToSingleton<T>( clazz : Class<T>, type : Class<T>, name : String = '' ) : Void 
 	{
 		
 	}
@@ -113,17 +172,17 @@ private class MockDependencyInjector implements IDependencyInjector
 	
 	public function mapClassNameToValue( className : String, value : Dynamic, ?name : String = '' ) : Void
 	{
-		
+		this.mappedValue = { className: className, value: value, name: name };
 	}
 
     public function mapClassNameToType( className : String, type : Class<Dynamic>, name:String = '' ) : Void
 	{
-		
+		this.mappedType = { className: className, type: type, name: name };
 	}
 
     public function mapClassNameToSingleton( className : String, type : Class<Dynamic>, name:String = '' ) : Void
 	{
-		
+		this.mappedSingleton = { className: className, type: type, name: name };
 	}
 	
 	public function unmapClassName( className : String, name : String = '' ) : Void
