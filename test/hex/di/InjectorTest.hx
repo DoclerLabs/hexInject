@@ -362,12 +362,14 @@ class InjectorTest
 		Assert.notEquals( injectee.getDependency3(), injectee2.getDependency3(), "Injected values for named Interface should be different" );
 	}
 	
+	#if debug
 	@Test( "Test get mapping result without provider throws an exception" )
 	public function testGetMappingResultWithoutProviderThrowsAnException() : Void
 	{
 		this.injector.map( Clazz );
 		Assert.methodCallThrows( NullPointerException, this.injector, this.injector.instantiateUnmapped, [ null ], "" );
 	}
+	#end
 	
 	@Test( "Test one parameter constructor injection" )
 	public function testOneParameterConstructorInjection() : Void
