@@ -2,6 +2,7 @@ package hex.di;
 
 import hex.di.error.MissingMappingException;
 import hex.di.mock.injectees.ClassInjectee;
+import hex.di.mock.injectees.ClassInjecteeWithBoolProperty;
 import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
@@ -133,10 +134,22 @@ class InjectorTest
 		var f2 : String->Array<Int>->Bool = function ( s: String, a : Array<Int> ) : Bool { return true; };
 		this.injector.mapClassName( "String->Void" ).toValue( f );
 		this.injector.mapClassName( "String->Array<Int>->Bool" ).toValue( f2 );
+		this.injector.injectInto( injectee );
 		Assert.equals( f, injectee.methodWithStringArgument, "Value should have been injected" );
 		Assert.equals( f2, injectee.methodWithMultipleArguments, "Value should have been injected" );
 	}
 	
+	@Test( "Test 'mapClassNameToValue' with boolean value" )
+	public function testMapToValueWithBoolean() : Void
+	{
+		var injectee = new ClassInjecteeWithBoolProperty();
+		var b = true;
+		this.injector.mapClassNameToValue( "Bool", b );
+		this.injector.injectInto( injectee );
+		Assert.isTrue( injectee.property, "Value should have been injected" );
+	}
+	
+	//
 	@Test( "Test 'mapToValue' with named class parameter" )
 	public function testMapToValueWithNamedClassParameter() : Void
 	{
@@ -595,7 +608,6 @@ class InjectorTest
 		var injectee2 : ClassInjectee = injector.instantiateUnmapped( ClassInjectee );
 		Assert.notEquals( injectee1.property, injectee2.property, 'injectee1.property is not the same instance as injectee2.property' );
 	}
-	
 	
 	@Test
 	public function testGetInstanceOnUmappedInterfaceThrowsException() : Void

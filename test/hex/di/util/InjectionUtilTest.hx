@@ -75,6 +75,30 @@ class InjectionUtilTest
 		Assert.equals( MockClassWithTypeParams, mapping.type );
 		Assert.equals( "", mapping.name );
 	}
+	
+	@Test( "test map dependency to method" )
+	public function testMapDependencyToMethod() : Void
+	{
+		var f = function ( s : String, a : Array<Int> ) : Bool { return true; };
+		this._injector.mapDependencyToValue( new Dependency<String->Array<Int>->Bool>(), f );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "String->Array<Int>->Bool", mapping.className );
+		Assert.equals( f, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to Boolean" )
+	public function testMapDependencyToBoolean() : Void
+	{
+		var o = true;
+		this._injector.mapDependencyToValue( new Dependency<Bool>(), o );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "Bool", mapping.className );
+		Assert.isTrue( mapping.value );
+		Assert.equals( "", mapping.name );
+	}
 }
 
 private class MockDependencyInjector implements IDependencyInjector
