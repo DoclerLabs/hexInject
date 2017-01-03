@@ -3,7 +3,11 @@ package hex.di.util;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.di.InjectionEvent;
+import hex.di.mock.types.MockEnum;
+import hex.di.mock.types.MockTypedef;
+import hex.di.mock.types.MockTypedefImplementation;
 import hex.di.provider.IDependencyProvider;
+import hex.structures.Point;
 import hex.unittest.assertion.Assert;
 
 using hex.di.util.InjectionUtil;
@@ -97,6 +101,42 @@ class InjectionUtilTest
 		var mapping = this._injector.mappedValue;
 		Assert.equals( "Bool", mapping.className );
 		Assert.isTrue( mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to enum" )
+	public function testMapDependencyToEnum() : Void
+	{
+		var item = MockEnum.MockItemWithBool( true );
+		this._injector.mapDependencyToValue( new Dependency<MockEnum>(), item );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.di.mock.types.MockEnum", mapping.className );
+		Assert.equals( item, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to abstract" )
+	public function testMapDependencyToAbstract() : Void
+	{
+		var p = new Point( 3, 4 );
+		this._injector.mapDependencyToValue( new Dependency<Point>(), p );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.structures.Point", mapping.className );
+		Assert.equals( p, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to typedef" )
+	public function testMapDependencyToTypedef() : Void
+	{
+		var o = new MockTypedefImplementation();
+		this._injector.mapDependencyToValue( new Dependency<MockTypedef>(), o );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( o, mapping.value );
 		Assert.equals( "", mapping.name );
 	}
 }

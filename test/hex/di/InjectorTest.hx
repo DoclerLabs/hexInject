@@ -2,7 +2,10 @@ package hex.di;
 
 import hex.di.error.MissingMappingException;
 import hex.di.mock.injectees.ClassInjectee;
+import hex.di.mock.injectees.ClassInjecteeWithAbstractProperty;
 import hex.di.mock.injectees.ClassInjecteeWithBoolProperty;
+import hex.di.mock.injectees.ClassInjecteeWithEnumProperty;
+import hex.di.mock.injectees.ClassInjecteeWithTypedefProperty;
 import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
@@ -41,7 +44,10 @@ import hex.di.mock.types.ClazzWithGeneric;
 import hex.di.mock.types.ComplexClazz;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
+import hex.di.mock.types.MockEnum;
+import hex.di.mock.types.MockTypedefImplementation;
 import hex.error.NullPointerException;
+import hex.structures.Point;
 import hex.unittest.assertion.Assert;
 
 /**
@@ -147,6 +153,36 @@ class InjectorTest
 		this.injector.mapClassNameToValue( "Bool", b );
 		this.injector.injectInto( injectee );
 		Assert.isTrue( injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with abstract value" )
+	public function testMapToValueWithAbstract() : Void
+	{
+		var injectee = new ClassInjecteeWithAbstractProperty();
+		var p = new Point( 3, 4 );
+		this.injector.mapClassNameToValue( "hex.structures.Point", p );
+		this.injector.injectInto( injectee );
+		Assert.equals( p, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with enum value" )
+	public function testMapToValueWithEnum() : Void
+	{
+		var injectee = new ClassInjecteeWithEnumProperty();
+		var item = MockEnum.MockItemWithBool( true );
+		this.injector.mapClassNameToValue( "hex.di.mock.types.MockEnum", item );
+		this.injector.injectInto( injectee );
+		Assert.equals( item, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with typedef value" )
+	public function testMapToValueWithTypedef() : Void
+	{
+		var injectee = new ClassInjecteeWithTypedefProperty();
+		var item = new MockTypedefImplementation();
+		this.injector.mapClassNameToValue( "hex.di.mock.types.MockTypedef", item );
+		this.injector.injectInto( injectee );
+		Assert.equals( item, injectee.property, "Value should have been injected" );
 	}
 	
 	//

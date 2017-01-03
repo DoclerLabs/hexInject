@@ -2,6 +2,7 @@ package hex.di.util;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.TypeTools;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.error.PrivateConstructorException;
@@ -34,8 +35,16 @@ class InjectionUtil
 															value : ExprOf<T>,
 															?id : ExprOf<String>
 														) : Expr
-	{
+	{	
 		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
+
+		//check type matching
+		var varType = 
+					TypeTools.toComplexType( 
+						Context.typeof( 
+							Context.parseInlineString( '( null : ${classReference})', Context.currentPos() ) ) );
+		Context.typeof( macro { var v : $varType = $value; } );
+		
 		return macro { $injector.mapClassNameToValue( $v{ classReference }, $value, $id ); };
 	}
 	
@@ -47,6 +56,9 @@ class InjectionUtil
 	{
 		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
 		var typeReference = InjectionUtil._getClassReference( type );
+		
+		
+		
 		return macro { $injector.mapClassNameToType( $v{ classReference }, $typeReference, $id ); };
 	}
 	
