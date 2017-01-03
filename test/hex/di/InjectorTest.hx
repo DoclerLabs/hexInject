@@ -6,6 +6,7 @@ import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
 import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
+import hex.di.mock.injectees.InterfaceInjecteeWithMethod;
 import hex.di.mock.injectees.MixedParametersConstructorInjectee;
 import hex.di.mock.injectees.MixedParametersMethodInjectee;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
@@ -122,6 +123,18 @@ class InjectorTest
 		this.injector.injectInto( injectee );
 		Assert.equals( s, injectee.stringProperty, "Value should have been injected" );
 		Assert.equals( i, injectee.intProperty, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapToValue' with interface fully qualified name parameter and method" )
+	public function testMapToValueWithInterfaceFullyQualifiedNameParameterAndMethod() : Void
+	{
+		var injectee = new InterfaceInjecteeWithMethod();
+		var f : String->Void = function ( s: String ) {};
+		var f2 : String->Array<Int>->Bool = function ( s: String, a : Array<Int> ) : Bool { return true; };
+		this.injector.mapClassName( "String->Void" ).toValue( f );
+		this.injector.mapClassName( "String->Array<Int>->Bool" ).toValue( f2 );
+		Assert.equals( f, injectee.methodWithStringArgument, "Value should have been injected" );
+		Assert.equals( f2, injectee.methodWithMultipleArguments, "Value should have been injected" );
 	}
 	
 	@Test( "Test 'mapToValue' with named class parameter" )
@@ -679,7 +692,7 @@ class InjectorTest
 	@Test( "Test unmap singleton provider invokes PreDestroy methods on singleton" )
 	public function testUnmapSingletonProviderInvokesPredestroyMethodsOnSingleton() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		var singleton = this.injector.getInstance( Clazz );
 		Assert.isFalse( singleton.preDestroyCalled, "singleton.preDestroyCalled should be false" );
 		this.injector.unmap( Clazz );
@@ -698,7 +711,7 @@ class InjectorTest
 	@Test( "Test 'teardown' destroy all singletons" )
 	public function testTeardownDestroyAllSingletons() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		this.injector.map( Interface ).toSingleton( Clazz );
 		var singleton1 = injector.getInstance( Clazz );
 		var singleton2 = injector.getInstance( Interface );
@@ -805,7 +818,7 @@ class InjectorTest
 	@Test( "Test 'getOrCreateNewInstance' provides mapped value" )
 	public function testGetOrCreateNewInstanceProvidesMappedValue() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		var instance1 = this.injector.getOrCreateNewInstance( Clazz );
 		var instance2 = this.injector.getOrCreateNewInstance( Clazz );
 		Assert.equals( instance1, instance2, "" );
