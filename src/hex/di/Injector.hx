@@ -275,7 +275,7 @@ class Injector implements IDependencyInjector
 		}
 		else
 		{
-			return this._createMapping( type, name, mappingID );
+			return this._createMapping( name, mappingID );
 		}
 	}
 
@@ -300,7 +300,6 @@ class Injector implements IDependencyInjector
 	
 	public function mapClassName( className : String, name : String = '' ) : InjectionMapping
 	{
-		var type = Type.resolveClass( className.split( '<' )[ 0 ] );
 		var mappingID = className + '|' + name;
 		
 		if ( this._mapping[ mappingID ] != null )
@@ -309,7 +308,7 @@ class Injector implements IDependencyInjector
 		}
 		else
 		{
-			return this._createMapping( type, name, mappingID );
+			return this._createMapping( name, mappingID );
 		}
 	}
 	
@@ -344,7 +343,7 @@ class Injector implements IDependencyInjector
 		this._mapping.remove( mappingID );
 	}
 
-	function _createMapping( type : Class<Dynamic>, name : String, mappingID : String ) : InjectionMapping
+	function _createMapping( name : String, mappingID : String ) : InjectionMapping
 	{
 		if ( this._processedMapping[ mappingID ] )
 		{
@@ -353,7 +352,7 @@ class Injector implements IDependencyInjector
 
 		this._processedMapping[ mappingID ] = true;
 
-		var mapping = new InjectionMapping( this, type, name, mappingID );
+		var mapping = new InjectionMapping( this, name, mappingID );
 		this._mapping[ mappingID ] = mapping;
 		this._processedMapping.remove( mappingID );
 

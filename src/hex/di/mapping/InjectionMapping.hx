@@ -20,10 +20,9 @@ class InjectionMapping
 
     public var provider	( default, null ) : IDependencyProvider;
 
-    public function new( injector : IDependencyInjector, type : Class<Dynamic>, name : String, mappingID : String )
+    public function new( injector : IDependencyInjector, name : String, mappingID : String )
     {
         this._injector			= injector;
-        this._type 				= type;
         this._name 				= name;
         this._mappingID 		= mappingID;
     }
@@ -38,11 +37,6 @@ class InjectionMapping
 		#end
 		
         return this.provider.getResult( this._injector );
-    }
-
-    inline public function asSingleton() : InjectionMapping
-    {
-        return this.toSingleton( this._type );
     }
 
     inline public function toSingleton( type : Class<Dynamic> ) : InjectionMapping
