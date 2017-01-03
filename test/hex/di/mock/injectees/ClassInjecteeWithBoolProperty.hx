@@ -13,10 +13,4 @@ class ClassInjecteeWithBoolProperty implements IInjectorContainer
 	{
 		
 	}
-	
-	@PostConstruct( 1 )
-	public function doSomeStuff() : Void
-	{
-
-	}
 }
