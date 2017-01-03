@@ -37,14 +37,7 @@ class InjectionUtil
 														) : Expr
 	{	
 		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
-
-		//check type matching
-		var varType = 
-					TypeTools.toComplexType( 
-						Context.typeof( 
-							Context.parseInlineString( '( null : ${classReference})', Context.currentPos() ) ) );
-		Context.typeof( macro { var v : $varType = $value; } );
-		
+		MacroUtil.assertValueMatching( classReference, value, clazz.pos );
 		return macro { $injector.mapClassNameToValue( $v{ classReference }, $value, $id ); };
 	}
 	
@@ -54,11 +47,9 @@ class InjectionUtil
 															?id : ExprOf<String>
 														) : Expr
 	{
-		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
-		var typeReference = InjectionUtil._getClassReference( type );
-		
-		
-		
+		var classReference 			= InjectionUtil._getStringClassRepresentation( clazz );
+		var typeReference 			= InjectionUtil._getClassReference( type );
+		MacroUtil.assertTypeMatching( classReference, InjectionUtil._getStringClassRepresentation( type ), clazz.pos );
 		return macro { $injector.mapClassNameToType( $v{ classReference }, $typeReference, $id ); };
 	}
 	
@@ -68,8 +59,9 @@ class InjectionUtil
 																?id : ExprOf<String>
 															) : Expr
 	{
-		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
-		var typeReference = InjectionUtil._getClassReference( type );
+		var classReference 			= InjectionUtil._getStringClassRepresentation( clazz );
+		var typeReference 			= InjectionUtil._getClassReference( type );
+		MacroUtil.assertTypeMatching( classReference, InjectionUtil._getStringClassRepresentation( type ), clazz.pos );
 		return macro { $injector.mapClassNameToSingleton( $v{ classReference }, $typeReference, $id ); };
 	}
 	

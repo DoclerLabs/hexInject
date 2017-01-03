@@ -8,6 +8,7 @@ import hex.di.mock.types.MockTypedef;
 import hex.di.mock.types.MockTypedefImplementation;
 import hex.di.provider.IDependencyProvider;
 import hex.structures.Point;
+import hex.structures.Size;
 import hex.unittest.assertion.Assert;
 
 using hex.di.util.InjectionUtil;
@@ -116,8 +117,8 @@ class InjectionUtilTest
 		Assert.equals( "", mapping.name );
 	}
 	
-	@Test( "test map dependency to abstract" )
-	public function testMapDependencyToAbstract() : Void
+	@Test( "test map value to abstract" )
+	public function testMapValueToAbstract() : Void
 	{
 		var p = new Point( 3, 4 );
 		this._injector.mapDependencyToValue( new Dependency<Point>(), p );
@@ -128,6 +129,34 @@ class InjectionUtilTest
 		Assert.equals( "", mapping.name );
 	}
 	
+	@Test( "test map type to abstract" )
+	public function testMapTypeToAbstract() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<Point>(), 
+			new Dependency<Size>() 
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.structures.Point", mapping.className );
+		Assert.equals( Size, mapping.type );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to type with typedef" )
+	public function testMapDependencyToTypeWithTypedef() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<MockTypedef>(), 
+			new Dependency<MockTypedefImplementation>()
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( MockTypedefImplementation, mapping.type );
+		Assert.equals( "", mapping.name );
+	
+	}
 	@Test( "test map dependency to typedef" )
 	public function testMapDependencyToTypedef() : Void
 	{
@@ -137,6 +166,20 @@ class InjectionUtilTest
 		var mapping = this._injector.mappedValue;
 		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
 		Assert.equals( o, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map typedef to singleton" )
+	public function testMapTypedefToSingleton() : Void
+	{
+		this._injector.mapDependencyToSingleton( 
+			new Dependency<MockTypedef>(), 
+			new Dependency<MockTypedefImplementation>()
+		);
+		
+		var mapping = this._injector.mappedSingleton;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( MockTypedefImplementation, mapping.type );
 		Assert.equals( "", mapping.name );
 	}
 }
