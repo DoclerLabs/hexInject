@@ -54,23 +54,18 @@ import hex.unittest.assertion.Assert;
  * ...
  * @author Francis Bourre
  */
-class InjectorTest
+class InjectorTest implements IInjectorListener
 {
-    var injector 				: Injector;
-    var receivedInjectorEvents 	: Array<Dynamic>;
+    var injector 						: Injector;
+    var injectorPreConstructArguments 	: Array<Dynamic>;
+    var injectorPostConstructArguments 	: Array<Dynamic>;
 
     @Before
     public function runBeforeEachTest() : Void
     {
-        this.injector 				= new Injector();
-        this.receivedInjectorEvents = [];
-    }
-
-    @After
-    public function teardown() : Void
-    {
-        this.injector 				= null;
-        this.receivedInjectorEvents = null;
+        this.injector = new Injector();
+		this.injectorPreConstructArguments = [];
+		this.injectorPostConstructArguments = [];
     }
 
    @Test( "Test 'unmap' remvoves existing mapping" )
@@ -665,76 +660,27 @@ class InjectorTest
 		Assert.isNull( injectee.getDependency(), "Injectee mustn't contain Interface instance" );
 	}
 	
-	@Test( "Test injector dispatches POST_INSTANTIATE event" )
-	public function testInjectorDispatchesPostInstantiateEvent() : Void
+	@Test( "Test 'injectInto' triggers `onPreConstruct` and `onPostConstruct` callbacks" )
+	public function testInjectIntoTriggersPreAndPostConstruct() : Void
 	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.POST_INSTANTIATE ), "InjectionEvent.POST_INSTANTIATE should be dispatched" );
-	}
-	
-	@Test( "Test injector dispatches PRE_CONSTRUCT event" )
-	public function testInjectorDispatchesPreConstructEvent() : Void
-	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.PRE_CONSTRUCT ), "InjectionEvent.PRE_CONSTRUCT should be dispatched" );
-	}
-	
-	@Test( "Test injector dispatches POST_CONSTRUCT event" )
-	public function testInjectorDispatchesPostConstructEvent() : Void
-	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.POST_CONSTRUCT ), "InjectionEvent.POST_CONSTRUCT should be dispatched" );
-	}
-	
-	@Test( "Test injector events contain instance reference" )
-	public function testInjectorEventsContainsInstanceReference() : Void
-	{
-		this.injector.map( Clazz ).toType( Clazz );
-		this.injector.addEventListener( InjectionEvent.POST_INSTANTIATE, this._assertThatEventHasClazzInstance );
-		this.injector.addEventListener( InjectionEvent.PRE_CONSTRUCT, this._assertThatEventHasClazzInstance );
-		this.injector.addEventListener( InjectionEvent.POST_CONSTRUCT, this._assertThatEventHasClazzInstance );
-		var instance : Clazz = this.injector.getInstance( Clazz );
-	}
-	
-	@Test( "Test 'injectInto' dispatches PRE_CONSTRUCT event" )
-	public function testInjectIntoDispatchesPreConstructEvent() : Void
-	{
-		Assert.isTrue( this._injectIntoInstanceAndListenForEvent( InjectionEvent.PRE_CONSTRUCT ), "InjectionEvent.PRE_CONSTRUCT should be listened" );
-	}
-
-	@Test( "Test 'injectInto' dispatches POST_CONSTRUCT event" )
-	public function testInjectIntoDispatchesPostConstructEvent() : Void
-	{
-		Assert.isTrue( this._injectIntoInstanceAndListenForEvent( InjectionEvent.POST_CONSTRUCT ), "InjectionEvent.POST_CONSTRUCT should be listened" );
-	}
-
-	function _assertThatEventHasClazzInstance( e : InjectionEvent ) : Void
-	{
-		Assert.isInstanceOf( e.instance, Clazz, "" );
-	}
-	
-	function _injectIntoInstanceAndListenForEvent( eventType : String ) : Bool
-	{
+		this.injector.addListener( this );
+		
 		var injectee = new ClassInjectee();
 		this.injector.map( Clazz ).toValue( new Clazz() );
-		this._listenToInjectorEvent( eventType );
 		this.injector.injectInto( injectee );
-		return receivedInjectorEvents.pop() == eventType;
+		
+		Assert.deepEquals( [ this.injector, injectee, ClassInjectee ], this.injectorPreConstructArguments  );
+		Assert.deepEquals( [ this.injector, injectee, ClassInjectee ], this.injectorPostConstructArguments  );
 	}
 	
-	function _constructMappedTypeAndListenForEvent( eventType : String ) : Bool
+	public function onPreConstruct( target : IDependencyInjector, instance : Dynamic, instanceType : Class<Dynamic> ): Void
 	{
-		this.injector.map( Clazz ).toType( Clazz );
-		this._listenToInjectorEvent( eventType );
-		this.injector.getInstance( Clazz );
-		return receivedInjectorEvents.pop() == eventType;
+		this.injectorPreConstructArguments =  [ target, instance, instanceType ];
 	}
 	
-	function _listenToInjectorEvent( eventType : String ) : Void
+	public function onPostConstruct( target : IDependencyInjector, instance : Dynamic, instanceType : Class<Dynamic> ) : Void
 	{
-		this.injector.addEventListener( eventType, this._onInjectorEvent );
-	}
-	
-	public function _onInjectorEvent( e : InjectionEvent ) : Void
-	{
-		this.receivedInjectorEvents.push( e.type );
+		this.injectorPostConstructArguments =  [ target, instance, instanceType ];
 	}
 	
 	@Test( "Test unmap singleton provider invokes PreDestroy methods on singleton" )

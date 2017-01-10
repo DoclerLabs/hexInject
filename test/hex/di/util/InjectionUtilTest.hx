@@ -2,7 +2,7 @@ package hex.di.util;
 
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
-import hex.di.InjectionEvent;
+import hex.di.IInjectorListener;
 import hex.di.mock.types.MockEnum;
 import hex.di.mock.types.MockTypedef;
 import hex.di.mock.types.MockTypedefImplementation;
@@ -262,12 +262,12 @@ private class MockDependencyInjector implements IDependencyInjector
 		
 	}
 
-	public function addEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	public function addListener( listener : IInjectorListener ) : Bool
 	{
 		return false;
 	}
 
-	public function removeEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	public function removeListener( listener : IInjectorListener ) : Bool
 	{
 		return false;
 	}

@@ -1,5 +1,9 @@
 package hex.di;
 
+#if macro
+//skip this class
+#else
+
 import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
 import hex.di.error.InjectorException;
@@ -11,7 +15,8 @@ import hex.di.reflect.ClassDescription;
 import hex.di.reflect.FastClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionUtil;
-import hex.event.LightweightClosureDispatcher;
+import hex.event.ITrigger;
+import hex.event.ITriggerOwner;
 import hex.log.Stringifier;
 import hex.util.ClassUtil;
 
@@ -19,20 +24,23 @@ import hex.util.ClassUtil;
  * ...
  * @author Francis Bourre
  */
-class Injector implements IDependencyInjector
+class Injector 
+	implements ITriggerOwner
+	implements IDependencyInjector
 {
-	var _ed						: LightweightClosureDispatcher<InjectionEvent>;
 	var _mapping				: Map<String,InjectionMapping>;
 	var _processedMapping 		: Map<String,Bool>;
 	var _managedObjects			: HashMap<Dynamic, Dynamic>;
 	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
+	@Trigger
+    public var trigger ( default, never ) : ITrigger<IInjectorListener>;
+	
 	public function new() 
 	{
 		this._classDescriptor	= new FastClassDescriptionProvider();
 
-		this._ed 				= new LightweightClosureDispatcher();
 		this._mapping 			= new Map();
 		this._processedMapping 	= new Map();
 		this._managedObjects 	= new HashMap();
@@ -52,14 +60,14 @@ class Injector implements IDependencyInjector
 	}
 
 	//
-	public function addEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	public function addListener( listener: IInjectorListener ) : Bool
 	{
-		return this._ed.addEventListener( eventType, callback );
+		return this.trigger.connect( listener );
 	}
-
-	public function removeEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	
+	public function removeListener( listener: IInjectorListener ) : Bool
 	{
-		return this._ed.removeEventListener( eventType, callback );
+		return this.trigger.disconnect( listener );
 	}
 
 	public function mapToValue<T>( clazz : Class<T>, value : T, ?name : String = '' ) : Void
@@ -152,8 +160,6 @@ class Injector implements IDependencyInjector
 			instance = Type.createInstance( type, [] );
 		}
 
-		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.POST_INSTANTIATE, this, instance, type ) );
-		
 		if ( classDescription != null )
 		{
 			this._applyInjection( instance, type, classDescription );
@@ -295,7 +301,8 @@ class Injector implements IDependencyInjector
 		this._mapping 						= new Map();
 		this._processedMapping 				= new Map();
 		this._managedObjects 				= new HashMap();
-		this._ed 							= new LightweightClosureDispatcher();
+		
+		//TODO disconnect all listeners from trigger
 	}
 	
 	public function mapClassName( className : String, name : String = '' ) : InjectionMapping
@@ -361,7 +368,7 @@ class Injector implements IDependencyInjector
 	
 	function _applyInjection( target : Dynamic, targetType : Class<Dynamic>, classDescription : ClassDescription ) : Void
 	{
-		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.PRE_CONSTRUCT, this, target, targetType ) );
+		this.trigger.onPreConstruct( this, target, targetType );
 
 		InjectionUtil.applyClassInjection( target, this, classDescription );
 		if ( classDescription.pd.length > 0 )
@@ -369,7 +376,7 @@ class Injector implements IDependencyInjector
 			this._managedObjects.put( target,  target );
 		}
 		
-		this._ed.dispatchEvent( new InjectionEvent( InjectionEvent.POST_CONSTRUCT, this, target, targetType ) );
+		this.trigger.onPostConstruct( this, target, targetType );
 	}
 	
 	inline function _getMappingID( type : Class<Dynamic>, name : String = '' ) : String
@@ -390,3 +397,4 @@ class Injector implements IDependencyInjector
 		#end
 	}
 }
+#end
