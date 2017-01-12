@@ -2,6 +2,7 @@ package hex.di.util;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.TypeTools;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.error.PrivateConstructorException;
@@ -34,8 +35,9 @@ class InjectionUtil
 															value : ExprOf<T>,
 															?id : ExprOf<String>
 														) : Expr
-	{
+	{	
 		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
+		MacroUtil.assertValueMatching( classReference, value, clazz.pos );
 		return macro { $injector.mapClassNameToValue( $v{ classReference }, $value, $id ); };
 	}
 	
@@ -45,8 +47,9 @@ class InjectionUtil
 															?id : ExprOf<String>
 														) : Expr
 	{
-		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
-		var typeReference = InjectionUtil._getClassReference( type );
+		var classReference 			= InjectionUtil._getStringClassRepresentation( clazz );
+		var typeReference 			= InjectionUtil._getClassReference( type );
+		MacroUtil.assertTypeMatching( classReference, InjectionUtil._getStringClassRepresentation( type ), clazz.pos );
 		return macro { $injector.mapClassNameToType( $v{ classReference }, $typeReference, $id ); };
 	}
 	
@@ -56,8 +59,9 @@ class InjectionUtil
 																?id : ExprOf<String>
 															) : Expr
 	{
-		var classReference = InjectionUtil._getStringClassRepresentation( clazz );
-		var typeReference = InjectionUtil._getClassReference( type );
+		var classReference 			= InjectionUtil._getStringClassRepresentation( clazz );
+		var typeReference 			= InjectionUtil._getClassReference( type );
+		MacroUtil.assertTypeMatching( classReference, InjectionUtil._getStringClassRepresentation( type ), clazz.pos );
 		return macro { $injector.mapClassNameToSingleton( $v{ classReference }, $typeReference, $id ); };
 	}
 	

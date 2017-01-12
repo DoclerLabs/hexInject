@@ -2,8 +2,13 @@ package hex.di.util;
 
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
-import hex.di.InjectionEvent;
+import hex.di.IInjectorListener;
+import hex.di.mock.types.MockEnum;
+import hex.di.mock.types.MockTypedef;
+import hex.di.mock.types.MockTypedefImplementation;
 import hex.di.provider.IDependencyProvider;
+import hex.structures.Point;
+import hex.structures.Size;
 import hex.unittest.assertion.Assert;
 
 using hex.di.util.InjectionUtil;
@@ -73,6 +78,108 @@ class InjectionUtilTest
 		var mapping = this._injector.mappedSingleton;
 		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
 		Assert.equals( MockClassWithTypeParams, mapping.type );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to method" )
+	public function testMapDependencyToMethod() : Void
+	{
+		var f = function ( s : String, a : Array<Int> ) : Bool { return true; };
+		this._injector.mapDependencyToValue( new Dependency<String->Array<Int>->Bool>(), f );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "String->Array<Int>->Bool", mapping.className );
+		Assert.equals( f, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to Boolean" )
+	public function testMapDependencyToBoolean() : Void
+	{
+		var o = true;
+		this._injector.mapDependencyToValue( new Dependency<Bool>(), o );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "Bool", mapping.className );
+		Assert.isTrue( mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to enum" )
+	public function testMapDependencyToEnum() : Void
+	{
+		var item = MockEnum.MockItemWithBool( true );
+		this._injector.mapDependencyToValue( new Dependency<MockEnum>(), item );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.di.mock.types.MockEnum", mapping.className );
+		Assert.equals( item, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map value to abstract" )
+	public function testMapValueToAbstract() : Void
+	{
+		var p = new Point( 3, 4 );
+		this._injector.mapDependencyToValue( new Dependency<Point>(), p );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.structures.Point", mapping.className );
+		Assert.equals( p, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map type to abstract" )
+	public function testMapTypeToAbstract() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<Point>(), 
+			new Dependency<Size>() 
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.structures.Point", mapping.className );
+		Assert.equals( Size, mapping.type );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency to type with typedef" )
+	public function testMapDependencyToTypeWithTypedef() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<MockTypedef>(), 
+			new Dependency<MockTypedefImplementation>()
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( MockTypedefImplementation, mapping.type );
+		Assert.equals( "", mapping.name );
+	
+	}
+	@Test( "test map dependency to typedef" )
+	public function testMapDependencyToTypedef() : Void
+	{
+		var o = new MockTypedefImplementation();
+		this._injector.mapDependencyToValue( new Dependency<MockTypedef>(), o );
+		
+		var mapping = this._injector.mappedValue;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( o, mapping.value );
+		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map typedef to singleton" )
+	public function testMapTypedefToSingleton() : Void
+	{
+		this._injector.mapDependencyToSingleton( 
+			new Dependency<MockTypedef>(), 
+			new Dependency<MockTypedefImplementation>()
+		);
+		
+		var mapping = this._injector.mappedSingleton;
+		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
+		Assert.equals( MockTypedefImplementation, mapping.type );
 		Assert.equals( "", mapping.name );
 	}
 }
@@ -155,12 +262,12 @@ private class MockDependencyInjector implements IDependencyInjector
 		
 	}
 
-	public function addEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	public function addListener( listener : IInjectorListener ) : Bool
 	{
 		return false;
 	}
 
-	public function removeEventListener( eventType : String, callback : InjectionEvent->Void ) : Bool
+	public function removeListener( listener : IInjectorListener ) : Bool
 	{
 		return false;
 	}

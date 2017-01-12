@@ -2,10 +2,15 @@ package hex.di;
 
 import hex.di.error.MissingMappingException;
 import hex.di.mock.injectees.ClassInjectee;
+import hex.di.mock.injectees.ClassInjecteeWithAbstractProperty;
+import hex.di.mock.injectees.ClassInjecteeWithBoolProperty;
+import hex.di.mock.injectees.ClassInjecteeWithEnumProperty;
+import hex.di.mock.injectees.ClassInjecteeWithTypedefProperty;
 import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
 import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
+import hex.di.mock.injectees.InterfaceInjecteeWithMethod;
 import hex.di.mock.injectees.MixedParametersConstructorInjectee;
 import hex.di.mock.injectees.MixedParametersMethodInjectee;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
@@ -39,30 +44,28 @@ import hex.di.mock.types.ClazzWithGeneric;
 import hex.di.mock.types.ComplexClazz;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
+import hex.di.mock.types.MockEnum;
+import hex.di.mock.types.MockTypedefImplementation;
 import hex.error.NullPointerException;
+import hex.structures.Point;
 import hex.unittest.assertion.Assert;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class InjectorTest
+class InjectorTest implements IInjectorListener
 {
-    var injector 				: Injector;
-    var receivedInjectorEvents 	: Array<Dynamic>;
+    var injector 						: Injector;
+    var injectorPreConstructArguments 	: Array<Dynamic>;
+    var injectorPostConstructArguments 	: Array<Dynamic>;
 
     @Before
     public function runBeforeEachTest() : Void
     {
-        this.injector 				= new Injector();
-        this.receivedInjectorEvents = [];
-    }
-
-    @After
-    public function teardown() : Void
-    {
-        this.injector 				= null;
-        this.receivedInjectorEvents = null;
+        this.injector = new Injector();
+		this.injectorPreConstructArguments = [];
+		this.injectorPostConstructArguments = [];
     }
 
    @Test( "Test 'unmap' remvoves existing mapping" )
@@ -124,6 +127,60 @@ class InjectorTest
 		Assert.equals( i, injectee.intProperty, "Value should have been injected" );
 	}
 	
+	@Test( "Test 'mapToValue' with interface fully qualified name parameter and method" )
+	public function testMapToValueWithInterfaceFullyQualifiedNameParameterAndMethod() : Void
+	{
+		var injectee = new InterfaceInjecteeWithMethod();
+		var f : String->Void = function ( s: String ) {};
+		var f2 : String->Array<Int>->Bool = function ( s: String, a : Array<Int> ) : Bool { return true; };
+		this.injector.mapClassName( "String->Void" ).toValue( f );
+		this.injector.mapClassName( "String->Array<Int>->Bool" ).toValue( f2 );
+		this.injector.injectInto( injectee );
+		Assert.equals( f, injectee.methodWithStringArgument, "Value should have been injected" );
+		Assert.equals( f2, injectee.methodWithMultipleArguments, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with boolean value" )
+	public function testMapToValueWithBoolean() : Void
+	{
+		var injectee = new ClassInjecteeWithBoolProperty();
+		var b = true;
+		this.injector.mapClassNameToValue( "Bool", b );
+		this.injector.injectInto( injectee );
+		Assert.isTrue( injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with abstract value" )
+	public function testMapToValueWithAbstract() : Void
+	{
+		var injectee = new ClassInjecteeWithAbstractProperty();
+		var p = new Point( 3, 4 );
+		this.injector.mapClassNameToValue( "hex.structures.Point", p );
+		this.injector.injectInto( injectee );
+		Assert.equals( p, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with enum value" )
+	public function testMapToValueWithEnum() : Void
+	{
+		var injectee = new ClassInjecteeWithEnumProperty();
+		var item = MockEnum.MockItemWithBool( true );
+		this.injector.mapClassNameToValue( "hex.di.mock.types.MockEnum", item );
+		this.injector.injectInto( injectee );
+		Assert.equals( item, injectee.property, "Value should have been injected" );
+	}
+	
+	@Test( "Test 'mapClassNameToValue' with typedef value" )
+	public function testMapToValueWithTypedef() : Void
+	{
+		var injectee = new ClassInjecteeWithTypedefProperty();
+		var item = new MockTypedefImplementation();
+		this.injector.mapClassNameToValue( "hex.di.mock.types.MockTypedef", item );
+		this.injector.injectInto( injectee );
+		Assert.equals( item, injectee.property, "Value should have been injected" );
+	}
+	
+	//
 	@Test( "Test 'mapToValue' with named class parameter" )
 	public function testMapToValueWithNamedClassParameter() : Void
 	{
@@ -583,7 +640,6 @@ class InjectorTest
 		Assert.notEquals( injectee1.property, injectee2.property, 'injectee1.property is not the same instance as injectee2.property' );
 	}
 	
-	
 	@Test
 	public function testGetInstanceOnUmappedInterfaceThrowsException() : Void
 	{
@@ -604,82 +660,33 @@ class InjectorTest
 		Assert.isNull( injectee.getDependency(), "Injectee mustn't contain Interface instance" );
 	}
 	
-	@Test( "Test injector dispatches POST_INSTANTIATE event" )
-	public function testInjectorDispatchesPostInstantiateEvent() : Void
+	@Test( "Test 'injectInto' triggers `onPreConstruct` and `onPostConstruct` callbacks" )
+	public function testInjectIntoTriggersPreAndPostConstruct() : Void
 	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.POST_INSTANTIATE ), "InjectionEvent.POST_INSTANTIATE should be dispatched" );
-	}
-	
-	@Test( "Test injector dispatches PRE_CONSTRUCT event" )
-	public function testInjectorDispatchesPreConstructEvent() : Void
-	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.PRE_CONSTRUCT ), "InjectionEvent.PRE_CONSTRUCT should be dispatched" );
-	}
-	
-	@Test( "Test injector dispatches POST_CONSTRUCT event" )
-	public function testInjectorDispatchesPostConstructEvent() : Void
-	{
-		Assert.isTrue( this._constructMappedTypeAndListenForEvent( InjectionEvent.POST_CONSTRUCT ), "InjectionEvent.POST_CONSTRUCT should be dispatched" );
-	}
-	
-	@Test( "Test injector events contain instance reference" )
-	public function testInjectorEventsContainsInstanceReference() : Void
-	{
-		this.injector.map( Clazz ).toType( Clazz );
-		this.injector.addEventListener( InjectionEvent.POST_INSTANTIATE, this._assertThatEventHasClazzInstance );
-		this.injector.addEventListener( InjectionEvent.PRE_CONSTRUCT, this._assertThatEventHasClazzInstance );
-		this.injector.addEventListener( InjectionEvent.POST_CONSTRUCT, this._assertThatEventHasClazzInstance );
-		var instance : Clazz = this.injector.getInstance( Clazz );
-	}
-	
-	@Test( "Test 'injectInto' dispatches PRE_CONSTRUCT event" )
-	public function testInjectIntoDispatchesPreConstructEvent() : Void
-	{
-		Assert.isTrue( this._injectIntoInstanceAndListenForEvent( InjectionEvent.PRE_CONSTRUCT ), "InjectionEvent.PRE_CONSTRUCT should be listened" );
-	}
-
-	@Test( "Test 'injectInto' dispatches POST_CONSTRUCT event" )
-	public function testInjectIntoDispatchesPostConstructEvent() : Void
-	{
-		Assert.isTrue( this._injectIntoInstanceAndListenForEvent( InjectionEvent.POST_CONSTRUCT ), "InjectionEvent.POST_CONSTRUCT should be listened" );
-	}
-
-	function _assertThatEventHasClazzInstance( e : InjectionEvent ) : Void
-	{
-		Assert.isInstanceOf( e.instance, Clazz, "" );
-	}
-	
-	function _injectIntoInstanceAndListenForEvent( eventType : String ) : Bool
-	{
+		this.injector.addListener( this );
+		
 		var injectee = new ClassInjectee();
 		this.injector.map( Clazz ).toValue( new Clazz() );
-		this._listenToInjectorEvent( eventType );
 		this.injector.injectInto( injectee );
-		return receivedInjectorEvents.pop() == eventType;
+		
+		Assert.deepEquals( [ this.injector, injectee, ClassInjectee ], this.injectorPreConstructArguments  );
+		Assert.deepEquals( [ this.injector, injectee, ClassInjectee ], this.injectorPostConstructArguments  );
 	}
 	
-	function _constructMappedTypeAndListenForEvent( eventType : String ) : Bool
+	public function onPreConstruct( target : IDependencyInjector, instance : Dynamic, instanceType : Class<Dynamic> ): Void
 	{
-		this.injector.map( Clazz ).toType( Clazz );
-		this._listenToInjectorEvent( eventType );
-		this.injector.getInstance( Clazz );
-		return receivedInjectorEvents.pop() == eventType;
+		this.injectorPreConstructArguments =  [ target, instance, instanceType ];
 	}
 	
-	function _listenToInjectorEvent( eventType : String ) : Void
+	public function onPostConstruct( target : IDependencyInjector, instance : Dynamic, instanceType : Class<Dynamic> ) : Void
 	{
-		this.injector.addEventListener( eventType, this._onInjectorEvent );
-	}
-	
-	public function _onInjectorEvent( e : InjectionEvent ) : Void
-	{
-		this.receivedInjectorEvents.push( e.type );
+		this.injectorPostConstructArguments =  [ target, instance, instanceType ];
 	}
 	
 	@Test( "Test unmap singleton provider invokes PreDestroy methods on singleton" )
 	public function testUnmapSingletonProviderInvokesPredestroyMethodsOnSingleton() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		var singleton = this.injector.getInstance( Clazz );
 		Assert.isFalse( singleton.preDestroyCalled, "singleton.preDestroyCalled should be false" );
 		this.injector.unmap( Clazz );
@@ -698,7 +705,7 @@ class InjectorTest
 	@Test( "Test 'teardown' destroy all singletons" )
 	public function testTeardownDestroyAllSingletons() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		this.injector.map( Interface ).toSingleton( Clazz );
 		var singleton1 = injector.getInstance( Clazz );
 		var singleton2 = injector.getInstance( Interface );
@@ -805,7 +812,7 @@ class InjectorTest
 	@Test( "Test 'getOrCreateNewInstance' provides mapped value" )
 	public function testGetOrCreateNewInstanceProvidesMappedValue() : Void
 	{
-		this.injector.map( Clazz ).asSingleton();
+		this.injector.map( Clazz ).toSingleton( Clazz );
 		var instance1 = this.injector.getOrCreateNewInstance( Clazz );
 		var instance2 = this.injector.getOrCreateNewInstance( Clazz );
 		Assert.equals( instance1, instance2, "" );
