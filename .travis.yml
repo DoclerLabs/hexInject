@@ -37,14 +37,19 @@ install:
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
+  - git clone --recursive https://github.com/chipshort/hexDoc-Theme.git ./hexdoctheme
   - export DISPLAY=:99.0;
   - export AUDIODEV=null;
   - haxe flash/install.hxml
 
 script:
+  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -php bin; fi
   - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-php.hxml && php bin/index.php; fi
+  - haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -neko bin/docs.n
   - haxe build-neko.hxml         && neko bin/MainInjectTest.n
+  - haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -js bin/docs.js
   - haxe build-js.hxml           && node bin/MainInjectTest.js
+  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -swf-version 11 -swf bin/docs.swf; fi
   - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf; fi
   
 notifications:
