@@ -34,7 +34,6 @@ class Injector
 	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
-	@Trigger
     public var trigger ( default, never ) : ITrigger<IInjectorListener>;
 	
 	public function new() 
