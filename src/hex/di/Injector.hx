@@ -149,19 +149,15 @@ class Injector
 	{
 		var classDescription = this._classDescriptor.getClassDescription( type );
 
-		var instance : Dynamic; 
+		var instance : T; 
 		if ( classDescription != null && classDescription.c != null )
 		{
 			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a );
+			this._applyInjection( instance, type, classDescription );
 		}
 		else
 		{
 			instance = Type.createInstance( type, [] );
-		}
-
-		if ( classDescription != null )
-		{
-			this._applyInjection( instance, type, classDescription );
 		}
 
 		return instance;
