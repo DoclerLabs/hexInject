@@ -1,11 +1,8 @@
 package hex.di;
 
-#if macro
-//skip this class
-#else
-
 import hex.collection.HashMap;
 import hex.di.IDependencyInjector;
+import hex.di.IInjectorListener;
 import hex.di.error.InjectorException;
 import hex.di.error.MissingClassDescriptionException;
 import hex.di.error.MissingMappingException;
@@ -25,7 +22,9 @@ import hex.util.ClassUtil;
  * @author Francis Bourre
  */
 class Injector 
+	#if !macro
 	implements ITriggerOwner
+	#end
 	implements IDependencyInjector
 {
 	var _mapping				: Map<String,InjectionMapping>;
@@ -363,7 +362,9 @@ class Injector
 	
 	function _applyInjection( target : Dynamic, targetType : Class<Dynamic>, classDescription : ClassDescription ) : Void
 	{
+		#if !macro
 		this.trigger.onPreConstruct( this, target, targetType );
+		#end
 
 		InjectionUtil.applyClassInjection( target, this, classDescription );
 		if ( classDescription.pd.length > 0 )
@@ -371,7 +372,9 @@ class Injector
 			this._managedObjects.put( target,  target );
 		}
 		
+		#if !macro
 		this.trigger.onPostConstruct( this, target, targetType );
+		#end
 	}
 	
 	inline function _getMappingID( type : Class<Dynamic>, name : String = '' ) : String
@@ -392,4 +395,3 @@ class Injector
 		#end
 	}
 }
-#end
