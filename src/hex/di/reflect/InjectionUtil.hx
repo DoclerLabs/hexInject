@@ -35,9 +35,10 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyConstructorInjection( type : Class<Dynamic>, injector : Injector, arguments : Array<ArgumentInjection> ) : Dynamic
+	inline public static function applyConstructorInjection<T>( type : Class<T>, injector : Injector, arguments : Array<ArgumentInjection> ) : T
 	{
-		return Type.createInstance( type, InjectionUtil.gatherArgs( type, injector, arguments, 'new' ) );
+		var args = InjectionUtil.gatherArgs( type, injector, arguments, 'new' );
+		return Type.createInstance( type, args );
 	}
 	
 	inline public static function applyPropertyInjection( 	propertyName: String, 
@@ -95,7 +96,7 @@ class InjectionUtil
 				}
 			}
 		}
-			
+		
 		return args;
 	}
 	

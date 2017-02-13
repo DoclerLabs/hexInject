@@ -1,29 +1,17 @@
+sudo: required
+dist: trusty
+
 language: haxe
 
 # haxe versions : http://haxe.org/website-content/downloads/versions.json
 haxe:
   - "3.2.1"
-  - "3.3.0-rc.1"
+  - "3.4.0"
   - development
 
 matrix:
   allow_failures:
   - haxe: development
-    
-addons:
-  apt:
-    packages:
-      # PHP
-      - php5-cli
-      # Flash
-      - libcurl3:i386
-      - libglib2.0-0:i386
-      - libx11-6:i386
-      - libxext6:i386
-      - libxt6:i386
-      - libxcursor1:i386
-      - libnss3:i386
-      - libgtk2.0-0:i386
 
 before_install:
   - echo $TRAVIS_BRANCH
@@ -31,26 +19,32 @@ before_install:
   - echo $TRAVIS_TAG
   - if [[ "$TRAVIS_TAG" != "" ]]; then export DEPENDENCIES_BRANCH=$TRAVIS_TAG; fi
   - echo $DEPENDENCIES_BRANCH
+  - sudo sed -i -e 's/deb http/deb [arch=amd64] http/' "/etc/apt/sources.list.d/google-chrome.list" "/opt/google/chrome/cron/google-chrome"
+  - sudo dpkg --add-architecture i386
+  - sudo apt-get update
+  - sudo apt-get install -qq libcurl3:i386
+  - sudo apt-get install -qq libglib2.0-0:i386
+  - sudo apt-get install -qq libx11-6:i386
+  - sudo apt-get install -qq libxext6:i386
+  - sudo apt-get install -qq libxt6:i386
+  - sudo apt-get install -qq libxcursor1:i386
+  - sudo apt-get install -qq libnss3:i386
+  - sudo apt-get install -qq libgtk2.0-0:i386
 
 install:
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexCore.git ./hexcore
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
-  - git clone --recursive https://github.com/chipshort/hexDoc-Theme.git ./hexdoctheme
   - export DISPLAY=:99.0;
   - export AUDIODEV=null;
   - haxe flash/install.hxml
 
 script:
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -php bin; fi
   - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-php.hxml && php bin/index.php; fi
-  - haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -neko bin/docs.n
-  - haxe build-neko.hxml         && neko bin/MainInjectTest.n
-  - haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -js bin/docs.js
-  - haxe build-js.hxml           && node bin/MainInjectTest.js
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml -cp hexdoctheme/src --macro "ImportAll.run()" --no-output -swf-version 11 -swf bin/docs.swf; fi
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf; fi
+  - haxe build-neko.hxml         && neko bin/MainTest.n
+  - haxe build-js.hxml           && node bin/MainTest.js
+  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainTest.swf; fi
   
 notifications:
   email:

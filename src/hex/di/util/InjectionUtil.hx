@@ -2,7 +2,6 @@ package hex.di.util;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import haxe.macro.TypeTools;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.error.PrivateConstructorException;
@@ -19,7 +18,7 @@ class InjectionUtil
 	/** @private */
     function new()
     {
-        throw new PrivateConstructorException( "This class can't be instantiated." );
+        throw new PrivateConstructorException();
     }
 	
 	macro public static function getDependencyInstance<T>( 	injector : ExprOf<IDependencyInjector>, 
