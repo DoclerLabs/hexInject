@@ -1,3 +1,13 @@
 build-each.hxml
+
+--each
+
+--macro include('hex')
+--no-output
 -swf-version 11
--swf bin/MainInjectTest.swf
+-swf bin/docs.swf
+
+--next
+
+-swf-version 11
+-swf bin/MainTest.swf

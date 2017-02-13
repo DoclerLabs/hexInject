@@ -41,14 +41,10 @@ install:
   - haxe flash/install.hxml
 
 script:
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml --macro "include('hex')" --no-output -php bin; fi
   - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-php.hxml && php bin/index.php; fi
-  - haxe build-each.hxml --macro "include('hex')" --no-output -neko bin/docs.n
-  - haxe build-neko.hxml         && neko bin/MainInjectTest.n
-  - haxe build-each.hxml --macro "include('hex')" --no-output -js bin/docs.js
-  - haxe build-js.hxml           && node bin/MainInjectTest.js
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-each.hxml --macro "include('hex')" --no-output -swf-version 11 -swf bin/docs.swf; fi
-  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainInjectTest.swf; fi
+  - haxe build-neko.hxml         && neko bin/MainTest.n
+  - haxe build-js.hxml           && node bin/MainTest.js
+  - if [ $TRAVIS_HAXE_VERSION != "3.2.1" ]; then haxe build-flash.hxml -D fdb && haxe flash/run.hxml bin/MainTest.swf; fi
   
 notifications:
   email:
