@@ -12,6 +12,7 @@ import hex.di.reflect.ClassDescription;
 import hex.di.reflect.FastClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionUtil;
+import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
 import hex.log.Stringifier;
@@ -146,8 +147,13 @@ class Injector
 
     public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
+		if ( type == null )
+		{
+			throw new NullPointerException( 'class description cannot be null' );
+		}
+		
 		var classDescription = this._classDescriptor.getClassDescription( type );
-
+		
 		var instance : T; 
 		if ( classDescription != null && classDescription.c != null )
 		{
