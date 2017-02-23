@@ -2,9 +2,9 @@ package hex.di.mapping;
 
 import hex.di.IDependencyInjector;
 import hex.di.provider.ClassProvider;
+import hex.di.provider.IDependencyProvider;
 import hex.di.provider.SingletonProvider;
 import hex.di.provider.ValueProvider;
-import hex.di.provider.IDependencyProvider;
 import hex.error.NullPointerException;
 
 /**
@@ -14,7 +14,6 @@ import hex.error.NullPointerException;
 class InjectionMapping
 {
     var _injector		        : IDependencyInjector;
-    var _type					: Class<Dynamic>;
     var _name					: String;
     var _mappingID				: String;
 
@@ -29,13 +28,12 @@ class InjectionMapping
 
     public function getResult() : Dynamic
     {
-		#if debug
         if ( this.provider == null )
         {
-			throw new NullPointerException( "can't retrieve result, mapping with id '" + this._mappingID + "' has no provider" );
+			throw new NullPointerException( "can't retrieve result, mapping with id '" 
+				+ this._mappingID + "' has no provider" );
         }
-		#end
-		
+
         return this.provider.getResult( this._injector );
     }
 
