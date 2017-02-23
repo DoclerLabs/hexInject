@@ -302,7 +302,9 @@ class Injector
 		this._processedMapping 				= new Map();
 		this._managedObjects 				= new HashMap();
 		
-		//TODO disconnect all listeners from trigger
+		#if !macro
+		this.trigger.disconnectAll();
+		#end
 	}
 	
 	public function mapClassName( className : String, name : String = '' ) : InjectionMapping
