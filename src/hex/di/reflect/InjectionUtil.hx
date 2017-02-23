@@ -2,7 +2,7 @@ package hex.di.reflect;
 
 import hex.di.Injector;
 import hex.di.error.MissingMappingException;
-import hex.log.Stringifier;
+import hex.util.Stringifier;
 
 /**
  * ...

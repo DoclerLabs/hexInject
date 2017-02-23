@@ -15,7 +15,7 @@ import hex.di.reflect.InjectionUtil;
 import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
-import hex.log.Stringifier;
+import hex.util.Stringifier;
 import hex.util.ClassUtil;
 
 /**
