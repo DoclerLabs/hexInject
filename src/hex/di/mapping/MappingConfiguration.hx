@@ -15,7 +15,7 @@ import hex.service.stateful.IStatefulService;
  */
 class MappingConfiguration extends Locator<String, Helper> implements IStatefulConfig
 {
-	var _mapping = new HashMap<Class<Dynamic>, Dynamic>();
+	var _mapping = new HashMap<String, Dynamic>();
 	
 	public function new() 
 	{
@@ -28,15 +28,15 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
         for ( className in keys )
         {
 			var separatorIndex 	: Int = className.indexOf( "#" );
-			var classKey : Class<Dynamic>;
+			var classKey : String;
 
 			if ( separatorIndex != -1 )
 			{
-				classKey = Type.resolveClass( className.substr( separatorIndex+1 ) );
+				classKey = className.substr( separatorIndex+1 );
 			}
 			else
 			{
-				classKey = Type.resolveClass( className );
+				classKey = className;
 			}
 
 			var helper : Helper = this.locate( className );
@@ -46,11 +46,11 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 			{
 				if ( helper.isSingleton )
 				{
-					injector.mapToSingleton( classKey, mapped, helper.mapName );
+					injector.mapClassNameToSingleton( classKey, mapped, helper.mapName );
 				}
 				else
 				{
-					injector.mapToType( classKey, mapped, helper.mapName );
+					injector.mapClassNameToType( classKey, mapped, helper.mapName );
 				}
 			}
 			else
@@ -69,7 +69,7 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 					injector.injectInto( mapped );
 				}
 				
-				injector.mapToValue( classKey, mapped, helper.mapName );
+				injector.mapClassNameToValue( classKey, mapped, helper.mapName );
 			}
 			
 			this._mapping.put( classKey, mapped );
@@ -86,7 +86,7 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 		return this._registerMapping( className, new Helper( value, mapName, asSingleton, injectInto ), mapName );
 	}
 	
-	public function getMapping() : HashMap<Class<Dynamic>, Dynamic>
+	public function getMapping() : HashMap<String, Dynamic>
 	{
 		return this._mapping;
 	}
