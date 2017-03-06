@@ -32,10 +32,24 @@ before_install:
   - sudo apt-get install -qq libgtk2.0-0:i386
 
 install:
+  - haxelib newrepo
+#hexLog
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexLog.git ./hexlog
+  - haxelib dev hexlog ./hexlog
+#hexCore
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexCore.git ./hexcore
-  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
-  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
+  - haxelib dev hexcore ./hexcore
+#hexUnit
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
+  - haxelib dev hexunit ./hexunit
+#hexReflection
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
+  - haxelib dev hexreflection ./hexreflection
+#hexAnnotation
+  - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
+  - haxelib dev hexannotation ./hexannotation
+#hexInject
+  - haxelib dev hexinject .
   - export DISPLAY=:99.0;
   - export AUDIODEV=null;
   - haxe flash/install.hxml
