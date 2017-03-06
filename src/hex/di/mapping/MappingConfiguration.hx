@@ -8,6 +8,7 @@ import hex.event.CompositeDispatcher;
 import hex.event.IDispatcher;
 import hex.module.IModule;
 import hex.service.stateful.IStatefulService;
+import hex.util.Stringifier;
 
 /**
  * ...
@@ -15,7 +16,7 @@ import hex.service.stateful.IStatefulService;
  */
 class MappingConfiguration extends Locator<String, Helper> implements IStatefulConfig
 {
-	var _mapping = new HashMap<Class<Dynamic>, Dynamic>();
+	var _mapping = new HashMap<String, Dynamic>();
 	
 	public function new() 
 	{
@@ -28,15 +29,15 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
         for ( className in keys )
         {
 			var separatorIndex 	: Int = className.indexOf( "#" );
-			var classKey : Class<Dynamic>;
+			var classKey : String;
 
 			if ( separatorIndex != -1 )
 			{
-				classKey = Type.resolveClass( className.substr( separatorIndex+1 ) );
+				classKey = className.substr( separatorIndex+1 );
 			}
 			else
 			{
-				classKey = Type.resolveClass( className );
+				classKey = className;
 			}
 
 			var helper : Helper = this.locate( className );
@@ -46,22 +47,23 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 			{
 				if ( helper.isSingleton )
 				{
-					injector.mapToSingleton( classKey, mapped, helper.mapName );
+					injector.mapClassNameToSingleton( classKey, mapped, helper.mapName );
 				}
 				else
 				{
-					injector.mapToType( classKey, mapped, helper.mapName );
+					injector.mapClassNameToType( classKey, mapped, helper.mapName );
 				}
 			}
 			else
 			{
 				if ( Std.is( mapped, IStatefulService ) )
 				{
-					var serviceDispatcher : CompositeDispatcher = ( cast mapped ).getDispatcher();
+					/*var serviceDispatcher : CompositeDispatcher = ( cast mapped ).getDispatcher();
 					if ( serviceDispatcher != null )
 					{
 						serviceDispatcher.add( dispatcher );
-					}
+					}*/
+					trace( 'Warning: IStatefulService instances are not added as listener:' + Stringifier.stringify( mapped ) );
 				}
 
 				if ( helper.injectInto )
@@ -69,7 +71,7 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 					injector.injectInto( mapped );
 				}
 				
-				injector.mapToValue( classKey, mapped, helper.mapName );
+				injector.mapClassNameToValue( classKey, mapped, helper.mapName );
 			}
 			
 			this._mapping.put( classKey, mapped );
@@ -78,17 +80,22 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 	
 	public function addMapping( type : Class<Dynamic>, value : Dynamic, ?mapName : String = "", ?asSingleton : Bool = false, ?injectInto : Bool = false ) : Bool
 	{
-		return this._registerMapping( type, new Helper( value, mapName, asSingleton, injectInto ), mapName );
+		return this._registerMapping( Type.getClassName( type ), new Helper( value, mapName, asSingleton, injectInto ), mapName );
 	}
 	
-	public function getMapping() : HashMap<Class<Dynamic>, Dynamic>
+	public function addMappingWithClassName( className : String, value : Dynamic, ?mapName : String = "", ?asSingleton : Bool = false, ?injectInto : Bool = false ) : Bool
+	{
+		return this._registerMapping( className, new Helper( value, mapName, asSingleton, injectInto ), mapName );
+	}
+	
+	public function getMapping() : HashMap<String, Dynamic>
 	{
 		return this._mapping;
 	}
 	
-	function _registerMapping( type : Class<Dynamic>, helper : Helper, ?mapName : String = "" ) : Bool
+	function _registerMapping( className : String, helper : Helper, ?mapName : String = "" ) : Bool
 	{
-		var className : String = ( mapName != "" ? mapName + "#" : "" ) + Type.getClassName( type );
+		var className : String = ( mapName != "" ? mapName + "#" : "" ) + className;
 		return this.register( className, helper );
 	}
 }

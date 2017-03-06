@@ -12,9 +12,10 @@ import hex.di.reflect.ClassDescription;
 import hex.di.reflect.FastClassDescriptionProvider;
 import hex.di.reflect.IClassDescriptionProvider;
 import hex.di.reflect.InjectionUtil;
+import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
-import hex.log.Stringifier;
+import hex.util.Stringifier;
 import hex.util.ClassUtil;
 
 /**
@@ -146,8 +147,13 @@ class Injector
 
     public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
+		if ( type == null )
+		{
+			throw new NullPointerException( 'class description cannot be null' );
+		}
+		
 		var classDescription = this._classDescriptor.getClassDescription( type );
-
+		
 		var instance : T; 
 		if ( classDescription != null && classDescription.c != null )
 		{
@@ -296,7 +302,9 @@ class Injector
 		this._processedMapping 				= new Map();
 		this._managedObjects 				= new HashMap();
 		
-		//TODO disconnect all listeners from trigger
+		#if !macro
+		this.trigger.disconnectAll();
+		#end
 	}
 	
 	public function mapClassName( className : String, name : String = '' ) : InjectionMapping

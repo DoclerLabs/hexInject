@@ -2,16 +2,14 @@
   "name": "hexinject",
   "license": "MIT",
   "classPath": "src",
-  "tags": ["haxe", "ioc", "dependency", "injection", "annotation", "hexmachina"],
-  "description": "Fast annotation driven IOC solution for Haxe based on hexAnnotation (annotation parsing at compile time)",
+  "tags": ["haxe", "dependency", "injection", "hexmachina"],
+  "description": "Dependency injector with very fast injections",
   "contributors": ["doclerlabs"],
   "releasenote": "SpeedInjector implementation",
-  "version": "0.2.0",
-  "url": "https://github.com/DoclerLabs/hexAnnotation",
+  "version": "git",
+  "url": "https://github.com/DoclerLabs/hexInject",
   "dependencies": 
   {
-	"hexcore": "git:https://github.com/DoclerLabs/hexCore.git",
-	"hexreflection": "git:https://github.com/DoclerLabs/hexReflection.git",
 	"hexannotation": "git:https://github.com/DoclerLabs/hexAnnotation.git"
   }
 }

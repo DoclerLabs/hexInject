@@ -65,7 +65,7 @@ class InjectionUtil
 	}
 	
 	#if macro
-	static function _getStringClassRepresentation<T>( clazz : ExprOf<Dependency<T>> ) : String
+	public static function _getStringClassRepresentation<T>( clazz : ExprOf<Dependency<T>> ) : String
 	{
 		switch( clazz.expr )
 		{
@@ -87,7 +87,7 @@ class InjectionUtil
 		return "";
 	}
 	
-	static function _getClassReference<T>( clazz : ExprOf<Dependency<T>> ) : ExprOf<Class<T>>
+	public static function _getClassReference<T>( clazz : ExprOf<Dependency<T>> ) : ExprOf<Class<T>>
 	{
 		switch( clazz.expr )
 		{
@@ -106,6 +106,26 @@ class InjectionUtil
 		
 		Context.error( "Invalid dependency", clazz.pos );
 		return macro null;
+	}
+	
+	public static function _getComplexType<T>( clazz : ExprOf<Dependency<T>> ) : ComplexType
+	{
+		switch( clazz.expr )
+		{
+			case ENew( t, params ):
+
+				switch( t.params[ 0 ] )
+				{
+					case TPType( t ):
+						return t;
+						
+					case _:
+				}
+				
+			case _:
+		}
+		
+		return null;
 	}
 	#end
 }
