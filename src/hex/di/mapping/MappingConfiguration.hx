@@ -8,6 +8,7 @@ import hex.event.CompositeDispatcher;
 import hex.event.IDispatcher;
 import hex.module.IModule;
 import hex.service.stateful.IStatefulService;
+import hex.util.Stringifier;
 
 /**
  * ...
@@ -57,11 +58,12 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 			{
 				if ( Std.is( mapped, IStatefulService ) )
 				{
-					var serviceDispatcher : CompositeDispatcher = ( cast mapped ).getDispatcher();
+					/*var serviceDispatcher : CompositeDispatcher = ( cast mapped ).getDispatcher();
 					if ( serviceDispatcher != null )
 					{
 						serviceDispatcher.add( dispatcher );
-					}
+					}*/
+					trace( 'Warning: IStatefulService instances are not added as listener:' + Stringifier.stringify( mapped ) );
 				}
 
 				if ( helper.injectInto )
