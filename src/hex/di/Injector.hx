@@ -15,7 +15,6 @@ import hex.di.reflect.InjectionUtil;
 import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
-import hex.util.Stringifier;
 import hex.util.ClassUtil;
 
 /**
@@ -99,9 +98,8 @@ class Injector
 		}
 		else
 		{
-			throw new MissingMappingException( 	"'" + Stringifier.stringify( this ) + "' is missing a mapping to get instance with type '" +
-												Type.getClassName( type ) + "' inside instance of '" + Stringifier.stringify( this ) + 
-												"'. Target dependency: '" + mappingID + "'" );
+			throw new MissingMappingException( 	"Injector is missing a mapping to get instance with type '" +
+												Type.getClassName( type ) + "'. Target dependency: '" + mappingID + "'" );
 		}
 	}
 	
@@ -120,9 +118,8 @@ class Injector
 		}
 		else
 		{
-			throw new MissingMappingException( 	"'" + Stringifier.stringify( this ) + "' is missing a mapping to get instance with type '" +
-												className + "' inside instance of '" + Stringifier.stringify( this ) + 
-												"'. Target dependency: '" + mappingID + "'" );
+			throw new MissingMappingException( 	"Injector is missing a mapping to get instance with type '" +
+												className + "'. Target dependency: '" + mappingID + "'" );
 		}
 	}
 	
@@ -250,8 +247,7 @@ class Injector
 		}
 		else
 		{
-			throw new MissingClassDescriptionException( "'" + Stringifier.stringify( this ) + 
-														"' is missing a class description to inject into an instance of '" +
+			throw new MissingClassDescriptionException( "Injector is missing a class description to inject into an instance of '" +
 														ClassUtil.getClassName( target ) + 
 														"'. This class should implement IInjectorContainer" );
 		}
@@ -344,19 +340,23 @@ class Injector
 		#if debug
 		if ( mapping == null )
 		{
-			throw new InjectorException( "unmap failed with mapping named '" + mappingID + "' @" + Stringifier.stringify( this ) );
+			trace( "Warning: unmap failed with mapping named '" + mappingID + 
+					"'. Maybe this mapping was overridden previously." );
 		}
 		#end
 
-		mapping.provider.destroy();
-		this._mapping.remove( mappingID );
+		if ( mapping != null )
+		{
+			mapping.provider.destroy();
+			this._mapping.remove( mappingID );
+		}
 	}
 
 	function _createMapping( name : String, mappingID : String ) : InjectionMapping
 	{
 		if ( this._processedMapping[ mappingID ] )
 		{
-			throw new InjectorException( "Mapping named '" + mappingID + "' is already processing @" + Stringifier.stringify( this ) );
+			throw new InjectorException( "Mapping named '" + mappingID + "' is already processing" );
 		}
 
 		this._processedMapping[ mappingID ] = true;
