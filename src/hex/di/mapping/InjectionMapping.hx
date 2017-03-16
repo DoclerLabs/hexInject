@@ -11,18 +11,16 @@ import hex.error.NullPointerException;
  * ...
  * @author Francis Bourre
  */
-class InjectionMapping
+class InjectionMapping<T>
 {
     var _injector		        : IDependencyInjector;
-    var _name					: String;
     var _mappingID				: String;
 
-    public var provider	( default, null ) : IDependencyProvider;
+    public var provider	( default, null ) : IDependencyProvider<T>;
 
-    public function new( injector : IDependencyInjector, name : String, mappingID : String )
+    public function new( injector : IDependencyInjector, mappingID : String )
     {
         this._injector			= injector;
-        this._name 				= name;
         this._mappingID 		= mappingID;
     }
 
@@ -37,22 +35,22 @@ class InjectionMapping
         return this.provider.getResult( this._injector );
     }
 
-    inline public function toSingleton( type : Class<Dynamic> ) : InjectionMapping
+    inline public function toSingleton( type : Class<T> ) : InjectionMapping<T>
     {
         return this._toProvider( new SingletonProvider( type, this._injector ) );
     }
 
-    inline public function toType( type : Class<Dynamic> ) : InjectionMapping
+    inline public function toType( type : Class<T> ) : InjectionMapping<T>
     {
         return this._toProvider( new ClassProvider( type ) );
     }
 
-    inline public function toValue( value : Dynamic ) : InjectionMapping
+    inline public function toValue( value : T ) : InjectionMapping<T>
     {
         return this._toProvider( new ValueProvider( value, this._injector ) );
     }
 
-    inline function _toProvider( provider : IDependencyProvider ) : InjectionMapping
+    inline function _toProvider( provider : IDependencyProvider<T> ) : InjectionMapping<T>
     {
 		#if debug
         if ( this.provider != null )

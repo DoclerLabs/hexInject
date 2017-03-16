@@ -272,7 +272,7 @@ private class MockDependencyInjector implements IDependencyInjector
 		return false;
 	}
 	
-	public function getProvider( className : String, name : String = '' ) : IDependencyProvider
+	public function getProvider<T>( className : String, name : String = '' ) : IDependencyProvider<T>
 	{
 		return null;
 	}

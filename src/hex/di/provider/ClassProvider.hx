@@ -4,16 +4,16 @@ package hex.di.provider;
  * ...
  * @author Francis Bourre
  */
-class ClassProvider implements IDependencyProvider
+class ClassProvider<T> implements IDependencyProvider<T>
 {
-    var _type : Class<Dynamic>;
+    var _type : Class<T>;
 
-    public function new( type : Class<Dynamic> )
+    public function new( type : Class<T> )
     {
         this._type = type;
     }
 
-    inline public function getResult( injector : IDependencyInjector ) : Dynamic
+    inline public function getResult( injector : IDependencyInjector ) : T
     {
         return injector.instantiateUnmapped( this._type );
     }
