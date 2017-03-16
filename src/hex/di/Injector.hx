@@ -27,7 +27,7 @@ class Injector
 	#end
 	implements IDependencyInjector
 {
-	var _mapping				: Map<String,InjectionMapping>;
+	var _mapping				: Map<String,InjectionMapping<Dynamic>>;
 	var _processedMapping 		: Map<String,Bool>;
 	var _managedObjects			: HashMap<Dynamic, Dynamic>;
 	var _parentInjector			: Injector;
@@ -106,9 +106,9 @@ class Injector
 	public function getInstanceWithClassName<T>( className : String, name : String = '' ) : T
 	{
 		var mappingID = className + '|' + name;
-		var mapping = this._mapping[ mappingID ];
+		var mapping = cast this._mapping[ mappingID ];
 		
-		if ( this._mapping[ mappingID ] != null )
+		if ( mapping != null )
 		{
 			return mapping.getResult();
 		}
@@ -123,12 +123,12 @@ class Injector
 		}
 	}
 	
-	public function getProvider( className : String, name : String = '' ) : IDependencyProvider
+	public function getProvider<T>( className : String, name : String = '' ) : IDependencyProvider<T>
 	{
 		var mappingID = className + '|' + name;
-		var mapping : InjectionMapping = this._mapping[ mappingID ];
+		var mapping = cast this._mapping[ mappingID ];
 
-		if ( this._mapping[ mappingID ] != null )
+		if ( mapping != null )
 		{
 			return mapping.provider;
 		}
@@ -206,9 +206,9 @@ class Injector
     public function satisfies( type : Class<Dynamic>, name : String = '' ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
-		var mapping : InjectionMapping = this._mapping[ mappingID ];
+		var mapping = cast this._mapping[ mappingID ];
 
-		if ( this._mapping[ mappingID ] != null )
+		if ( mapping != null )
 		{
 			return mapping.provider != null;
 		}
@@ -225,7 +225,7 @@ class Injector
 	public function satisfiesDirectly( type : Class<Dynamic>, name : String = '' ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
-		var mapping : InjectionMapping = this._mapping[ mappingID ];
+		var mapping = cast this._mapping[ mappingID ];
 		
 		if ( mapping != null )
 		{
@@ -267,13 +267,13 @@ class Injector
 		}
 	}
 
-	public function map( type : Class<Dynamic>, name : String = '' ) : InjectionMapping
+	public function map<T>( type : Class<T>, name : String = '' ) : InjectionMapping<T>
 	{
 		var mappingID = this._getMappingID( type, name );
 
 		if ( this._mapping[ mappingID ] != null )
 		{
-			return this._mapping[ mappingID ];
+			return cast this._mapping[ mappingID ];
 		}
 		else
 		{
@@ -303,13 +303,13 @@ class Injector
 		#end
 	}
 	
-	public function mapClassName( className : String, name : String = '' ) : InjectionMapping
+	public function mapClassName<T>( className : String, name : String = '' ) : InjectionMapping<T>
 	{
 		var mappingID = className + '|' + name;
 		
 		if ( this._mapping[ mappingID ] != null )
 		{
-			return this._mapping[ mappingID ];
+			return cast this._mapping[ mappingID ];
 		}
 		else
 		{
@@ -352,7 +352,7 @@ class Injector
 		}
 	}
 
-	function _createMapping( name : String, mappingID : String ) : InjectionMapping
+	function _createMapping<T>( name : String, mappingID : String ) : InjectionMapping<T>
 	{
 		if ( this._processedMapping[ mappingID ] )
 		{
@@ -361,7 +361,7 @@ class Injector
 
 		this._processedMapping[ mappingID ] = true;
 
-		var mapping = new InjectionMapping( this, name, mappingID );
+		var mapping = new InjectionMapping( this, mappingID );
 		this._mapping[ mappingID ] = mapping;
 		this._processedMapping.remove( mappingID );
 
