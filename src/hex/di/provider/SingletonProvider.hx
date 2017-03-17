@@ -26,8 +26,7 @@ class SingletonProvider<T> implements IDependencyProvider<T>
 		#if debug
         if ( this._isDestroyed )
         {
-            throw new InjectorException( "Forbidden usage of unmapped singleton provider for type '" 
-				+ Type.getClassName( this._type ) + "'" );
+            throw new InjectorException( "Forbidden usage of unmapped singleton provider" );
         }
         else 
 		#end
