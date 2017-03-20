@@ -255,14 +255,17 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		this._managedObjects.remove( instance );
-
-		var classDescription = this._classDescriptor.getClassDescription( Type.getClass( instance ) );
-		if ( classDescription != null )
+		if( !Reflect.isFunction(instance) )
 		{
-			for ( preDestroy in classDescription.pd )
+			this._managedObjects.remove( instance );
+
+			var classDescription = this._classDescriptor.getClassDescription( Type.getClass( instance ) );
+			if ( classDescription != null )
 			{
-				InjectionUtil.applyMethodInjection( instance, this, preDestroy.a, preDestroy.m );
+				for ( preDestroy in classDescription.pd )
+				{
+					InjectionUtil.applyMethodInjection( instance, this, preDestroy.a, preDestroy.m );
+				}
 			}
 		}
 	}
@@ -375,7 +378,7 @@ class Injector
 		#end
 
 		InjectionUtil.applyClassInjection( target, this, classDescription );
-		if ( classDescription.pd.length > 0 )
+		if ( classDescription.pd.length > 0  && !Reflect.isFunction(target) )
 		{
 			this._managedObjects.put( target,  target );
 		}
