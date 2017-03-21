@@ -4,9 +4,7 @@ import hex.collection.HashMap;
 import hex.collection.Locator;
 import hex.config.stateful.IStatefulConfig;
 import hex.di.IDependencyInjector;
-import hex.event.CompositeDispatcher;
-import hex.event.IDispatcher;
-import hex.module.IModule;
+import hex.module.IContextModule;
 import hex.service.stateful.IStatefulService;
 import hex.util.Stringifier;
 
@@ -23,7 +21,7 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 		super();
 	}
 	
-	public function configure( injector : IDependencyInjector, dispatcher : IDispatcher<{}>, module : IModule ) : Void
+	public function configure( injector : IDependencyInjector, module : IContextModule ) : Void
 	{
 		var keys = this.keys();
         for ( className in keys )
@@ -58,11 +56,6 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 			{
 				if ( Std.is( mapped, IStatefulService ) )
 				{
-					/*var serviceDispatcher : CompositeDispatcher = ( cast mapped ).getDispatcher();
-					if ( serviceDispatcher != null )
-					{
-						serviceDispatcher.add( dispatcher );
-					}*/
 					trace( 'Warning: IStatefulService instances are not added as listener:' + Stringifier.stringify( mapped ) );
 				}
 
