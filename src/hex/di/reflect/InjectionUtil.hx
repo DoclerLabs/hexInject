@@ -15,44 +15,45 @@ class InjectionUtil
 		
 	}
 	
-	inline public static function applyClassInjection<T>( target : T, injector : Injector, classDescription : ClassDescription ) : T
+	inline public static function applyClassInjection<T>( target : T, injector : Injector, classDescription : ClassDescription, targetType : Class<Dynamic> ) : T
 	{
 		for ( property in classDescription.p )
 		{
-			InjectionUtil.applyPropertyInjection( property.p, property.t, property.n, property.o, target, injector );
+			InjectionUtil.applyPropertyInjection( target, injector, targetType, property.p, property.t, property.n, property.o );
 		}
 		
 		for ( method in classDescription.m )
 		{
-			InjectionUtil.applyMethodInjection( target, injector, method.a, method.m );
+			InjectionUtil.applyMethodInjection( target, injector, targetType, method.a, method.m );
 		}
 		
 		for ( postConstruct in classDescription.pc )
 		{
-			InjectionUtil.applyMethodInjection( target, injector, postConstruct.a, postConstruct.m );
+			InjectionUtil.applyMethodInjection( target, injector, targetType, postConstruct.a, postConstruct.m );
 		}
 
 		return target;
 	}
 	
-	inline public static function applyConstructorInjection<T>( type : Class<T>, injector : Injector, arguments : Array<ArgumentInjection> ) : T
+	inline public static function applyConstructorInjection<T>( type : Class<T>, injector : Injector, arguments : Array<ArgumentInjection>, targetType : Class<Dynamic> ) : T
 	{
-		var args = InjectionUtil.gatherArgs( type, injector, arguments, 'new' );
+		var args = InjectionUtil.gatherArgs( type, injector, arguments, 'new', targetType );
 		return Type.createInstance( type, args );
 	}
 	
-	inline public static function applyPropertyInjection( 	propertyName: String, 
+	inline public static function applyPropertyInjection( 	target : Dynamic, 
+															injector : Injector,
+															targetType : Class<Dynamic>,
+															propertyName: String, 
 															propertyType: String, 
 															injectionName: String = '', 
-															isOptional: Bool = false,
-															target : Dynamic, 
-															injector : Injector ) : Dynamic
+															isOptional: Bool = false ) : Dynamic
 	{
 		var provider = injector.getProvider( propertyType, injectionName );
 
 		if ( provider != null )
 		{
-			Reflect.setProperty( target, propertyName, provider.getResult( injector ) );
+			Reflect.setProperty( target, propertyName, provider.getResult( injector, targetType ) );
 		}
 		else if ( !isOptional )
 		{
@@ -67,13 +68,13 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyMethodInjection( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String ) : Dynamic
+	inline public static function applyMethodInjection( target : Dynamic, injector : Injector, targetType : Class<Dynamic>, arguments : Array<ArgumentInjection>, methodName : String ) : Dynamic
 	{
-		Reflect.callMethod( target, Reflect.field( target, methodName ), InjectionUtil.gatherArgs( target, injector, arguments, methodName ) );
+		Reflect.callMethod( target, Reflect.field( target, methodName ), InjectionUtil.gatherArgs( target, injector, arguments, methodName, targetType ) );
         return target;
 	}
 	
-	inline static function gatherArgs( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String ) : Array<Dynamic>
+	inline static function gatherArgs( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String, targetType : Class<Dynamic> ) : Array<Dynamic>
 	{
 		var args = [];
         for ( arg in arguments )
@@ -82,7 +83,7 @@ class InjectionUtil
 
 			if ( provider != null )
 			{
-				args.push( provider.getResult( injector ) );
+				args.push( provider.getResult( injector, targetType ) );
 			}
 			else if ( !arg.o )
 			{

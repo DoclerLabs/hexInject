@@ -24,7 +24,7 @@ class InjectionMapping<T>
         this._mappingID 		= mappingID;
     }
 
-    public function getResult() : Dynamic
+    public function getResult( target : Class<Dynamic> ) : Dynamic
     {
         if ( this.provider == null )
         {
@@ -32,25 +32,25 @@ class InjectionMapping<T>
 				+ this._mappingID + "' has no provider" );
         }
 
-        return this.provider.getResult( this._injector );
+        return this.provider.getResult( this._injector, target );
     }
 
     inline public function toSingleton( type : Class<T> ) : InjectionMapping<T>
     {
-        return this._toProvider( new SingletonProvider( type, this._injector ) );
+        return this.toProvider( new SingletonProvider( type, this._injector ) );
     }
 
     inline public function toType( type : Class<T> ) : InjectionMapping<T>
     {
-        return this._toProvider( new ClassProvider( type ) );
+        return this.toProvider( new ClassProvider( type ) );
     }
 
     inline public function toValue( value : T ) : InjectionMapping<T>
     {
-        return this._toProvider( new ValueProvider( value, this._injector ) );
+        return this.toProvider( new ValueProvider( value, this._injector ) );
     }
 
-    inline function _toProvider( provider : IDependencyProvider<T> ) : InjectionMapping<T>
+    inline public function toProvider( provider : IDependencyProvider<T> ) : InjectionMapping<T>
     {
 		#if debug
         if ( this.provider != null )

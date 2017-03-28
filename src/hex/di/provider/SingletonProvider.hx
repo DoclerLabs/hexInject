@@ -21,7 +21,7 @@ class SingletonProvider<T> implements IDependencyProvider<T>
         this._injector      = injector;
     }
 
-    public function getResult( injector : IDependencyInjector ) : T
+    public function getResult( injector : IDependencyInjector, target : Class<Dynamic> ) : T
     {
 		#if debug
         if ( this._isDestroyed )

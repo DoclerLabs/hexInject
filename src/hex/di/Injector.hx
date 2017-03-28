@@ -90,7 +90,7 @@ class Injector
 
 		if ( mapping != null )
 		{
-			return mapping.getResult();
+			return mapping.getResult( type );
 		}
 		else if ( this._parentInjector != null )
 		{
@@ -154,7 +154,7 @@ class Injector
 		var instance : T; 
 		if ( classDescription != null && classDescription.c != null )
 		{
-			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a );
+			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a, type );
 			this._applyInjection( instance, type, classDescription );
 		}
 		else
@@ -255,7 +255,7 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		if( !Reflect.isFunction(instance) )
+		if( !Reflect.isFunction( instance ) )
 		{
 			this._managedObjects.remove( instance );
 
@@ -264,7 +264,7 @@ class Injector
 			{
 				for ( preDestroy in classDescription.pd )
 				{
-					InjectionUtil.applyMethodInjection( instance, this, preDestroy.a, preDestroy.m );
+					InjectionUtil.applyMethodInjection( instance, this, Type.getClass( instance ), preDestroy.a, preDestroy.m );
 				}
 			}
 		}
@@ -377,7 +377,7 @@ class Injector
 		this.trigger.onPreConstruct( this, target, targetType );
 		#end
 
-		InjectionUtil.applyClassInjection( target, this, classDescription );
+		InjectionUtil.applyClassInjection( target, this, classDescription, targetType );
 		if ( classDescription.pd.length > 0  && !Reflect.isFunction(target) )
 		{
 			this._managedObjects.put( target,  target );
