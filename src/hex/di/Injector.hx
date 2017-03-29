@@ -110,7 +110,7 @@ class Injector
 		
 		if ( mapping != null )
 		{
-			return mapping.getResult();
+			return mapping.getResult( Type.getClass( className.split( '<' )[ 0 ]  ) );
 		}
 		else if ( this._parentInjector != null )
 		{
