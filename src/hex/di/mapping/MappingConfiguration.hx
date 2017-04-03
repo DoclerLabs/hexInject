@@ -7,6 +7,7 @@ import hex.di.IDependencyInjector;
 import hex.module.IContextModule;
 import hex.service.stateful.IStatefulService;
 import hex.util.Stringifier;
+import hex.log.HexLog.getLogger;
 
 /**
  * ...
@@ -56,7 +57,7 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 			{
 				if ( Std.is( mapped, IStatefulService ) )
 				{
-					trace( 'Warning: IStatefulService instances are not added as listener:' + Stringifier.stringify( mapped ) );
+					getLogger().warn( 'IStatefulService instances are not added as listener:' + Stringifier.stringify( mapped ) );
 				}
 
 				if ( helper.injectInto )
