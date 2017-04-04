@@ -6,6 +6,7 @@ import hex.di.provider.IDependencyProvider;
 import hex.di.provider.SingletonProvider;
 import hex.di.provider.ValueProvider;
 import hex.error.NullPointerException;
+import hex.log.HexLog.getLogger;
 
 /**
  * ...
@@ -55,10 +56,10 @@ class InjectionMapping<T>
 		#if debug
         if ( this.provider != null )
         {
-            trace(  'Warning: Injector already has a mapping for ' + this._mappingID + '.\n ' +
-                    'If you have overridden this mapping intentionally you can use ' +
-                    '"injector.unmap()" prior to your replacement mapping in order to ' +
-                    'avoid seeing this message.' );
+            getLogger().warn( 'Injector already has a mapping for ' + this._mappingID + '.\n ' +
+							  'If you have overridden this mapping intentionally you can use ' +
+							  '"injector.unmap()" prior to your replacement mapping in order to ' +
+							  'avoid seeing this message.' );
         }
 		#end
 		

@@ -15,6 +15,7 @@ import hex.di.reflect.InjectionUtil;
 import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
+import hex.log.LogManager;
 import hex.util.ClassUtil;
 
 /**
@@ -343,7 +344,7 @@ class Injector
 		#if debug
 		if ( mapping == null )
 		{
-			trace( "Warning: unmap failed with mapping named '" + mappingID + 
+			LogManager.getLoggerByInstance(this).warn( "Unmap failed with mapping named '" + mappingID + 
 					"'. Maybe this mapping was overridden previously." );
 		}
 		#end
