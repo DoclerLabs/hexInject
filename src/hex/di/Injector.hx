@@ -91,7 +91,7 @@ class Injector
 
 		if ( mapping != null )
 		{
-			return mapping.getResult( type );
+			return mapping.getResult( null );
 		}
 		else if ( this._parentInjector != null )
 		{
