@@ -38,6 +38,7 @@ import hex.di.mock.injectees.TwoParametersConstructorInjecteeWithGeneric;
 import hex.di.mock.injectees.TwoParametersMethodInjectee;
 import hex.di.mock.injectees.TwoParametersMethodInjecteeWithGeneric;
 import hex.di.mock.injectees.XMLInjectee;
+import hex.di.mock.provider.MockDependencyProvider;
 import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Clazz2;
 import hex.di.mock.types.ClazzWithGeneric;
@@ -857,5 +858,34 @@ class InjectorTest implements IInjectorListener
 
 		Assert.isInstanceOf( instance, NamedClassInjecteeWithClassName, "instance should be an instance of 'NamedClassInjecteeWithClassName'" );
 		Assert.equals( clazzInstance, instance.property, "Named value should have been injected" );
+	}
+	
+	@Test( "Test dependency provider" )
+	public function testDependencyProvider() : Void
+	{
+		var instance = new Clazz();
+		var provider = new MockDependencyProvider<Clazz>(instance);
+		injector.map( Clazz ).toProvider(provider);
+		
+		var returnVal = injector.getInstance(Clazz);
+		
+		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
+		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
+		Assert.isNull(provider.target, "Target is unknown so it's supposed to be null");
+	}
+	
+	@Test( "Test injection from dependency provider" )
+	public function testInjectionFromDependencyProvider() : Void
+	{
+		var instance = new Clazz();
+		var provider = new MockDependencyProvider<Clazz>(instance);
+		injector.map( Clazz, 'Clazz' ).toProvider(provider);
+		
+		var newInst = injector.instantiateUnmapped(NamedClassInjecteeWithClassName);
+		
+		Assert.equals(instance, newInst.property, "Returned value must come from dependency provider");
+		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
+		Assert.equals(NamedClassInjecteeWithClassName, provider.target, "Target should be proper class");
+		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
 }

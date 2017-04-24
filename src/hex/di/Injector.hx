@@ -15,6 +15,7 @@ import hex.di.reflect.InjectionUtil;
 import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
+import hex.log.LogManager;
 import hex.util.ClassUtil;
 
 /**
@@ -90,7 +91,7 @@ class Injector
 
 		if ( mapping != null )
 		{
-			return mapping.getResult();
+			return mapping.getResult( null );
 		}
 		else if ( this._parentInjector != null )
 		{
@@ -110,7 +111,7 @@ class Injector
 		
 		if ( mapping != null )
 		{
-			return mapping.getResult();
+			return mapping.getResult( Type.getClass( className.split( '<' )[ 0 ]  ) );
 		}
 		else if ( this._parentInjector != null )
 		{
@@ -154,7 +155,7 @@ class Injector
 		var instance : T; 
 		if ( classDescription != null && classDescription.c != null )
 		{
-			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a );
+			instance = InjectionUtil.applyConstructorInjection( type, this, classDescription.c.a, type );
 			this._applyInjection( instance, type, classDescription );
 		}
 		else
@@ -255,7 +256,7 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		if( !Reflect.isFunction(instance) )
+		if( !Reflect.isFunction( instance ) )
 		{
 			this._managedObjects.remove( instance );
 
@@ -264,7 +265,7 @@ class Injector
 			{
 				for ( preDestroy in classDescription.pd )
 				{
-					InjectionUtil.applyMethodInjection( instance, this, preDestroy.a, preDestroy.m );
+					InjectionUtil.applyMethodInjection( instance, this, Type.getClass( instance ), preDestroy.a, preDestroy.m );
 				}
 			}
 		}
@@ -343,7 +344,7 @@ class Injector
 		#if debug
 		if ( mapping == null )
 		{
-			trace( "Warning: unmap failed with mapping named '" + mappingID + 
+			LogManager.getLoggerByInstance(this).warn( "Unmap failed with mapping named '" + mappingID + 
 					"'. Maybe this mapping was overridden previously." );
 		}
 		#end
@@ -377,7 +378,7 @@ class Injector
 		this.trigger.onPreConstruct( this, target, targetType );
 		#end
 
-		InjectionUtil.applyClassInjection( target, this, classDescription );
+		InjectionUtil.applyClassInjection( target, this, classDescription, targetType );
 		if ( classDescription.pd.length > 0  && !Reflect.isFunction(target) )
 		{
 			this._managedObjects.put( target,  target );
