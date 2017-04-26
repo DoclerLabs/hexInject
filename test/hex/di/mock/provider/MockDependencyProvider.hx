@@ -22,9 +22,6 @@ class MockDependencyProvider<T> implements IDependencyProvider<T>
 		
 	}
 	
-	
-	/* INTERFACE hex.di.provider.IDependencyProvider.IDependencyProvider<T> */
-	
 	public function getResult(injector:IDependencyInjector, target:Class<Dynamic>):T 
 	{
 		this.injector = injector;

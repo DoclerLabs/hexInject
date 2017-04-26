@@ -84,18 +84,18 @@ class Injector
 		this.map( clazz, name ).toSingleton( type );
 	}
 
-    public function getInstance<T>( type : Class<T>, name : String = '' ) : T
+    public function getInstance<T>( type : Class<T>, name : String = '', targetType : Class<Dynamic> = null ) : T
 	{
 		var mappingID = this._getMappingID( type, name );
 		var mapping = this._mapping[ mappingID ];
 
 		if ( mapping != null )
 		{
-			return mapping.getResult( null );
+			return mapping.getResult( targetType );
 		}
 		else if ( this._parentInjector != null )
 		{
-			return this._parentInjector.getInstance( type, name );
+			return this._parentInjector.getInstance( type, name, targetType );
 		}
 		else
 		{
@@ -104,18 +104,18 @@ class Injector
 		}
 	}
 	
-	public function getInstanceWithClassName<T>( className : String, name : String = '' ) : T
+	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null ) : T
 	{
 		var mappingID = className + '|' + name;
 		var mapping = cast this._mapping[ mappingID ];
 		
 		if ( mapping != null )
 		{
-			return mapping.getResult( Type.getClass( className.split( '<' )[ 0 ]  ) );
+			return mapping.getResult( targetType );
 		}
 		else if ( this._parentInjector != null )
 		{
-			return this._parentInjector.getInstanceWithClassName( className, name );
+			return this._parentInjector.getInstanceWithClassName( className, name, targetType );
 		}
 		else
 		{

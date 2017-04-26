@@ -888,4 +888,48 @@ class InjectorTest implements IInjectorListener
 		Assert.equals(NamedClassInjecteeWithClassName, provider.target, "Target should be proper class");
 		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
+	
+	@Test( "Test dependency provider with class name" )
+	public function testDependencyProviderWithClassName() : Void
+	{
+		var instance = new Clazz();
+		var provider = new MockDependencyProvider<Clazz>(instance);
+		injector.map( Clazz ).toProvider(provider);
+		
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.types.Clazz");
+		
+		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
+		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
+		Assert.isNull(provider.target, "Target is unknown so it's supposed to be null");
+	}
+	
+	@Test( "Test getInstance target type is passed to dependency provider" )
+	public function testGetInstanceTargetTypeIsPassedToDependencyProvider() : Void
+	{
+		var instance = new Clazz();
+		var provider = new MockDependencyProvider<Clazz>(instance);
+		injector.map( Clazz ).toProvider(provider);
+		
+		var returnVal = injector.getInstance(Clazz, null, NamedClassInjecteeWithClassName);
+		
+		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
+		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
+		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
+	}
+	
+	@Test( "Test getInstanceWithClassName target type is passed to dependency provider" )
+	public function testGetInstanceWithClassNameTargetTypeIsPassedToDependencyProvider() : Void
+	{
+		var instance = new Clazz();
+		var provider = new MockDependencyProvider<Clazz>(instance);
+		injector.map( Clazz ).toProvider(provider);
+		
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.types.Clazz", null, NamedClassInjecteeWithClassName);
+		
+		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
+		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
+		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
+	}
+	
+	
 }
