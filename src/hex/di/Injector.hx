@@ -1,6 +1,6 @@
 package hex.di;
 
-import hex.collection.HashMap;
+import hex.collection.ArrayMap;
 import hex.di.IDependencyInjector;
 import hex.di.IInjectorListener;
 import hex.di.error.InjectorException;
@@ -30,7 +30,7 @@ class Injector
 {
 	var _mapping				: Map<String,InjectionMapping<Dynamic>>;
 	var _processedMapping 		: Map<String,Bool>;
-	var _managedObjects			: HashMap<Dynamic, Dynamic>;
+	var _managedObjects			: ArrayMap<Dynamic, Dynamic>;
 	var _parentInjector			: Injector;
 	var _classDescriptor		: IClassDescriptionProvider;
 	
@@ -42,7 +42,7 @@ class Injector
 
 		this._mapping 			= new Map();
 		this._processedMapping 	= new Map();
-		this._managedObjects 	= new HashMap();
+		this._managedObjects 	= new ArrayMap();
 	}
 
 	public function createChildInjector() : Injector
@@ -300,7 +300,7 @@ class Injector
 
 		this._mapping 						= new Map();
 		this._processedMapping 				= new Map();
-		this._managedObjects 				= new HashMap();
+		this._managedObjects 				= new ArrayMap<Dynamic, Dynamic>();
 		
 		#if !macro
 		this.trigger.disconnectAll();
