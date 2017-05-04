@@ -1,13 +1,12 @@
 package hex.di.mapping;
 
-import hex.collection.HashMap;
 import hex.collection.Locator;
 import hex.config.stateful.IStatefulConfig;
 import hex.di.IDependencyInjector;
+import hex.log.HexLog.getLogger;
 import hex.module.IContextModule;
 import hex.service.stateful.IStatefulService;
 import hex.util.Stringifier;
-import hex.log.HexLog.getLogger;
 
 /**
  * ...
@@ -15,8 +14,6 @@ import hex.log.HexLog.getLogger;
  */
 class MappingConfiguration extends Locator<String, Helper> implements IStatefulConfig
 {
-	var _mapping = new HashMap<String, Dynamic>();
-	
 	public function new() 
 	{
 		super();
@@ -67,8 +64,6 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 				
 				injector.mapClassNameToValue( classKey, mapped, helper.mapName );
 			}
-			
-			this._mapping.put( classKey, mapped );
 		}
 	}
 	
@@ -80,11 +75,6 @@ class MappingConfiguration extends Locator<String, Helper> implements IStatefulC
 	public function addMappingWithClassName( className : String, value : Dynamic, ?mapName : String = "", ?asSingleton : Bool = false, ?injectInto : Bool = false ) : Bool
 	{
 		return this._registerMapping( className, new Helper( value, mapName, asSingleton, injectInto ), mapName );
-	}
-	
-	public function getMapping() : HashMap<String, Dynamic>
-	{
-		return this._mapping;
 	}
 	
 	function _registerMapping( className : String, helper : Helper, ?mapName : String = "" ) : Bool
