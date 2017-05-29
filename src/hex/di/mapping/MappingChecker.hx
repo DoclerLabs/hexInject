@@ -46,7 +46,7 @@ class MappingChecker
 					ret: macro:Array<MappingDefinition>,
 					expr: macro 
 					{
-						//mappings = hex.di.mapping.MappingChecker.filter( $v { Context.getLocalClass().toString() }, mappings );
+						mappings = hex.di.mapping.MappingChecker.filter( Type.resolveClass( $v { Context.getLocalClass().toString() } ), mappings );
 						
 						if ( injectInto == null ) injectInto = [];
 						for ( mapping in  mappings )
@@ -181,7 +181,13 @@ class MappingChecker
 	public static function filter<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
 	{
 		var dependencies = Reflect.getProperty( classReference, DEPENDENCY );
-		trace( dependencies );
 		return mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+	}
+	
+	public static function match<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Bool
+	{
+		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
 }

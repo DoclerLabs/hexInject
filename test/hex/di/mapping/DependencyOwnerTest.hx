@@ -1,5 +1,6 @@
 package hex.di.mapping;
 
+import hex.di.error.MissingMappingException;
 import hex.di.mock.owner.DependencyOwner;
 import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Clazz2;
@@ -46,6 +47,24 @@ class DependencyOwnerTest
 	}
 	
 	@Test
+	public function testMatch() : Void
+	{
+		var f2 = function() {};
+		var mappings : Array<MappingDefinition> = [
+			{ fromType: "String", toValue: "test" },
+			{ fromType: "hex.di.mock.types.Interface", toClass: Clazz, withName: "id" },
+			{ fromType: "hex.di.mock.types.Interface", toClass: Clazz2, withName: "id2", asSingleton: true },
+			{ fromType: "hex.di.mock.types.InterfaceWithGeneric<String>", toClass: ClazzWithGeneric, withName: "name" },
+			/*{ fromType: "Void->String", toValue: f1 },*/
+			{ fromType: "Void->Void", toValue: f2, withName:hex.di.mock.MockConstants.NAME_ONE }
+		];
+		
+		Assert.isTrue( MappingChecker.match( DependencyOwner, mappings ) );
+		/*Assert.methodCallThrows( MissingMappingException, injector, injector.getInstanceWithClassName, [ "Void->String" ],
+			"This mapping should have been filtered by the dependency checker");*/
+	}
+	
+	@Test
 	public function testDependencyOwnerGotRightMappings() : Void
 	{
 		var f1 = function() return 'hello';
@@ -79,7 +98,9 @@ class DependencyOwnerTest
 		var clazzInstance = injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" );
 		Assert.isInstanceOf( clazzInstance, ClazzWithGeneric );
 		
-		Assert.equals( f1, injector.getInstanceWithClassName( "Void->String" ) );
 		Assert.equals( f2, injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) );
+		
+		Assert.methodCallThrows( MissingMappingException, injector, injector.getInstanceWithClassName, [ "Void->String" ],
+			"This mapping should have been filtered by the dependency checker");
 	}
 }
