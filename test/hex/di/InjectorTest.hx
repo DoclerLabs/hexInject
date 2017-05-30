@@ -181,11 +181,17 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( item, injectee.property, "Value should have been injected" );
 	}
 	
-	//
+	public static var testMapToValueWithNameDataProvider:Array<Array<Dynamic>> = [
+		[new NamedClassInjectee()],
+		[new NamedClassInjecteeConst()],
+		[new NamedClassInjecteeConstOutside()],
+		[new NamedClassInjecteeConstOutsideFQCN()]
+	];
+	
 	@Test( "Test 'mapToValue' with named class parameter" )
-	public function testMapToValueWithNamedClassParameter() : Void
+	@DataProvider("testMapToValueWithNameDataProvider")
+	public function testMapToValueWithNamedClassParameter(injectee:Dynamic) : Void
 	{
-		var injectee = new NamedClassInjectee();
 		var value = new Clazz();
 		this.injector.map( Clazz, NamedClassInjectee.NAME ).toValue( value );
 		this.injector.injectInto( injectee );
@@ -476,13 +482,21 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( injectee.getDependency2(), 'stringDependency', "The String 'stringDependency' should have been injected for named String parameter" );
 	}
 	
+	public static var namedAndUnnamedParametersConstructorDataProvider:Array<Array<Dynamic>> = [
+		[MixedParametersConstructorInjectee],
+		[MixedParametersConstructorInjecteeConst],
+		[MixedParametersConstructorInjecteeConstOutside],
+		[MixedParametersConstructorInjecteeConstOutsideFQCN]
+	];
+	
 	@Test( "Test named and unnamed parameters constructor injection" )
-	public function testNamedAndUnnamedParametersConstructorInjection() : Void
+	@DataProvider("namedAndUnnamedParametersConstructorDataProvider")
+	public function testNamedAndUnnamedParametersConstructorInjection(clss:Class<Dynamic>) : Void
 	{
 		this.injector.map( Clazz, 'namedDep' ).toType( Clazz );
 		this.injector.map( Clazz ).toType( Clazz );
 		this.injector.map( Interface, 'namedDep2' ).toType( Clazz );
-		var injectee = this.injector.instantiateUnmapped( MixedParametersConstructorInjectee );
+		var injectee = this.injector.instantiateUnmapped( clss );
 		Assert.isNotNull( injectee.getDependency(), "Instance of Class should have been injected for named Clazz parameter" );
 		Assert.isNotNull( injectee.getDependency2(), "Instance of Class should have been injected for unnamed Clazz parameter" );
 		Assert.isNotNull( injectee.getDependency3(), "Instance of Class should have been injected for Interface" );
@@ -528,17 +542,24 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.injectInto, [injectee], "'injectInto' should throw InjectorMissingMappingError" );
 	}
 	
-	@Test( "Test posConstruct method is called" )
-	public function testPostConstructMethodIsCalled() : Void
+	public static var postConstructDataProvider:Array<Array<Dynamic>> = [
+		[new ClassInjectee()],
+		[new ClassInjecteeWithConst()],
+		[new ClassInjecteeWithConstOutside()],
+		[new ClassInjecteeWithConstOutsideFQCN()]
+	];
+	
+	@Test( "Test postConstruct method is called" )
+	@DataProvider("postConstructDataProvider")
+	public function testPostConstructMethodIsCalled(injectee:Dynamic) : Void
 	{
-		var injectee = new ClassInjectee();
 		var value = new Clazz();
 		injector.map( Clazz ).toValue( value );
 		injector.injectInto( injectee );
 		Assert.isTrue( injectee.someProperty, "'postConstruct' tagged method should be called after class instantiation" );
 	}
 	
-	@Test( "Test posConstruct method with arg is called" )
+	@Test( "Test postConstruct method with arg is called" )
 	public function testPostConstructMethodWithArgIsCalled() : Void
 	{
 		this.injector.map( Clazz ).toType( Clazz );
@@ -546,7 +567,7 @@ class InjectorTest implements IInjectorListener
 		Assert.isInstanceOf( injectee.property, Clazz, "'postConstruct' tagged method should be called with args after class instantiation" );
 	}
 	
-	@Test( "Test posConstruct method with arg are called in the right order" )
+	@Test( "Test postConstruct method with arg are called in the right order" )
 	public function testPostConstructMethodAreCalledInTheRightOrder() : Void
 	{
 		var injectee = new OrderedPostConstructInjectee();
@@ -647,10 +668,18 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.getInstance, [ Interface ], "'getInstance' should throw MissingMappingException" );
 	}
 	
+	public static var instantiateClassWithOptionalPropertyDataProvider:Array<Array<Dynamic>> = [
+		[OptionalClassInjectee],
+		[OptionalClassInjecteeConst],
+		[OptionalClassInjecteeConstOutside],
+		[OptionalClassInjecteeConstOutsideFQCN]
+	];
+	
 	@Test( "Test instantiate class with optional property" )
-	public function testInstantiateClassWithOptionalProperty() : Void
+	@DataProvider("instantiateClassWithOptionalPropertyDataProvider")
+	public function testInstantiateClassWithOptionalProperty(clss:Class<Dynamic>) : Void
 	{
-		var injectee = this.injector.instantiateUnmapped( OptionalClassInjectee );
+		var injectee = this.injector.instantiateUnmapped( clss );
 		Assert.isNull( injectee.property, "Injectee mustn't contain Clazz instance" );
 	}
 	
