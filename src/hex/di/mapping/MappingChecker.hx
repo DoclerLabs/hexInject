@@ -213,7 +213,7 @@ class MappingChecker
 
 	public static function filter<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
 	{
-		var dependencies = Reflect.getProperty( classReference, DEPENDENCY );
+		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
 		return mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
 	}
 	
