@@ -49,19 +49,22 @@ class DependencyOwnerTest
 	@Test
 	public function testMatch() : Void
 	{
-		var f2 = function() {};
+		var f1 = function() return 'hello';
+		var f2 = function() { };
+		
 		var mappings : Array<MappingDefinition> = [
 			{ fromType: "String", toValue: "test" },
 			{ fromType: "hex.di.mock.types.Interface", toClass: Clazz, withName: "id" },
 			{ fromType: "hex.di.mock.types.Interface", toClass: Clazz2, withName: "id2", asSingleton: true },
 			{ fromType: "hex.di.mock.types.InterfaceWithGeneric<String>", toClass: ClazzWithGeneric, withName: "name" },
-			/*{ fromType: "Void->String", toValue: f1 },*/
 			{ fromType: "Void->Void", toValue: f2, withName:hex.di.mock.MockConstants.NAME_ONE }
 		];
 		
 		Assert.isTrue( MappingChecker.match( DependencyOwner, mappings ) );
-		/*Assert.methodCallThrows( MissingMappingException, injector, injector.getInstanceWithClassName, [ "Void->String" ],
-			"This mapping should have been filtered by the dependency checker");*/
+		
+		mappings.push( { fromType: "Void->String", toValue: f1 } );
+		Assert.isFalse( MappingChecker.match( DependencyOwner, mappings ),
+			"This checking should mismatch, DependencyOwner class doesn't have `Void->String` dependency annotated" );
 	}
 	
 	@Test

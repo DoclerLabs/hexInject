@@ -23,6 +23,8 @@ class MappingChecker
 	
 	/** @private */
     function new()  throw new PrivateConstructorException();
+	
+	static var _dependencies : Map<String, Array<String>> = new Map();
 
 	macro public static function check() : Array<Field>
 	{
@@ -113,6 +115,9 @@ class MappingChecker
 			kind: FieldType.FVar( macro: Array<String>, macro $v{ m } ), 
 			pos: Context.currentPos(),
 		});
+		
+		var className = Context.getLocalClass().get().pack.join('.') + '.' + Context.getLocalClass().get().name;
+		MappingChecker._dependencies.set( className, m );
 
 		for ( f in fields )
 		{
@@ -175,6 +180,34 @@ class MappingChecker
 			case _: Context.error( 'Invalid Dependency description', meta.pos );
 		}
 		return null;
+	}
+	
+	public static function getDependency( className : String ) : Array<String>
+	{
+		return MappingChecker._dependencies.get( className );
+	}
+	
+	public static function matchForClassName<T>( className : String, mappings : Array<MappingDefinition> ) : Bool
+	{
+		var dependencies = MappingChecker._dependencies.get( className );
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		return filtered.length == mappings.length && dependencies.length == mappings.length;
+	}
+	
+	public static function getMissingMapping<T>( className : String, mappings : Array<MappingDefinition> ) : Array<String>
+	{
+		var dependencies = MappingChecker._dependencies.get( className );
+		var result = [];
+		
+		for ( dep in dependencies )
+		{
+			if ( !Lambda.exists( mappings, function(e) return (e.fromType + '|' + (e.withName == null?"":e.withName)) == dep ) ) 
+			{
+				result.push( dep );
+			}
+		}
+		
+		return result;
 	}
 #end
 
