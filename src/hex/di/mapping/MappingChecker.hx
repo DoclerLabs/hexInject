@@ -20,6 +20,7 @@ class MappingChecker
 	
 #if macro
 	static inline var _annotation = 'Dependency';
+	static inline var _appendMappingDependencyName = 'AppendMappingDependency';
 	
 	/** @private */
     function new()  throw new PrivateConstructorException();
@@ -128,13 +129,35 @@ class MappingChecker
 					if ( f.name == 'new' )
 					{
 						var a : Array<Expr> = [];
+						var exprsAfterMapping : Array<Expr> = [];
+
+						switch( func.expr.expr )
+						{
+							case EBlock( exprs ) : for ( e in exprs )
+							{
+								switch(e.expr)
+								{
+									case EMeta( s, exp ) if ( s.name == _appendMappingDependencyName ):
+									{
+										a = exprsAfterMapping.copy();
+										exprsAfterMapping = [];
+										exprsAfterMapping.push( exp );
+									}
+									case _: {
+										exprsAfterMapping.push( e );
+									}
+								}
+							}
+							case _:
+						}
+						var olenght = a.length;
 						for ( arg in func.args )
 						{
 							var p = Context.currentPos();
 							var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
 							var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
 							
-							if ( a.length == 0 )
+							if ( a.length == olenght )
 							{
 								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}] ); } );
 								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name} ); } );
