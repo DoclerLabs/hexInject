@@ -91,7 +91,7 @@ class MappingChecker
 					{
 						for ( mapping in  injectInto )
 						{
-							this.getInjector().injectInto( mapping );
+							this.getInjector().injectInto( mapping.toValue );
 						}
 					}
 				}),
