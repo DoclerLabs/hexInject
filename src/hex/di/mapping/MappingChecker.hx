@@ -20,8 +20,8 @@ class MappingChecker
 	
 #if macro
 	static inline var _annotation = 'Dependency';
-	static inline var _appendMappingDependencyName = 'AppendMappingDependency';
 	
+	static inline var _afterMapping = 'AfterMapping';
 	/** @private */
     function new()  throw new PrivateConstructorException();
 	
@@ -129,35 +129,13 @@ class MappingChecker
 					if ( f.name == 'new' )
 					{
 						var a : Array<Expr> = [];
-						var exprsAfterMapping : Array<Expr> = [];
-
-						switch( func.expr.expr )
-						{
-							case EBlock( exprs ) : for ( e in exprs )
-							{
-								switch(e.expr)
-								{
-									case EMeta( s, exp ) if ( s.name == _appendMappingDependencyName ):
-									{
-										a = exprsAfterMapping.copy();
-										exprsAfterMapping = [];
-										exprsAfterMapping.push( exp );
-									}
-									case _: {
-										exprsAfterMapping.push( e );
-									}
-								}
-							}
-							case _:
-						}
-						var olenght = a.length;
 						for ( arg in func.args )
 						{
 							var p = Context.currentPos();
 							var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
 							var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
 							
-							if ( a.length == olenght )
+							if ( a.length == 0 )
 							{
 								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}] ); } );
 								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name} ); } );
@@ -169,15 +147,36 @@ class MappingChecker
 							}
 							
 						}
-						
-						//Append
+
 						if ( a.length > 0 )
 						{
 							a.push( macro  @:mergeBlock { this.__injectInto( __injectInto__ ); } );
-							func.expr.expr = switch( func.expr.expr )
+
+							var hasAfterMappingMeta = false;
+							function findAfterMappingMeta( e )
 							{
-								case EBlock( exprs ): EBlock( a.concat( exprs ) );
-								case _: EBlock( a );
+								switch( e.expr )
+								{
+									case EMeta( s, exp ) if ( s.name == _afterMapping ):
+										hasAfterMappingMeta = hasAfterMappingMeta || true;
+										//Append
+										a.push( exp );
+										e.expr = EBlock( a );
+									case _:
+										//trace( new haxe.macro.Printer().printExpr( e ) );
+										ExprTools.iter( e, findAfterMappingMeta );
+								}
+							};
+							ExprTools.iter( func.expr, findAfterMappingMeta );
+
+							//Append at the end if @AfterMapping not found
+							if( !hasAfterMappingMeta )
+							{
+								func.expr.expr = switch( func.expr.expr )
+								{
+									case EBlock( exprs ): EBlock( exprs.concat( a ) );
+									case _: EBlock( a );
+								}
 							}
 						}
 					}
