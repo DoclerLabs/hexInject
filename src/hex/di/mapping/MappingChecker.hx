@@ -4,6 +4,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 import haxe.macro.ExprTools;
+import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
 import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
@@ -22,6 +23,9 @@ class MappingChecker
 	static inline var _annotation = 'Dependency';
 	
 	static inline var _afterMapping = 'AfterMapping';
+	static inline var _mapMethodName = '__map';
+	static inline var _injectIntoMethodName = '__injectInto';
+
 	/** @private */
     function new()  throw new PrivateConstructorException();
 	
@@ -32,22 +36,23 @@ class MappingChecker
 		var fields = Context.getBuildFields();
 		
 		//if it's an interface we don't want to check
-		if ( Context.getLocalClass().get().isInterface )
+		//and check if macro is already apply
+		if ( Context.getLocalClass().get().isInterface || fields.filter( function(f) return f.name == DEPENDENCY ).length > 0 )
 		{
 			return fields;
 		}
-		
-		if ( fields.filter( function(f) return f.name == 'map' ).length == 0 )
+		//check if __map is already added on class or super class
+		if ( TypeTools.findField(Context.getLocalClass().get(), _mapMethodName) == null )
 		{
 			fields.push(
 			{
-				name: '__map',
+				name: _mapMethodName,
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					args: [{name:'mappings', type: macro:Array<MappingDefinition>}, {name:'injectInto', type: macro:Array<MappingDefinition>, opt:true}],
-					ret: macro:Array<MappingDefinition>,
 					expr: macro 
+					args: [{name:'mappings', type: macro:Array<hex.di.mapping.MappingDefinition>}, {name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>, opt:true}],
+					ret: macro:Array<hex.di.mapping.MappingDefinition>,
 					{
 						mappings = hex.di.mapping.MappingChecker.filter( Type.resolveClass( $v { Context.getLocalClass().toString() } ), mappings );
 						
@@ -81,11 +86,11 @@ class MappingChecker
 			
 			fields.push(
 			{
-				name: '__injectInto',
+				name: _injectIntoMethodName,
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					args: [{name:'injectInto', type: macro:Array<MappingDefinition>}],
+					args: [{name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>}],
 					ret: macro:Void,
 					expr: macro 
 					{
