@@ -50,9 +50,9 @@ class MappingChecker
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					expr: macro 
 					args: [{name:'mappings', type: macro:Array<hex.di.mapping.MappingDefinition>}, {name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>, opt:true}],
 					ret: macro:Array<hex.di.mapping.MappingDefinition>,
+					expr: macro 
 					{
 						mappings = hex.di.mapping.MappingChecker.filter( Type.resolveClass( $v { Context.getLocalClass().toString() } ), mappings );
 						
