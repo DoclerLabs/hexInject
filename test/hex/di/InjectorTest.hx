@@ -960,5 +960,17 @@ class InjectorTest implements IInjectorListener
 		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
 	
+	@Test( "Test get singleton instance With class name" )
+	public function testGetSingletonInstanceWithClassName() : Void
+	{
+		injector.mapClassName( "hex.di.mock.types.Interface", "name" ).toSingleton( Clazz );
+		Assert.equals( injector.getInstanceWithClassName( "hex.di.mock.types.Interface", "name" ), injector.getInstanceWithClassName( "hex.di.mock.types.Interface", "name" ) );
+	}
 	
+	@Test( "Test get non singleton instance With class name" )
+	public function testGetNonSingletonInstanceWithClassName() : Void
+	{
+		injector.mapClassName( "hex.di.mock.types.Interface", "name" ).toType( Clazz );
+		Assert.notEquals( injector.getInstanceWithClassName( "hex.di.mock.types.Interface", "name" ), injector.getInstanceWithClassName( "hex.di.mock.types.Interface", "name" ) );
+	}
 }
