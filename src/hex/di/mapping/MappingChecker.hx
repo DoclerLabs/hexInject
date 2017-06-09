@@ -50,11 +50,11 @@ class MappingChecker
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					args: [{name:'mappings', type: macro:Array<hex.di.mapping.MappingDefinition>}, {name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>, opt:true}],
+					args: [{name:'mappings', type: macro:Array<hex.di.mapping.MappingDefinition>}, {name:'target', type: macro:Class<Dynamic>}, {name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>, opt:true}],
 					ret: macro:Array<hex.di.mapping.MappingDefinition>,
 					expr: macro 
 					{
-						mappings = hex.di.mapping.MappingChecker.filter( Type.resolveClass( $v { Context.getLocalClass().toString() } ), mappings );
+						mappings = hex.di.mapping.MappingChecker.filter( target, mappings );
 						
 						if ( injectInto == null ) injectInto = [];
 						for ( mapping in  mappings )
@@ -142,13 +142,13 @@ class MappingChecker
 							
 							if ( a.length == 0 )
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}] ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name} ); } );
+								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
 							}
 							else
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], __injectInto__ ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, __injectInto__ ); } );
+								if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+								if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
 							}
 							
 						}
