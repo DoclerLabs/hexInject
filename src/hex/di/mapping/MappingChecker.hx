@@ -4,6 +4,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 import haxe.macro.ExprTools;
+import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
 import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
@@ -21,6 +22,10 @@ class MappingChecker
 #if macro
 	static inline var _annotation = 'Dependency';
 	
+	static inline var _afterMapping = 'AfterMapping';
+	static inline var _mapMethodName = '__map';
+	static inline var _injectIntoMethodName = '__injectInto';
+
 	/** @private */
     function new()  throw new PrivateConstructorException();
 	
@@ -31,24 +36,25 @@ class MappingChecker
 		var fields = Context.getBuildFields();
 		
 		//if it's an interface we don't want to check
-		if ( Context.getLocalClass().get().isInterface )
+		//and check if macro is already apply
+		if ( Context.getLocalClass().get().isInterface || fields.filter( function(f) return f.name == DEPENDENCY ).length > 0 )
 		{
 			return fields;
 		}
-		
-		if ( fields.filter( function(f) return f.name == 'map' ).length == 0 )
+		//check if __map is already added on class or super class
+		if ( TypeTools.findField(Context.getLocalClass().get(), _mapMethodName) == null )
 		{
 			fields.push(
 			{
-				name: '__map',
+				name: _mapMethodName,
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					args: [{name:'mappings', type: macro:Array<MappingDefinition>}, {name:'injectInto', type: macro:Array<MappingDefinition>, opt:true}],
-					ret: macro:Array<MappingDefinition>,
+					args: [{name:'mappings', type: macro:Array<hex.di.mapping.MappingDefinition>}, {name:'target', type: macro:Class<Dynamic>}, {name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>, opt:true}],
+					ret: macro:Array<hex.di.mapping.MappingDefinition>,
 					expr: macro 
 					{
-						mappings = hex.di.mapping.MappingChecker.filter( Type.resolveClass( $v { Context.getLocalClass().toString() } ), mappings );
+						mappings = hex.di.mapping.MappingChecker.filter( target, mappings );
 						
 						if ( injectInto == null ) injectInto = [];
 						for ( mapping in  mappings )
@@ -80,17 +86,17 @@ class MappingChecker
 			
 			fields.push(
 			{
-				name: '__injectInto',
+				name: _injectIntoMethodName,
 				pos: haxe.macro.Context.currentPos(),
 				kind: FFun( 
 				{
-					args: [{name:'injectInto', type: macro:Array<MappingDefinition>}],
+					args: [{name:'injectInto', type: macro:Array<hex.di.mapping.MappingDefinition>}],
 					ret: macro:Void,
 					expr: macro 
 					{
 						for ( mapping in  injectInto )
 						{
-							this.getInjector().injectInto( mapping );
+							this.getInjector().injectInto( mapping.toValue );
 						}
 					}
 				}),
@@ -136,25 +142,46 @@ class MappingChecker
 							
 							if ( a.length == 0 )
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}] ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name} ); } );
+								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
 							}
 							else
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], __injectInto__ ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, __injectInto__ ); } );
+								if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+								if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
 							}
 							
 						}
-						
-						//Append
+
 						if ( a.length > 0 )
 						{
 							a.push( macro  @:mergeBlock { this.__injectInto( __injectInto__ ); } );
-							func.expr.expr = switch( func.expr.expr )
+
+							var hasAfterMappingMeta = false;
+							function findAfterMappingMeta( e )
 							{
-								case EBlock( exprs ): EBlock( a.concat( exprs ) );
-								case _: EBlock( a );
+								switch( e.expr )
+								{
+									case EMeta( s, exp ) if ( s.name == _afterMapping ):
+										hasAfterMappingMeta = hasAfterMappingMeta || true;
+										//Append
+										a.push( exp );
+										e.expr = EBlock( a );
+									case _:
+										//trace( new haxe.macro.Printer().printExpr( e ) );
+										ExprTools.iter( e, findAfterMappingMeta );
+								}
+							};
+							ExprTools.iter( func.expr, findAfterMappingMeta );
+
+							//Append at the end if @AfterMapping not found
+							if( !hasAfterMappingMeta )
+							{
+								func.expr.expr = switch( func.expr.expr )
+								{
+									case EBlock( exprs ): EBlock( exprs.concat( a ) );
+									case _: EBlock( a );
+								}
 							}
 						}
 					}
