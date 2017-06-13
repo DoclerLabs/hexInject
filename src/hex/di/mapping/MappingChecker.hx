@@ -136,21 +136,28 @@ class MappingChecker
 						var a : Array<Expr> = [];
 						for ( arg in func.args )
 						{
-							var p = Context.currentPos();
-							var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
-							var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
-							
-							if ( a.length == 0 )
+							var isDynamic = switch( arg.type )
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+								case TPath( t ) if ( t.name == 'Dynamic' ) : true;
+								case _ : false;
 							}
-							else
+							if ( !isDynamic )
 							{
-								if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
-								if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+								var p = Context.currentPos();
+								var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
+								var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
+
+								if ( a.length == 0 )
+								{
+									if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+								}
+								else
+								{
+									if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+								}
 							}
-							
 						}
 
 						if ( a.length > 0 )
