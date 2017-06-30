@@ -4,6 +4,7 @@ import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.di.IInjectorListener;
 import hex.di.mock.types.MockEnum;
+import hex.di.mock.types.MockModuleWithTypes.InternalTypedef;
 import hex.di.mock.types.MockTypedef;
 import hex.di.mock.types.MockTypedefImplementation;
 import hex.di.provider.IDependencyProvider;
@@ -143,6 +144,20 @@ class InjectionUtilTest
 		Assert.equals( "", mapping.name );
 	}
 	
+	@Test( "test map dependency to internal typedef" )
+	public function testMapDependencyToInternalTypedef() : Void
+	{
+		this._injector.mapDependencyToType( 
+			new Dependency<InternalTypedef>(), 
+			new Dependency<MockTypedefImplementation>()
+		);
+		
+		var mapping = this._injector.mappedType;
+		Assert.equals( "hex.di.mock.types.InternalTypedef", mapping.className );
+		Assert.equals( MockTypedefImplementation, mapping.type );
+		Assert.equals( "", mapping.name );
+	}
+	
 	@Test( "test map dependency to type with typedef" )
 	public function testMapDependencyToTypeWithTypedef() : Void
 	{
@@ -155,8 +170,8 @@ class InjectionUtilTest
 		Assert.equals( "hex.di.mock.types.MockTypedef", mapping.className );
 		Assert.equals( MockTypedefImplementation, mapping.type );
 		Assert.equals( "", mapping.name );
-	
 	}
+	
 	@Test( "test map dependency to typedef" )
 	public function testMapDependencyToTypedef() : Void
 	{
