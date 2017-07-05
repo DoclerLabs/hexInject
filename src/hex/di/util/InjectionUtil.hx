@@ -4,6 +4,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
+import hex.di.mapping.MappingDefinition;
 import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
 
@@ -20,6 +21,46 @@ class InjectionUtil
     {
         throw new PrivateConstructorException();
     }
+	
+	public static function addDefinition( target : GetInjector, mappings : Array<MappingDefinition>, useMetadata : Bool = true ) : Void
+	{
+		if ( useMetadata ) 
+		{
+			var cls = Type.getClass( target );
+			mappings = hex.di.mapping.MappingChecker.filter( cls, mappings );
+			/*var className = Type.getClassName( cls );
+			if ( !hex.di.mapping.MappingChecker.matchForClassName( className, mappings ) )
+			{
+				var missingMappings = hex.di.mapping.MappingChecker.getMissingMapping( className, mappings );
+				throw new IllegalArgumentException(  "Missing mappings:" + missingMappings );
+			}*/
+		}
+						
+
+		for ( mapping in  mappings )
+		{
+			if ( mapping.toValue != null )
+			{
+				target.getInjector().mapClassNameToValue( mapping.fromType, mapping.toValue, mapping.withName );
+			}
+			else
+			{
+				if ( mapping.asSingleton )
+				{
+					target.getInjector().mapClassNameToSingleton( mapping.fromType, mapping.toClass, mapping.withName );
+				}
+				else
+				{
+					target.getInjector().mapClassNameToType( mapping.fromType, mapping.toClass, mapping.withName );
+				}
+			}
+			
+			if ( mapping.injectInto ) 
+			{
+				target.getInjector().injectInto( mapping.toValue );
+			}
+		}
+	}
 	
 	macro public static function getDependencyInstance<T>( 	injector : ExprOf<IDependencyInjector>, 
 															clazz : ExprOf<Dependency<T>>
@@ -128,4 +169,9 @@ class InjectionUtil
 		return null;
 	}
 	#end
+}
+
+typedef GetInjector =
+{
+	function getInjector() : IDependencyInjector;
 }
