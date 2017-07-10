@@ -116,7 +116,7 @@ class InjectionUtil
 				{
 					case TPType( t ):
 						
-						return t.toType().toString().split( ' ' ).join( '' );
+						return MacroUtil.getFQCNFromComplexType( t );
 					
 					case _:
 				}
