@@ -245,7 +245,7 @@ class InjectionUtilTest
 		);
 		
 		var mapping = this._injector.mappedType;
-		Assert.equals( "hex.di.mock.types.InternalTypedef", mapping.className );
+		Assert.equals( "hex.di.mock.types.MockModuleWithTypes.InternalTypedef", mapping.className );
 		Assert.equals( MockTypedefImplementation, mapping.type );
 		Assert.equals( "", mapping.name );
 	}
