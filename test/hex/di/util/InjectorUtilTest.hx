@@ -205,6 +205,16 @@ class InjectorUtilTest
 		Assert.equals( MockTypedefImplementation, mapping.type );
 		Assert.equals( "", mapping.name );
 	}
+	
+	@Test( "test unmap dependency" )
+	public function testUnmapDependency() : Void
+	{
+		this._injector.unmapDependency( new Dependency<String>(), 'test' );
+		
+		var mapping = this._injector.instanceWithClassName;
+		Assert.equals( "String", mapping.className );
+		Assert.equals( "test", mapping.name );
+	}
 }
 
 private class MockDependencyInjector implements IDependencyInjector
@@ -317,6 +327,6 @@ private class MockDependencyInjector implements IDependencyInjector
 	
 	public function unmapClassName( className : String, name : String = '' ) : Void
 	{
-		
+		this.instanceWithClassName = { className : className, name : name };
 	}
 }

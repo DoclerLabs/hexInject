@@ -60,6 +60,15 @@ class InjectorUtil
 		return macro { $injector.mapClassNameToSingleton( $v{ classReference }, $typeReference, $id ); };
 	}
 	
+	macro public static function unmapDependency<T>( 	injector : ExprOf<IDependencyInjector>, 
+														clazz : ExprOf<Dependency<T>>, 
+														?id : ExprOf<String>
+													) : Expr
+	{
+		var classReference = InjectorUtil._getStringClassRepresentation( clazz );
+		return macro { $injector.unmapClassName( $v{ classReference }, $id ); };
+	}
+	
 	#if macro
 	public static function _getStringClassRepresentation<T>( clazz : ExprOf<Dependency<T>> ) : String
 	{
