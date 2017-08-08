@@ -24,7 +24,6 @@ import hex.unittest.assertion.Assert;
  */
 class DependencyOwnerTest 
 {
-
 	@Test
 	public function testDependencyFilter() : Void
 	{
