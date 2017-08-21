@@ -122,8 +122,7 @@ class MappingChecker
 			pos: Context.currentPos(),
 		});
 		
-		var path = Context.getLocalClass().get().pack.join('.');
-		var className =  path.length > 0 ? path + '.' + Context.getLocalClass().get().name : Context.getLocalClass().get().name;
+		var className =  Context.getLocalClass().get().pack.concat([Context.getLocalClass().get().name]).join('.');
 		MappingChecker._dependencies.set( className, m );
 
 		for ( f in fields )
