@@ -4,6 +4,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
+import hex.di.Injector;
 import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
 
@@ -23,6 +24,15 @@ class InjectorUtil
 	{
 		var classReference = InjectorUtil._getStringClassRepresentation( clazz );
 		return macro { $injector.getInstanceWithClassName( $v{ classReference } ); };
+	}
+	
+	macro public static function mapDependency<T>( 	injector : ExprOf<Injector>, 
+													clazz : ExprOf<Dependency<T>>, 
+													?id : ExprOf<String>
+												) : Expr
+	{	
+		var classReference = InjectorUtil._getStringClassRepresentation( clazz );
+		return macro { $injector.mapClassName( $v{ classReference }, $id ); };
 	}
 	
 	macro public static function mapDependencyToValue<T>( 	injector : ExprOf<IDependencyInjector>, 
