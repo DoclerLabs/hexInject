@@ -3,7 +3,9 @@ package hex.di.util;
 import hex.di.Dependency;
 import hex.di.IDependencyInjector;
 import hex.di.IInjectorListener;
+import hex.di.Injector;
 import hex.di.error.MissingMappingException;
+import hex.di.mapping.InjectionMapping;
 import hex.di.mapping.MappingDefinition;
 import hex.di.mock.owner.DependencyOwner;
 import hex.di.mock.types.Clazz;
@@ -44,6 +46,17 @@ class InjectorUtilTest
 		var mapping = this._injector.instanceWithClassName;
 		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", mapping.className );
 		Assert.equals( "", mapping.name );
+	}
+	
+	@Test( "test map dependency" )
+	public function testMapDependency() : Void
+	{
+		var o = new MockClassWithTypeParams<String, MockClassWithTypeParams<String, Int>>( "hello", new MockClassWithTypeParams<String, Int>( "yo", 3 ) );
+		
+		var injector = new ReportingInjector();
+		injector.mapDependency( new Dependency<MockClassWithTypeParams<String,MockClassWithTypeParams<String, Int>>>() );
+		
+		Assert.equals( "hex.di.util.MockClassWithTypeParams<String,hex.di.util.MockClassWithTypeParams<String,Int>>", injector.mappedClassName );
 	}
 	
 	@Test( "test map dependency to value" )
@@ -328,5 +341,16 @@ private class MockDependencyInjector implements IDependencyInjector
 	public function unmapClassName( className : String, name : String = '' ) : Void
 	{
 		this.instanceWithClassName = { className : className, name : name };
+	}
+}
+
+class ReportingInjector extends Injector
+{
+	public var mappedClassName:String;
+	
+	override public function mapClassName<T>(className:String, name:String = ''):InjectionMapping<T> 
+	{
+		mappedClassName = className;
+		return super.mapClassName(className, name);
 	}
 }
