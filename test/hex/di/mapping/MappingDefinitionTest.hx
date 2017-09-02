@@ -34,7 +34,7 @@ class MappingDefinitionTest
 		];
 		
 		var dependencyOwner = new DependencyOwner();
-		dependencyOwner.addDefinition( [mapping].concat( mappings ) );
+		[mapping].concat( mappings ).addToInjector(dependencyOwner.getInjector(), dependencyOwner);
 		
 		var injector = dependencyOwner.getInjector();
 		Assert.equals( "test", injector.getInstance( String ) );
