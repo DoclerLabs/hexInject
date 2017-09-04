@@ -1,5 +1,7 @@
 package hex.di.mapping;
 
+import hex.di.IInjectorContainer;
+import hex.di.Injector;
 import hex.di.error.MissingMappingException;
 import hex.di.mock.owner.DependencyOwner;
 import hex.di.mock.types.Clazz;
@@ -59,6 +61,21 @@ class MappingDefinitionTest
 		Assert.methodCallThrows( MissingMappingException, injector, injector.getInstanceWithClassName, [ "Void->String" ],
 			"This mapping should have been filtered by the dependency checker" );
 	}
+	
+	@Test("test order of operations")
+	public function testInjectIntoHappensAtLast()
+	{
+		var value = new Injectee();
+		var mappings : Array<MappingDefinition> = [
+			{ fromType: "hex.di.mapping.MappingDefinitionTest.Injectee", toValue: value, injectInto: true },
+			{ fromType: "hex.di.mock.types.Interface", toClass: Clazz2, asSingleton: true }
+		];
+		
+		var injector = new Injector();
+		mappings.addToInjector(injector);
+		Assert.isNotNull(value.something);
+		Assert.equals(injector.getInstance(Interface), value.something);
+	}
 }
 
 @Dependency( var _:Interface, "id" )
@@ -78,4 +95,13 @@ class DependencyOwner implements hex.di.mapping.IDependencyOwner
 	}
 	
 	public function getInjector() : IDependencyInjector return this._injector;
+}
+
+class Injectee implements IInjectorContainer
+{
+	@Inject
+	@Optional(true)
+	public var something:Interface;
+	
+	public function new() { }
 }
