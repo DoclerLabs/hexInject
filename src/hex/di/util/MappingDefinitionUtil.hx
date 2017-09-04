@@ -18,6 +18,8 @@ class MappingDefinitionUtil
 			mappings = hex.di.mapping.MappingChecker.filter( cls, mappings );
 		}
 
+		var injectIntoValues = [];
+		
 		for ( mapping in  mappings )
 		{
 			if ( mapping.toValue != null )
@@ -38,8 +40,10 @@ class MappingDefinitionUtil
 			
 			if ( mapping.injectInto ) 
 			{
-				target.injectInto( mapping.toValue );
+				injectIntoValues.push(mapping.toValue);
 			}
 		}
+		
+		injectIntoValues.map(target.injectInto);
 	}
 }
