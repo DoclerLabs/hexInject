@@ -2,6 +2,7 @@ package hex.di.util;
 
 import hex.di.mapping.MappingDefinition;
 
+using Lambda;
 /**
  * ...
  * @author Francis Bourre
@@ -44,6 +45,6 @@ class MappingDefinitionUtil
 			}
 		}
 		
-		injectIntoValues.map(target.injectInto);
+		injectIntoValues.iter(target.injectInto);
 	}
 }
