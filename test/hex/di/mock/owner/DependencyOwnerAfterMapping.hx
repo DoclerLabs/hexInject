@@ -134,6 +134,8 @@ class DependencyOwnerChildWithAfterMappingWrapped extends SuperDependencyOwner
 			if( arg == 3 )
 			{
 				@AfterMapping
+				var i = 0;
+				i++;
 				id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
 				id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
 			}
