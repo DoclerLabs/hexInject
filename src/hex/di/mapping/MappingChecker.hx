@@ -173,7 +173,7 @@ class MappingChecker
 										hasAfterMappingMeta = hasAfterMappingMeta || true;
 										//Append
 										a.push( exp );
-										e.expr = EBlock( a );
+										e.expr = (macro @:mergeBlock $b{a}).expr;
 									case _:
 										//trace( new haxe.macro.Printer().printExpr( e ) );
 										ExprTools.iter( e, findAfterMappingMeta );
