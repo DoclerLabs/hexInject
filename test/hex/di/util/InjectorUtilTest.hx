@@ -267,7 +267,7 @@ private class MockDependencyInjector implements IDependencyInjector
 		return null;
 	}
 	
-	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null ) : T
+	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
 	{
 		this.instanceWithClassName = { className: className, name: name };
 		return null;
