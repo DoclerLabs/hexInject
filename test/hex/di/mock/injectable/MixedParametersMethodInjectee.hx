@@ -1,4 +1,4 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 import hex.di.mock.types.Interface;
 
@@ -6,7 +6,7 @@ import hex.di.mock.types.Interface;
  * ...
  * @author Francis Bourre
  */
-class MixedParametersMethodInjectee implements IInjectorContainer
+class MixedParametersMethodInjectee implements IInjectable
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: Clazz;

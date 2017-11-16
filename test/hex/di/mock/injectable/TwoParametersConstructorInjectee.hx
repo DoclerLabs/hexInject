@@ -1,15 +1,15 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class TwoNamedParametersConstructorInjectee implements IInjectorContainer
+class TwoParametersConstructorInjectee implements IInjectable
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: String;
-	
-	@Inject( "namedDependency", "namedDependency2" )
+
+	@Inject
 	public function new( dependency : Clazz, dependency2 : String )
 	{
 		this.m_dependency 	= dependency;
@@ -20,6 +20,7 @@ class TwoNamedParametersConstructorInjectee implements IInjectorContainer
 	{
 		return this.m_dependency;
 	}
+	
 	public function getDependency2() : String
 	{
 		return this.m_dependency2;

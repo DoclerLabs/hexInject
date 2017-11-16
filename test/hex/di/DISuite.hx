@@ -18,6 +18,7 @@ class DISuite
 		InjectorUtilTest, 
 		MappingConfigurationTest, 
 		MappingDefinitionTest, 
-		DependencyOwnerTest 
+		DependencyOwnerTest,
+		ReflectInjectorTest
 	];
 }

@@ -106,7 +106,7 @@ class ReflectInjector
 		}
 	}
 	
-	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null ) : T
+	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
 	{
 		var mappingID = className + '|' + name;
 		var mapping = cast this._mapping[ mappingID ];
@@ -119,11 +119,13 @@ class ReflectInjector
 		{
 			return this._parentInjector.getInstanceWithClassName( className, name, targetType );
 		}
-		else
+		else if ( shouldThrowAnError )
 		{
 			throw new MissingMappingException( 	"Injector is missing a mapping to get instance with type '" +
 												className + "'. Target dependency: '" + mappingID + "'" );
 		}
+		
+		return null;
 	}
 	
 	public function getProvider<T>( className : String, name : String = '' ) : IDependencyProvider<T>

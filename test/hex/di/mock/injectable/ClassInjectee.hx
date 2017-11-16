@@ -1,4 +1,4 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 import hex.di.mock.types.MockConstants;
 
@@ -6,7 +6,7 @@ import hex.di.mock.types.MockConstants;
  * ...
  * @author Francis Bourre
  */
-class ClassInjectee implements IInjectorContainer
+class ClassInjectee implements IInjectable
 {
 	@Inject
 	public var property : Clazz;
@@ -25,7 +25,7 @@ class ClassInjectee implements IInjectorContainer
 	}
 }
 
-class ClassInjecteeWithConst implements IInjectorContainer
+class ClassInjecteeWithConst implements IInjectable
 {
 	static inline var NUMBER_ONE = 1;
 	
@@ -46,7 +46,7 @@ class ClassInjecteeWithConst implements IInjectorContainer
 	}
 }
 
-class ClassInjecteeWithConstOutside implements IInjectorContainer
+class ClassInjecteeWithConstOutside implements IInjectable
 {
 	@Inject
 	public var property : Clazz;
@@ -65,7 +65,7 @@ class ClassInjecteeWithConstOutside implements IInjectorContainer
 	}
 }
 
-class ClassInjecteeWithConstOutsideFQCN implements IInjectorContainer
+class ClassInjecteeWithConstOutsideFQCN implements IInjectable
 {
 	@Inject
 	public var property : Clazz;

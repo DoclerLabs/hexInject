@@ -1,5 +1,6 @@
 package hex.di.mapping;
 
+import hex.di.mock.injectees.Clazz;
 import hex.di.mock.owner.DependencyOwnerWithoutDependency;
 import hex.di.mock.owner.DependencyOwnerWithoutMapping;
 import hex.di.mock.owner.DependencyOwnerAfterMapping.DependencyOwnerWithOutAfterMapping;
@@ -12,7 +13,6 @@ import hex.di.mock.owner.DependencyOwnerChild.DependencyOwnerChild;
 import hex.di.mock.owner.DependencyOwnerChild.DependencyOwnerChildTwice;
 import hex.di.error.MissingMappingException;
 import hex.di.mock.owner.DependencyOwner;
-import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Clazz2;
 import hex.di.mock.types.ClazzWithGeneric;
 import hex.di.mock.types.Interface;

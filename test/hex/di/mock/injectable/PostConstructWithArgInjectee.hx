@@ -1,10 +1,10 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class PostConstructWithArgInjectee implements IInjectorContainer
+class PostConstructWithArgInjectee implements IInjectable
 {
 	public var property : Clazz;
 	

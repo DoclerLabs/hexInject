@@ -1,4 +1,4 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.MockConstants;
@@ -7,7 +7,7 @@ import hex.di.mock.types.MockConstants;
  * ...
  * @author Francis Bourre
  */
-class MixedParametersConstructorInjectee implements IInjectorContainer
+class MixedParametersConstructorInjectee implements IInjectable
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: Clazz;
@@ -37,7 +37,7 @@ class MixedParametersConstructorInjectee implements IInjectorContainer
 	}
 }
 
-class MixedParametersConstructorInjecteeConst implements IInjectorContainer
+class MixedParametersConstructorInjecteeConst implements IInjectable
 {
 	static inline var NAMED_DEP = "namedDep";
 	static inline var NAMED_DEP_2 = "namedDep2";
@@ -70,7 +70,7 @@ class MixedParametersConstructorInjecteeConst implements IInjectorContainer
 	}
 }
 
-class MixedParametersConstructorInjecteeConstOutside implements IInjectorContainer
+class MixedParametersConstructorInjecteeConstOutside implements IInjectable
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: Clazz;
@@ -100,7 +100,7 @@ class MixedParametersConstructorInjecteeConstOutside implements IInjectorContain
 	}
 }
 
-class MixedParametersConstructorInjecteeConstOutsideFQCN implements IInjectorContainer
+class MixedParametersConstructorInjecteeConstOutsideFQCN implements IInjectable
 {
 	var m_dependency 	: Clazz;
 	var m_dependency2 	: Clazz;

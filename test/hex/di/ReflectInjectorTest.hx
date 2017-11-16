@@ -1,45 +1,45 @@
 package hex.di;
 
 import hex.di.error.MissingMappingException;
-import hex.di.mock.injectees.ClassInjectee;
-import hex.di.mock.injectees.ClassInjecteeWithAbstractProperty;
-import hex.di.mock.injectees.ClassInjecteeWithBoolProperty;
-import hex.di.mock.injectees.ClassInjecteeWithEnumProperty;
-import hex.di.mock.injectees.ClassInjecteeWithTypedefProperty;
-import hex.di.mock.injectees.Clazz;
-import hex.di.mock.injectees.ComplexClassInjectee;
-import hex.di.mock.injectees.ComplexClazz;
-import hex.di.mock.injectees.InjectorInjectee;
-import hex.di.mock.injectees.InterfaceInjectee;
-import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
-import hex.di.mock.injectees.InterfaceInjecteeWithMethod;
-import hex.di.mock.injectees.MixedParametersConstructorInjectee;
-import hex.di.mock.injectees.MixedParametersMethodInjectee;
-import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
-import hex.di.mock.injectees.NamedArrayCollectionInjectee;
-import hex.di.mock.injectees.NamedClassInjectee;
-import hex.di.mock.injectees.NamedClassInjecteeWithClassName;
-import hex.di.mock.injectees.NamedInterfaceInjectee;
-import hex.di.mock.injectees.OneNamedParameterConstructorInjectee;
-import hex.di.mock.injectees.OneNamedParameterMethodInjectee;
-import hex.di.mock.injectees.OneParameterConstructorInjectee;
-import hex.di.mock.injectees.OneParameterMethodInjectee;
-import hex.di.mock.injectees.OptionalClassInjectee;
-import hex.di.mock.injectees.OptionalOneRequiredParameterMethodInjectee;
-import hex.di.mock.injectees.OrderedPostConstructInjectee;
-import hex.di.mock.injectees.PostConstructWithArgInjectee;
-import hex.di.mock.injectees.RecursiveInterfaceInjectee;
-import hex.di.mock.injectees.SetterInjectee;
-import hex.di.mock.injectees.StringInjectee;
-import hex.di.mock.injectees.TwoNamedInterfaceFieldsInjectee;
-import hex.di.mock.injectees.TwoNamedParametersConstructorInjectee;
-import hex.di.mock.injectees.TwoNamedParametersMethodInjectee;
-import hex.di.mock.injectees.TwoParametersConstructorInjectee;
-import hex.di.mock.injectees.TwoParametersConstructorInjecteeWithConstructorInjectedDependencies;
-import hex.di.mock.injectees.TwoParametersConstructorInjecteeWithGeneric;
-import hex.di.mock.injectees.TwoParametersMethodInjectee;
-import hex.di.mock.injectees.TwoParametersMethodInjecteeWithGeneric;
-import hex.di.mock.injectees.XMLInjectee;
+import hex.di.mock.injectable.ClassInjectee;
+import hex.di.mock.injectable.ClassInjecteeWithAbstractProperty;
+import hex.di.mock.injectable.ClassInjecteeWithBoolProperty;
+import hex.di.mock.injectable.ClassInjecteeWithEnumProperty;
+import hex.di.mock.injectable.ClassInjecteeWithTypedefProperty;
+import hex.di.mock.injectable.Clazz;
+import hex.di.mock.injectable.ComplexClassInjectee;
+import hex.di.mock.injectable.ComplexClazz;
+import hex.di.mock.injectable.InjectorInjectee;
+import hex.di.mock.injectable.InterfaceInjectee;
+import hex.di.mock.injectable.InterfaceInjecteeWithGeneric;
+import hex.di.mock.injectable.InterfaceInjecteeWithMethod;
+import hex.di.mock.injectable.MixedParametersConstructorInjectee;
+import hex.di.mock.injectable.MixedParametersMethodInjectee;
+import hex.di.mock.injectable.MultipleSingletonsOfSameClassInjectee;
+import hex.di.mock.injectable.NamedArrayCollectionInjectee;
+import hex.di.mock.injectable.NamedClassInjectee;
+import hex.di.mock.injectable.NamedClassInjecteeWithClassName;
+import hex.di.mock.injectable.NamedInterfaceInjectee;
+import hex.di.mock.injectable.OneNamedParameterConstructorInjectee;
+import hex.di.mock.injectable.OneNamedParameterMethodInjectee;
+import hex.di.mock.injectable.OneParameterConstructorInjectee;
+import hex.di.mock.injectable.OneParameterMethodInjectee;
+import hex.di.mock.injectable.OptionalClassInjectee;
+import hex.di.mock.injectable.OptionalOneRequiredParameterMethodInjectee;
+import hex.di.mock.injectable.OrderedPostConstructInjectee;
+import hex.di.mock.injectable.PostConstructWithArgInjectee;
+import hex.di.mock.injectable.RecursiveInterfaceInjectee;
+import hex.di.mock.injectable.SetterInjectee;
+import hex.di.mock.injectable.StringInjectee;
+import hex.di.mock.injectable.TwoNamedInterfaceFieldsInjectee;
+import hex.di.mock.injectable.TwoNamedParametersConstructorInjectee;
+import hex.di.mock.injectable.TwoNamedParametersMethodInjectee;
+import hex.di.mock.injectable.TwoParametersConstructorInjectee;
+import hex.di.mock.injectable.TwoParametersConstructorInjecteeWithConstructorInjectedDependencies;
+import hex.di.mock.injectable.TwoParametersConstructorInjecteeWithGeneric;
+import hex.di.mock.injectable.TwoParametersMethodInjectee;
+import hex.di.mock.injectable.TwoParametersMethodInjecteeWithGeneric;
+import hex.di.mock.injectable.XMLInjectee;
 import hex.di.mock.provider.MockDependencyProvider;
 import hex.di.mock.types.Clazz2;
 import hex.di.mock.types.ClazzWithGeneric;
@@ -55,16 +55,16 @@ import hex.unittest.assertion.Assert;
  * ...
  * @author Francis Bourre
  */
-class InjectorTest implements IInjectorListener
+class ReflectInjectorTest implements IInjectorListener
 {
-    var injector 						: Injector;
+    var injector 						: ReflectInjector;
     var injectorPreConstructArguments 	: Array<Dynamic>;
     var injectorPostConstructArguments 	: Array<Dynamic>;
 
     @Before
     public function runBeforeEachTest() : Void
     {
-        this.injector = new Injector();
+        this.injector = new ReflectInjector();
 		this.injectorPreConstructArguments = [];
 		this.injectorPostConstructArguments = [];
     }
@@ -915,7 +915,7 @@ class InjectorTest implements IInjectorListener
 		Assert.equals(instance, newInst.property, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
 		Assert.equals(NamedClassInjecteeWithClassName, provider.target, "Target should be proper class");
-		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
+		Assert.equals("hex.di.mock.injectable.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
 	
 	@Test( "Test dependency provider with class name" )
@@ -925,7 +925,7 @@ class InjectorTest implements IInjectorListener
 		var provider = new MockDependencyProvider<Clazz>(instance);
 		injector.map( Clazz ).toProvider(provider);
 		
-		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectees.Clazz");
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectable.Clazz");
 		
 		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
@@ -943,7 +943,7 @@ class InjectorTest implements IInjectorListener
 		
 		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
-		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
+		Assert.equals("hex.di.mock.injectable.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
 	
 	@Test( "Test getInstanceWithClassName target type is passed to dependency provider" )
@@ -953,11 +953,11 @@ class InjectorTest implements IInjectorListener
 		var provider = new MockDependencyProvider<Clazz>(instance);
 		injector.map( Clazz ).toProvider(provider);
 		
-		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectees.Clazz", null, NamedClassInjecteeWithClassName);
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectable.Clazz", null, NamedClassInjecteeWithClassName);
 		
 		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
-		Assert.equals("hex.di.mock.injectees.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
+		Assert.equals("hex.di.mock.injectable.NamedClassInjecteeWithClassName", provider.className, "Target should be proper class");
 	}
 	
 	@Test( "Test get singleton instance With class name" )

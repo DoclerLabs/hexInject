@@ -1,10 +1,10 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class OneParameterMethodInjectee implements IInjectorContainer
+class OneParameterMethodInjectee implements IInjectable
 {
 	var m_dependency : Clazz;
 		

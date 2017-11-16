@@ -1,24 +1,23 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class OneParameterMethodInjectee implements IInjectorContainer
+class OneNamedParameterMethodInjectee implements IInjectable
 {
 	var m_dependency : Clazz;
 		
-	@Inject
+	@Inject( "namedDep" )
 	public function setDependency( dependency : Clazz ) : Void
 	{
 		this.m_dependency = dependency;
 	}
-	
 	public function getDependency() : Clazz
 	{
-		return m_dependency;
+		return this.m_dependency;
 	}
-		
+
 	public function new() 
 	{
 		

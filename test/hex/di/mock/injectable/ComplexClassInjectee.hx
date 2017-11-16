@@ -1,10 +1,10 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class ComplexClassInjectee implements IInjectorContainer
+class ComplexClassInjectee implements IInjectable
 {
 	@Inject
 	public var property : ComplexClazz;

@@ -1,10 +1,10 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class NamedClassInjecteeWithClassName implements IInjectorContainer
+class NamedClassInjecteeWithClassName implements IInjectable
 {
 	@Inject( 'Clazz' )
 	public var property : Clazz;

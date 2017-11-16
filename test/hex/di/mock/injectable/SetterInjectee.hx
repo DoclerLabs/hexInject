@@ -1,10 +1,10 @@
-package hex.di.mock.injectees;
+package hex.di.mock.injectable;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class SetterInjectee implements IInjectorContainer
+class SetterInjectee implements IInjectable
 {
 	@Inject
 	@:isVar 
