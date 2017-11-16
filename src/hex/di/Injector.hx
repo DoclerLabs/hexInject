@@ -145,18 +145,25 @@ class Injector
 		#end
 		
 		var instance : Dynamic; 
-		if ( ( cast type ).__ac != null )
+		try
 		{
 			instance = ( cast type ).__ac( this.getInstanceWithClassName );
 		}
-		else
+		catch( e : Dynamic )
 		{
 			instance = Type.createInstance( type, [] );
 		}
 
-		if ( instance.__ai != null )
+		try
 		{
-			this._applyInjection( instance, type );
+			if ( instance.__ai != null )
+			{
+				this._applyInjection( instance, type );
+			}
+		}
+		catch ( e : Dynamic )
+		{
+			
 		}
 
 		return instance;
@@ -243,11 +250,8 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		if ( instance.__ap != null )
-		{
-			this._managedObjects.remove( instance );
-			instance.__ap();
-		}
+		this._managedObjects.remove( instance );
+		instance.__ap();
 	}
 
 	public function map<T>( type : Class<T>, name : String = '' ) : InjectionMapping<T>
@@ -358,9 +362,17 @@ class Injector
 		#end
 
 		target.__ai( this.getInstanceWithClassName, targetType );
-		if ( target.__ap != null )
+		
+		try
 		{
-			this._managedObjects.put( target,  target );
+			if ( target.__ap != null )
+			{
+				this._managedObjects.put( target,  target );
+			}
+		}
+		catch ( e : Dynamic )
+		{
+			
 		}
 		
 		#if !macro
