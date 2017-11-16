@@ -729,6 +729,10 @@ class InjectorTest implements IInjectorListener
 		var target = new Clazz();
 		Assert.isFalse( target.preDestroyCalled, "target.preDestroyCalled should be false" );
 		this.injector.destroyInstance( target );
+		Assert.isFalse( target.preDestroyCalled, "target.preDestroyCalled should be false" );
+		this.injector.map( Clazz ).toType( Clazz );
+		target = this.injector.getOrCreateNewInstance( Clazz );
+		this.injector.destroyInstance( target );
 		Assert.isTrue( target.preDestroyCalled, "target.preDestroyCalled should be true" );
 	}
 	

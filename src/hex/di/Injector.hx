@@ -250,15 +250,23 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		this._managedObjects.remove( instance );
+		//#if php
+		if ( this._managedObjects.containsKey( instance ) )
+		{
+			this._managedObjects.remove( instance );
+			instance.__ap();
+		}
+		/*#else
 		try
 		{
+			this._managedObjects.remove( instance );
 			instance.__ap();
 		}
 		catch ( e : Dynamic )
 		{
 			
 		}
+		#end*/
 	}
 
 	public function map<T>( type : Class<T>, name : String = '' ) : InjectionMapping<T>
