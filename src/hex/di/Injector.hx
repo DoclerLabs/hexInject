@@ -243,10 +243,9 @@ class Injector
 
     public function destroyInstance( instance : Dynamic ) : Void
 	{
-		this._managedObjects.remove( instance );
-
-		if ( instance.__ap )
+		if ( instance.__ap != null )
 		{
+			this._managedObjects.remove( instance );
 			instance.__ap();
 		}
 	}
