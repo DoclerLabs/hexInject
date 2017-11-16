@@ -251,7 +251,14 @@ class Injector
     public function destroyInstance( instance : Dynamic ) : Void
 	{
 		this._managedObjects.remove( instance );
-		instance.__ap();
+		try
+		{
+			instance.__ap();
+		}
+		catch ( e : Dynamic )
+		{
+			
+		}
 	}
 
 	public function map<T>( type : Class<T>, name : String = '' ) : InjectionMapping<T>
