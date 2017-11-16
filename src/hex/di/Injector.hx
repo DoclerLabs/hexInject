@@ -8,6 +8,7 @@ import hex.di.error.MissingClassDescriptionException;
 import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
+import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
 import hex.log.LogManager;
@@ -139,6 +140,10 @@ class Injector
 
     public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
+		#if debug
+		if ( type == null ) throw new NullPointerException( 'type cant be null' );
+		#end
+		
 		var instance : Dynamic; 
 		if ( ( cast type ).__ac != null )
 		{
