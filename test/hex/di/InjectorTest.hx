@@ -6,7 +6,9 @@ import hex.di.mock.injectees.ClassInjecteeWithAbstractProperty;
 import hex.di.mock.injectees.ClassInjecteeWithBoolProperty;
 import hex.di.mock.injectees.ClassInjecteeWithEnumProperty;
 import hex.di.mock.injectees.ClassInjecteeWithTypedefProperty;
+import hex.di.mock.injectees.Clazz;
 import hex.di.mock.injectees.ComplexClassInjectee;
+import hex.di.mock.injectees.ComplexClazz;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
 import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
@@ -39,10 +41,8 @@ import hex.di.mock.injectees.TwoParametersMethodInjectee;
 import hex.di.mock.injectees.TwoParametersMethodInjecteeWithGeneric;
 import hex.di.mock.injectees.XMLInjectee;
 import hex.di.mock.provider.MockDependencyProvider;
-import hex.di.mock.types.Clazz;
 import hex.di.mock.types.Clazz2;
 import hex.di.mock.types.ClazzWithGeneric;
-import hex.di.mock.types.ComplexClazz;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
 import hex.di.mock.types.MockEnum;
@@ -729,6 +729,10 @@ class InjectorTest implements IInjectorListener
 		var target = new Clazz();
 		Assert.isFalse( target.preDestroyCalled, "target.preDestroyCalled should be false" );
 		this.injector.destroyInstance( target );
+		Assert.isFalse( target.preDestroyCalled, "target.preDestroyCalled should be false" );
+		this.injector.map( Clazz ).toType( Clazz );
+		target = this.injector.getOrCreateNewInstance( Clazz );
+		this.injector.destroyInstance( target );
 		Assert.isTrue( target.preDestroyCalled, "target.preDestroyCalled should be true" );
 	}
 	
@@ -925,7 +929,7 @@ class InjectorTest implements IInjectorListener
 		var provider = new MockDependencyProvider<Clazz>(instance);
 		injector.map( Clazz ).toProvider(provider);
 		
-		var returnVal = injector.getInstanceWithClassName("hex.di.mock.types.Clazz");
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectees.Clazz");
 		
 		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");
@@ -953,7 +957,7 @@ class InjectorTest implements IInjectorListener
 		var provider = new MockDependencyProvider<Clazz>(instance);
 		injector.map( Clazz ).toProvider(provider);
 		
-		var returnVal = injector.getInstanceWithClassName("hex.di.mock.types.Clazz", null, NamedClassInjecteeWithClassName);
+		var returnVal = injector.getInstanceWithClassName("hex.di.mock.injectees.Clazz", null, NamedClassInjecteeWithClassName);
 		
 		Assert.equals(instance, returnVal, "Returned value must come from dependency provider");
 		Assert.equals(injector, provider.injector, "Injector provided to the dependency provider must be the correct one");

@@ -1,6 +1,6 @@
-package hex.di.mock.types;
+package hex.di.mock.injectees;
 
-import hex.di.IInjectorContainer;
+import hex.di.mock.types.ComplexInterface;
 
 /**
  * ...

@@ -1,5 +1,6 @@
 package hex.di.reflect;
 
+import hex.di.IDependencyInjector;
 import hex.di.Injector;
 import hex.di.error.MissingMappingException;
 import hex.util.Stringifier;
@@ -15,7 +16,7 @@ class InjectionUtil
 		
 	}
 	
-	inline public static function applyClassInjection<T>( target : T, injector : Injector, classDescription : ClassDescription, targetType : Class<Dynamic> ) : T
+	inline public static function applyClassInjection<T>( target : T, injector : IDependencyInjector, classDescription : ClassDescription, targetType : Class<Dynamic> ) : T
 	{
 		for ( property in classDescription.p )
 		{
@@ -35,14 +36,14 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyConstructorInjection<T>( type : Class<T>, injector : Injector, arguments : Array<ArgumentInjection>, targetType : Class<Dynamic> ) : T
+	inline public static function applyConstructorInjection<T>( type : Class<T>, injector : IDependencyInjector, arguments : Array<ArgumentInjection>, targetType : Class<Dynamic> ) : T
 	{
 		var args = InjectionUtil.gatherArgs( type, injector, arguments, 'new', targetType );
 		return Type.createInstance( type, args );
 	}
 	
 	inline public static function applyPropertyInjection( 	target : Dynamic, 
-															injector : Injector,
+															injector : IDependencyInjector,
 															targetType : Class<Dynamic>,
 															propertyName: String, 
 															propertyType: String, 
@@ -68,13 +69,13 @@ class InjectionUtil
 		return target;
 	}
 	
-	inline public static function applyMethodInjection( target : Dynamic, injector : Injector, targetType : Class<Dynamic>, arguments : Array<ArgumentInjection>, methodName : String ) : Dynamic
+	inline public static function applyMethodInjection( target : Dynamic, injector : IDependencyInjector, targetType : Class<Dynamic>, arguments : Array<ArgumentInjection>, methodName : String ) : Dynamic
 	{
 		Reflect.callMethod( target, Reflect.field( target, methodName ), InjectionUtil.gatherArgs( target, injector, arguments, methodName, targetType ) );
         return target;
 	}
 	
-	inline static function gatherArgs( target : Dynamic, injector : Injector, arguments : Array<ArgumentInjection>, methodName : String, targetType : Class<Dynamic> ) : Array<Dynamic>
+	inline static function gatherArgs( target : Dynamic, injector : IDependencyInjector, arguments : Array<ArgumentInjection>, methodName : String, targetType : Class<Dynamic> ) : Array<Dynamic>
 	{
 		var args = [];
         for ( arg in arguments )
@@ -101,7 +102,7 @@ class InjectionUtil
 		return args;
 	}
 	
-	inline static function _throwMissingMappingException( target : Dynamic, type : String, injectionName : String, injector : Injector, methodName : String ) : Void
+	inline static function _throwMissingMappingException( target : Dynamic, type : String, injectionName : String, injector : IDependencyInjector, methodName : String ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
 			"' is missing a mapping to inject argument into method named '" +
@@ -111,7 +112,7 @@ class InjectionUtil
 							"|" + injectionName + "'" );
     }
 	
-	inline static function _throwMissingMappingConstructorException( target : Dynamic, type : String, injectionName : String, injector : Injector ) : Void
+	inline static function _throwMissingMappingConstructorException( target : Dynamic, type : String, injectionName : String, injector : IDependencyInjector ) : Void
     {
         throw new MissingMappingException( "'" + Stringifier.stringify( injector ) +
 			"' is missing a mapping to inject argument" +

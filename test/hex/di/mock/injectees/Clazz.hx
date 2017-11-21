@@ -1,4 +1,7 @@
-package hex.di.mock.types;
+package hex.di.mock.injectees;
+
+import hex.di.mock.types.Interface;
+import hex.di.mock.types.Interface2;
 
 /**
  * ...

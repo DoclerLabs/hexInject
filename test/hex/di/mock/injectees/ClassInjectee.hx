@@ -1,6 +1,5 @@
 package hex.di.mock.injectees;
 
-import hex.di.mock.types.Clazz;
 import hex.di.mock.types.MockConstants;
 
 /**
