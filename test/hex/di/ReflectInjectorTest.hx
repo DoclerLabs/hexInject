@@ -11,6 +11,7 @@ import hex.di.mock.injectable.ComplexClassInjectee;
 import hex.di.mock.injectable.ComplexClazz;
 import hex.di.mock.injectable.InjectorInjectee;
 import hex.di.mock.injectable.InterfaceInjectee;
+import hex.di.mock.injectable.InterfaceInjecteeWithIsLoggable;
 import hex.di.mock.injectable.InterfaceInjecteeWithGeneric;
 import hex.di.mock.injectable.InterfaceInjecteeWithMethod;
 import hex.di.mock.injectable.MixedParametersConstructorInjectee;
@@ -69,16 +70,25 @@ class ReflectInjectorTest implements IInjectorListener
 		this.injectorPostConstructArguments = [];
     }
 
-   @Test( "Test 'unmap' remvoves existing mapping" )
+	@Test( "Test 'unmap' remvoves existing mapping" )
     public function testUnmapRemovesExistingMapping() : Void
     {
-        var injectee = new InterfaceInjectee();
         var value = new Clazz();
         this.injector.map( Interface ).toValue( value );
         Assert.isTrue( this.injector.satisfies( Interface ), "Injector should satisifies mapped interface" );
         injector.unmap( Interface );
         Assert.isFalse( this.injector.satisfies( Interface ), "Injector shouldn't satisfie mapped interface anymore" );
     }
+
+	@Test( "Test conflict between IsLoggable and IInjectable in interface" )
+	public function testInterfaceInjecteeWithIsLoggable() : Void
+	{
+		var injectee = new InterfaceInjecteeWithIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+	}
 
     @Test( "Test 'mapToValue' with class parameter" )
     public function testMapToValueWithClassParameter() : Void
