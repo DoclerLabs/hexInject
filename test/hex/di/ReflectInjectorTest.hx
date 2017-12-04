@@ -9,6 +9,7 @@ import hex.di.mock.injectable.ClassInjecteeWithTypedefProperty;
 import hex.di.mock.injectable.Clazz;
 import hex.di.mock.injectable.ComplexClassInjectee;
 import hex.di.mock.injectable.ComplexClazz;
+import hex.di.mock.injectable.FunctionParameterConstructorInjectee;
 import hex.di.mock.injectable.InjectorInjectee;
 import hex.di.mock.injectable.InterfaceInjectee;
 import hex.di.mock.injectable.InterfaceInjecteeWithIsLoggable;
@@ -871,6 +872,18 @@ class ReflectInjectorTest implements IInjectorListener
 		var instance1 = this.injector.getOrCreateNewInstance( Clazz );
 		var instance2 = this.injector.getOrCreateNewInstance( Clazz );
 		Assert.notEquals( instance1, instance2, "" );
+	}
+	
+	@Test( "Test two params constructor injection with constructor injected dependencies" )
+	public function testFunctionParameterInjectionWithConstructorInjectedDependencies() : Void
+	{
+		var f = function ( s : String ) return s;
+		injector.mapClassName( 'String->String' ).toValue( f );
+		injector.map( FunctionParameterConstructorInjectee ).toType( FunctionParameterConstructorInjectee );
+
+		var injectee = this.injector.instantiateUnmapped( FunctionParameterConstructorInjectee );
+		Assert.equals( 'test', injectee.getDependency()( 'test' ), "function should have been injected and return the value" );
+		Assert.equals( f, injectee.getDependency(), "function should have been injected and be the same" );
 	}
 
 	@Test( "Test two params constructor injection with constructor injected dependencies" )
