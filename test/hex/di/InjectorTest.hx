@@ -192,11 +192,11 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( item, injectee.property, "Value should have been injected" );
 	}
 	
-	public static var testMapToValueWithNameDataProvider:Array<Array<Dynamic>> = [
-		[new NamedClassInjectee()],
-		[new NamedClassInjecteeConst()],
-		[new NamedClassInjecteeConstOutside()],
-		[new NamedClassInjecteeConstOutsideFQCN()]
+	public static var testMapToValueWithNameDataProvider:Array<Dynamic> = [
+		new NamedClassInjectee(),
+		new NamedClassInjecteeConst(),
+		new NamedClassInjecteeConstOutside(),
+		new NamedClassInjecteeConstOutsideFQCN()
 	];
 	
 	@Test( "Test 'mapToValue' with named class parameter" )
@@ -493,11 +493,11 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( injectee.getDependency2(), 'stringDependency', "The String 'stringDependency' should have been injected for named String parameter" );
 	}
 	
-	public static var namedAndUnnamedParametersConstructorDataProvider:Array<Array<Dynamic>> = [
-		[MixedParametersConstructorInjectee],
-		[MixedParametersConstructorInjecteeConst],
-		[MixedParametersConstructorInjecteeConstOutside],
-		[MixedParametersConstructorInjecteeConstOutsideFQCN]
+	public static var namedAndUnnamedParametersConstructorDataProvider:Array<Class<Dynamic>> = [
+		MixedParametersConstructorInjectee,
+		MixedParametersConstructorInjecteeConst,
+		MixedParametersConstructorInjecteeConstOutside,
+		MixedParametersConstructorInjecteeConstOutsideFQCN
 	];
 	
 	@Test( "Test named and unnamed parameters constructor injection" )
@@ -553,11 +553,11 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.injectInto, [injectee], "'injectInto' should throw InjectorMissingMappingError" );
 	}
 	
-	public static var postConstructDataProvider:Array<Array<Dynamic>> = [
-		[new ClassInjectee()],
-		[new ClassInjecteeWithConst()],
-		[new ClassInjecteeWithConstOutside()],
-		[new ClassInjecteeWithConstOutsideFQCN()]
+	public static var postConstructDataProvider:Array<Dynamic> = [
+		new ClassInjectee(),
+		new ClassInjecteeWithConst(),
+		new ClassInjecteeWithConstOutside(),
+		new ClassInjecteeWithConstOutsideFQCN()
 	];
 	
 	@Test( "Test postConstruct method is called" )
@@ -679,11 +679,11 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.getInstance, [ Interface ], "'getInstance' should throw MissingMappingException" );
 	}
 	
-	public static var instantiateClassWithOptionalPropertyDataProvider:Array<Array<Dynamic>> = [
-		[OptionalClassInjectee],
-		[OptionalClassInjecteeConst],
-		[OptionalClassInjecteeConstOutside],
-		[OptionalClassInjecteeConstOutsideFQCN]
+	public static var instantiateClassWithOptionalPropertyDataProvider:Array<Class<Dynamic>> = [
+		OptionalClassInjectee,
+		OptionalClassInjecteeConst,
+		OptionalClassInjecteeConstOutside,
+		OptionalClassInjecteeConstOutsideFQCN
 	];
 	
 	@Test( "Test instantiate class with optional property" )
