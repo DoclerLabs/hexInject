@@ -1,10 +1,5 @@
 package hex.di;
 
-import hex.di.mapping.DependencyOwnerTest;
-import hex.di.mapping.MappingConfigurationTest;
-import hex.di.mapping.MappingDefinitionTest;
-import hex.di.util.InjectorUtilTest;
-
 /**
  * ...
  * @author Francis Bourre
@@ -15,10 +10,9 @@ class DISuite
     public var list : Array<Class<Dynamic>> = 
 	[ 
 		InjectorTest, 
-		InjectorUtilTest, 
-		MappingConfigurationTest, 
-		MappingDefinitionTest, 
-		DependencyOwnerTest,
-		ReflectInjectorTest
+		hex.di.util.InjectorUtilTest, 
+		hex.di.mapping.MappingConfigurationTest, 
+		hex.di.mapping.MappingDefinitionTest, 
+		hex.di.mapping.DependencyOwnerTest
 	];
 }

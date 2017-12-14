@@ -12,11 +12,12 @@ import hex.di.mock.injectees.ComplexClazz;
 import hex.di.mock.injectees.FunctionParameterConstructorInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
-import hex.di.mock.injectees.InterfaceInjecteeWithIsLoggable;
 import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
+import hex.di.mock.injectees.InterfaceInjecteeWithIsLoggable;
 import hex.di.mock.injectees.InterfaceInjecteeWithMethod;
 import hex.di.mock.injectees.MixedParametersConstructorInjectee;
 import hex.di.mock.injectees.MixedParametersMethodInjectee;
+import hex.di.mock.injectees.MockLogger;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
 import hex.di.mock.injectees.NamedArrayCollectionInjectee;
 import hex.di.mock.injectees.NamedClassInjectee;
@@ -50,8 +51,10 @@ import hex.di.mock.types.Interface2;
 import hex.di.mock.types.MockEnum;
 import hex.di.mock.types.MockTypedefImplementation;
 import hex.error.NullPointerException;
+import hex.log.ILogger;
 import hex.structures.Point;
 import hex.unittest.assertion.Assert;
+
 
 /**
  * ...
@@ -87,8 +90,37 @@ class InjectorTest implements IInjectorListener
 		var injectee = new InterfaceInjecteeWithIsLoggable();
 		var value = new Clazz();
 		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
 		this.injector.injectInto( injectee );
 		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
+	}
+	
+	@Test( "Test conflict between IsLoggable and IInjectorContainer interface with inheritance" )
+	public function testExtendedInjecteeWithIsLoggable() : Void
+	{
+		var injectee = new ExtendedInjecteeWithIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
+	}
+	
+	@Test( "Test conflict between IsLoggable (implemented twice) and IInjectorContainer interface with inheritance" )
+	public function testExtendsAndImplementsIsLoggableTwice() : Void
+	{
+		var injectee = new ExtendsAndImplementsIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
 	}
 
     @Test( "Test 'mapToValue' with class parameter" )
