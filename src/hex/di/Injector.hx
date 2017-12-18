@@ -132,11 +132,6 @@ class Injector
 			return null;
 		}
 	}
-	
-	inline function _getClassDescription( type : Class<Dynamic> )
-	{
-		return Reflect.getProperty( type, "__INJECTION" );
-	}
 
     public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
@@ -148,6 +143,10 @@ class Injector
 		try
 		{
 			instance = ( cast type ).__ac( this.getInstanceWithClassName );
+		}
+		catch ( e : MissingMappingException )
+		{
+			throw( e );
 		}
 		catch( e : Dynamic )
 		{
@@ -161,9 +160,13 @@ class Injector
 				this._applyInjection( instance, type );
 			}
 		}
+		catch ( e : MissingMappingException )
+		{
+			throw( e );
+		}
 		catch ( e : Dynamic )
 		{
-			
+			//Do nothing
 		}
 
 		return instance;
