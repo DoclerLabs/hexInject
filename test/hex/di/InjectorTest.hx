@@ -9,12 +9,15 @@ import hex.di.mock.injectees.ClassInjecteeWithTypedefProperty;
 import hex.di.mock.injectees.Clazz;
 import hex.di.mock.injectees.ComplexClassInjectee;
 import hex.di.mock.injectees.ComplexClazz;
+import hex.di.mock.injectees.FunctionParameterConstructorInjectee;
 import hex.di.mock.injectees.InjectorInjectee;
 import hex.di.mock.injectees.InterfaceInjectee;
 import hex.di.mock.injectees.InterfaceInjecteeWithGeneric;
+import hex.di.mock.injectees.InterfaceInjecteeWithIsLoggable;
 import hex.di.mock.injectees.InterfaceInjecteeWithMethod;
 import hex.di.mock.injectees.MixedParametersConstructorInjectee;
 import hex.di.mock.injectees.MixedParametersMethodInjectee;
+import hex.di.mock.injectees.MockLogger;
 import hex.di.mock.injectees.MultipleSingletonsOfSameClassInjectee;
 import hex.di.mock.injectees.NamedArrayCollectionInjectee;
 import hex.di.mock.injectees.NamedClassInjectee;
@@ -48,8 +51,10 @@ import hex.di.mock.types.Interface2;
 import hex.di.mock.types.MockEnum;
 import hex.di.mock.types.MockTypedefImplementation;
 import hex.error.NullPointerException;
+import hex.log.ILogger;
 import hex.structures.Point;
 import hex.unittest.assertion.Assert;
+
 
 /**
  * ...
@@ -69,16 +74,54 @@ class InjectorTest implements IInjectorListener
 		this.injectorPostConstructArguments = [];
     }
 
-   @Test( "Test 'unmap' remvoves existing mapping" )
+    @Test( "Test 'unmap' remvoves existing mapping" )
     public function testUnmapRemovesExistingMapping() : Void
     {
-        var injectee = new InterfaceInjectee();
         var value = new Clazz();
         this.injector.map( Interface ).toValue( value );
         Assert.isTrue( this.injector.satisfies( Interface ), "Injector should satisifies mapped interface" );
         injector.unmap( Interface );
         Assert.isFalse( this.injector.satisfies( Interface ), "Injector shouldn't satisfie mapped interface anymore" );
     }
+
+	@Test( "Test conflict with IsLoggable and IInjectorContainer in interface" )
+	public function testInterfaceInjecteeWithIsLoggable() : Void
+	{
+		var injectee = new InterfaceInjecteeWithIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
+	}
+	
+	@Test( "Test conflict between IsLoggable and IInjectorContainer interface with inheritance" )
+	public function testExtendedInjecteeWithIsLoggable() : Void
+	{
+		var injectee = new ExtendedInjecteeWithIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
+	}
+	
+	@Test( "Test conflict between IsLoggable (implemented twice) and IInjectorContainer interface with inheritance" )
+	public function testExtendsAndImplementsIsLoggableTwice() : Void
+	{
+		var injectee = new ExtendsAndImplementsIsLoggable();
+		var value = new Clazz();
+		this.injector.map( Interface ).toValue( value );
+		var logger = new MockLogger();
+		this.injector.map( ILogger ).toValue( logger );
+		this.injector.injectInto( injectee );
+		Assert.equals( value, injectee.property, "Mapped value should have been injected" );
+		Assert.equals( logger, injectee.logger, "Mapped logger should have been injected" );
+	}
 
     @Test( "Test 'mapToValue' with class parameter" )
     public function testMapToValueWithClassParameter() : Void
@@ -181,11 +224,11 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( item, injectee.property, "Value should have been injected" );
 	}
 	
-	public static var testMapToValueWithNameDataProvider:Array<Array<Dynamic>> = [
-		[new NamedClassInjectee()],
-		[new NamedClassInjecteeConst()],
-		[new NamedClassInjecteeConstOutside()],
-		[new NamedClassInjecteeConstOutsideFQCN()]
+	public static var testMapToValueWithNameDataProvider:Array<Dynamic> = [
+		new NamedClassInjectee(),
+		new NamedClassInjecteeConst(),
+		new NamedClassInjecteeConstOutside(),
+		new NamedClassInjecteeConstOutsideFQCN()
 	];
 	
 	@Test( "Test 'mapToValue' with named class parameter" )
@@ -482,11 +525,11 @@ class InjectorTest implements IInjectorListener
 		Assert.equals( injectee.getDependency2(), 'stringDependency', "The String 'stringDependency' should have been injected for named String parameter" );
 	}
 	
-	public static var namedAndUnnamedParametersConstructorDataProvider:Array<Array<Dynamic>> = [
-		[MixedParametersConstructorInjectee],
-		[MixedParametersConstructorInjecteeConst],
-		[MixedParametersConstructorInjecteeConstOutside],
-		[MixedParametersConstructorInjecteeConstOutsideFQCN]
+	public static var namedAndUnnamedParametersConstructorDataProvider:Array<Class<Dynamic>> = [
+		MixedParametersConstructorInjectee,
+		MixedParametersConstructorInjecteeConst,
+		MixedParametersConstructorInjecteeConstOutside,
+		MixedParametersConstructorInjecteeConstOutsideFQCN
 	];
 	
 	@Test( "Test named and unnamed parameters constructor injection" )
@@ -542,11 +585,11 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.injectInto, [injectee], "'injectInto' should throw InjectorMissingMappingError" );
 	}
 	
-	public static var postConstructDataProvider:Array<Array<Dynamic>> = [
-		[new ClassInjectee()],
-		[new ClassInjecteeWithConst()],
-		[new ClassInjecteeWithConstOutside()],
-		[new ClassInjecteeWithConstOutsideFQCN()]
+	public static var postConstructDataProvider:Array<Dynamic> = [
+		new ClassInjectee(),
+		new ClassInjecteeWithConst(),
+		new ClassInjecteeWithConstOutside(),
+		new ClassInjecteeWithConstOutsideFQCN()
 	];
 	
 	@Test( "Test postConstruct method is called" )
@@ -668,11 +711,11 @@ class InjectorTest implements IInjectorListener
 		Assert.methodCallThrows( MissingMappingException, this.injector, this.injector.getInstance, [ Interface ], "'getInstance' should throw MissingMappingException" );
 	}
 	
-	public static var instantiateClassWithOptionalPropertyDataProvider:Array<Array<Dynamic>> = [
-		[OptionalClassInjectee],
-		[OptionalClassInjecteeConst],
-		[OptionalClassInjecteeConstOutside],
-		[OptionalClassInjecteeConstOutsideFQCN]
+	public static var instantiateClassWithOptionalPropertyDataProvider:Array<Class<Dynamic>> = [
+		OptionalClassInjectee,
+		OptionalClassInjecteeConst,
+		OptionalClassInjecteeConstOutside,
+		OptionalClassInjecteeConstOutsideFQCN
 	];
 	
 	@Test( "Test instantiate class with optional property" )
@@ -865,6 +908,18 @@ class InjectorTest implements IInjectorListener
 		var instance1 = this.injector.getOrCreateNewInstance( Clazz );
 		var instance2 = this.injector.getOrCreateNewInstance( Clazz );
 		Assert.notEquals( instance1, instance2, "" );
+	}
+	
+	@Test( "Test two params constructor injection with constructor injected dependencies" )
+	public function testFunctionParameterInjectionWithConstructorInjectedDependencies() : Void
+	{
+		var f = function ( s : String ) return s;
+		injector.mapClassName( 'String->String' ).toValue( f );
+		injector.map( FunctionParameterConstructorInjectee ).toType( FunctionParameterConstructorInjectee );
+
+		var injectee = this.injector.instantiateUnmapped( FunctionParameterConstructorInjectee );
+		Assert.equals( 'test', injectee.getDependency()( 'test' ), "function should have been injected and return the value" );
+		Assert.equals( f, injectee.getDependency(), "function should have been injected and be the same" );
 	}
 
 	@Test( "Test two params constructor injection with constructor injected dependencies" )

@@ -11,7 +11,7 @@ import hex.di.mock.types.MockConstants;
 class OptionalClassInjectee implements IInjectorContainer
 {
 	@Inject
-	@Optional( true )
+	@Optional
 	public var property : Interface;
 
 	public function new() 
