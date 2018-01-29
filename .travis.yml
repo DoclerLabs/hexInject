@@ -47,6 +47,8 @@ install:
 #hexAnnotation
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - haxelib dev hexannotation ./hexannotation
+#tink_macro
+  - haxelib install tink_macro 0.16.1
 #hexInject
   - haxelib dev hexinject .
   - export DISPLAY=:99.0;
