@@ -8,6 +8,7 @@ import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
 import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
+import hex.util.TinkHelper;
 using Lambda;
 
 /**
@@ -206,10 +207,10 @@ class MappingChecker
 		switch( meta.params )
 		{
 			case [ _ => macro var $varName: $t ]:
-				return { type: MacroUtil.getFQCNFromComplexType( t ), name: varName != '_'? varName : '' };
+				return { type: TinkHelper.fcqn( t ), name: varName != '_'? varName : '' };
 
 			case [ _ => ( macro var $varName: $t ),  _ => macro $e ]:
-				return { type: MacroUtil.getFQCNFromComplexType( t ), name: $v{ ExprTools.getValue( AnnotationReplaceBuilder.processParam( e ) ) } };
+				return { type: TinkHelper.fcqn( t ), name: $v{ ExprTools.getValue( AnnotationReplaceBuilder.processParam( e ) ) } };
 
 			case _: Context.error( 'Invalid Dependency description', meta.pos );
 		}
