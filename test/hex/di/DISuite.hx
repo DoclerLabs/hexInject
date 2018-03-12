@@ -11,7 +11,6 @@ class DISuite
 	[ 
 		InjectorTest, 
 		hex.di.util.InjectorUtilTest, 
-		hex.di.mapping.MappingConfigurationTest, 
 		hex.di.mapping.MappingDefinitionTest, 
 		hex.di.mapping.DependencyOwnerTest
 	];
