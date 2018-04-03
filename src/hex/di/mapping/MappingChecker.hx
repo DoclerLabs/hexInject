@@ -17,10 +17,13 @@ using Lambda;
  */
 class MappingChecker 
 {
+	
+	
+#if macro
+
 	//static property name that will handle the data
 	public static inline var DEPENDENCY : String = "__DEP__";
 	
-#if macro
 	static inline var _annotation = 'Dependency';
 	
 	static inline var _afterMapping = 'AfterMapping';
@@ -246,15 +249,15 @@ class MappingChecker
 	}
 #end
 
-	public static function filter<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
+	public static function filter<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
 	{
-		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
+		var dependencies : Array<String> = classReference.__DEP__;
 		return mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
 	}
 	
-	public static function match<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Bool
+	public static function match<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Bool
 	{
-		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
+		var dependencies : Array<String> = classReference.__DEP__;
 		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
 		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
