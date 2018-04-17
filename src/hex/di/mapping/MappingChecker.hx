@@ -113,7 +113,7 @@ class MappingChecker
 		var m = metas	
 						.filter( function(m) return m.name == _annotation )
 						.map( _parse )
-						.map( function(e) return e.type + '|' + e.name );
+						.map( function(e) return (e.type:ClassName) | (e.name:MappingName) );
 			
 		Context.getLocalClass().get().meta.remove( _annotation );
 
@@ -228,7 +228,7 @@ class MappingChecker
 	public static function matchForClassName<T>( className : String, mappings : Array<MappingDefinition> ) : Bool
 	{
 		var dependencies = MappingChecker._dependencies.get( className );
-		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
 	
@@ -239,7 +239,7 @@ class MappingChecker
 		
 		for ( dep in dependencies )
 		{
-			if ( !Lambda.exists( mappings, function(e) return (e.fromType + '|' + (e.withName == null?"":e.withName)) == dep ) ) 
+			if ( !Lambda.exists( mappings, function(e) return e.fromType | e.withName == dep ) ) 
 			{
 				result.push( dep );
 			}
@@ -252,13 +252,13 @@ class MappingChecker
 	public static function filter<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
 	{
 		var dependencies : Array<String> = classReference.__DEP__;
-		return mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		return mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 	}
 	
 	public static function match<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Bool
 	{
 		var dependencies : Array<String> = classReference.__DEP__;
-		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
 }
