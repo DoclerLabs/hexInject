@@ -7,9 +7,13 @@ import haxe.macro.ExprTools;
 import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
 import hex.error.PrivateConstructorException;
-import hex.util.MacroUtil;
 import hex.util.TinkHelper;
 using Lambda;
+
+#if macro
+using tink.MacroApi;
+#end
+
 
 /**
  * ...
@@ -17,13 +21,10 @@ using Lambda;
  */
 class MappingChecker 
 {
-	
-	
-#if macro
-
 	//static property name that will handle the data
 	public static inline var DEPENDENCY : String = "__DEP__";
 	
+#if macro
 	static inline var _annotation = 'Dependency';
 	
 	static inline var _afterMapping = 'AfterMapping';
@@ -148,18 +149,24 @@ class MappingChecker
 							if ( !isDynamic )
 							{
 								var p = Context.currentPos();
+								var localClass = Context.getLocalClass().toString().resolve();
 								var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
 								var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
+								
 
 								if ( a.length == 0 )
 								{
-									if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
-									if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+									//if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+									//if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i { arg.name }, Type.resolveClass( $v { Context.getLocalClass().toString() } ) ); } );
+									if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], $localClass ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, $localClass ); } );
 								}
 								else
 								{
-									if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
-									if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+									//if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+									//if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i { arg.name }, Type.resolveClass( $v { Context.getLocalClass().toString() } ), __injectInto__ ); } );
+									if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], $localClass, __injectInto__ ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, $localClass, __injectInto__ ); } );
 								}
 							}
 						}
