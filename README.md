@@ -6,8 +6,6 @@ Fast annotation driven IOC solution for Haxe based on hexAnnotation (annotation 
 
 ## Dependencies
 
-* [hexCore](https://github.com/DoclerLabs/hexCore)
-* [hexReflection](https://github.com/DoclerLabs/hexReflection)
 * [hexAnnotation](https://github.com/DoclerLabs/hexAnnotation)
 
 

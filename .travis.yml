@@ -33,34 +33,33 @@ before_install:
 install:
   - haxelib newrepo
   - export BRANCH_REF=$DEPENDENCIES_BRANCH
-#hexLog
+# hexLog
   - if [[ $( git ls-remote --heads https://github.com/DoclerLabs/hexLog.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexLog.git ./hexlog
   - haxelib dev hexlog ./hexlog
-#hexCore
+# hexCore
   - if [[ $( git ls-remote --heads https://github.com/DoclerLabs/hexCore.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexCore.git ./hexcore
+  - haxelib install ./hexcore/haxelib.json --always
   - haxelib dev hexcore ./hexcore
-#hexUnit
+# hexUnit
   - if [[ $( git ls-remote --heads https://github.com/DoclerLabs/hexUnit.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
   - haxelib dev hexunit ./hexunit
-#hexReflection
+# hexReflection
   - if [[ $( git ls-remote --heads https://github.com/DoclerLabs/hexReflection.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
   - haxelib dev hexreflection ./hexreflection
-#hexAnnotation
+# hexAnnotation
   - if [[ $( git ls-remote --heads https://github.com/DoclerLabs/hexAnnotation.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - haxelib dev hexannotation ./hexannotation
-#tink_macro
-  - haxelib install tink_macro 0.16.4
-#hexInject
+# hexInject
   - haxelib dev hexinject .
   - export DISPLAY=:99.0;
   - export AUDIODEV=null;
