@@ -1,8 +1,8 @@
 package hex.di.util;
 
 import hex.di.mapping.MappingDefinition;
-
 using Lambda;
+
 /**
  * ...
  * @author Francis Bourre
@@ -41,10 +41,10 @@ class MappingDefinitionUtil
 			
 			if ( mapping.injectInto ) 
 			{
-				injectIntoValues.push(mapping.toValue);
+				injectIntoValues.push( mapping.toValue );
 			}
 		}
 		
-		injectIntoValues.iter(target.injectInto);
+		for ( v in injectIntoValues ) target.injectInto( v );
 	}
 }

@@ -1,10 +1,10 @@
 package hex.di.mock.injectees;
 
-import haxe.PosInfos;
 import hex.log.ILogger;
 import hex.log.ILoggerContext;
 import hex.log.LogLevel;
 import hex.log.message.IMessage;
+import hex.log.PosInfos;
 
 /**
  * ...
