@@ -815,17 +815,20 @@ class InjectorTest implements IInjectorListener
 		Assert.isTrue( target2.preDestroyCalled, "target2.preDestroyCalled should be true" );
 	}
 
-	#if !neko
+
+	static public var baseTypes : Array<Dynamic> = [
+		#if (!neko && !hl)
+		Bool,
+		#end
+		Dynamic, Array, Class, Int, Float, String
+	];
+	@DataProvider("baseTypes")
 	@Test( "Test satisfies returns false for unmapped common base types" )
-	public function testSatisfiesReturnsFalseForUnmappedCommonBaseTypes() : Void
+	public function testSatisfiesReturnsFalseForUnmappedCommonBaseTypes(o) : Void
 	{
-		var baseTypes : Array<Dynamic> = [ Bool, Dynamic, Array, Class, Int, Float, String ];
-		for ( i in  0...baseTypes.length )
-		{
-			Assert.isFalse( this.injector.satisfies( baseTypes[ i ] ), "injector.satisfies should return false" );
-		}
+		Assert.isFalse( this.injector.satisfies( o ), "injector.satisfies should return false" );
 	}
-	#end
+
 	
 	@Test( "Test map injector to value" )
 	public function testMapInjectorToValue() : Void
