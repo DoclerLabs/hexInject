@@ -5,7 +5,8 @@ import hex.di.mapping.MappingDefinition;
 import hex.di.Injector;
 import hex.di.mock.types.Interface;
 import hex.di.mock.types.InterfaceWithGeneric;
-import hex.error.Exception;
+
+using tink.CoreApi;
 
 @Dependency( var _:Interface, "id" )
 @Dependency( var _:Interface, "id2" )
@@ -25,11 +26,11 @@ class DependencyOwnerWithOutAfterMapping implements IDependencyOwner
 	public function new( mapping : MappingDefinition, uselessArg : Int, mappings : Array<MappingDefinition> )
 	{
 		_injector = new Injector();
-		id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
-		str = try _injector.getInstance( String ) catch(e:Exception) null;
-		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+		id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
+		str = try _injector.getInstance( String ) catch(e:Error) null;
+		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 	}
 
 	public function getInjector() : IDependencyInjector return _injector;
@@ -54,11 +55,11 @@ class DependencyOwnerWithAfterMapping implements IDependencyOwner
 	{
 		_injector = new Injector();
 		@AfterMapping
-		id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
-		str = try _injector.getInstance( String ) catch(e:Exception) null;
-		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+		id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
+		str = try _injector.getInstance( String ) catch(e:Error) null;
+		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 	}
 
 	public function getInjector() : IDependencyInjector return _injector;
@@ -80,11 +81,11 @@ class DependencyOwnerChildWithOutAfterMapping extends SuperDependencyOwner
 	public function new( mapping : MappingDefinition, uselessArg : Int, mappings : Array<MappingDefinition> )
 	{
 		super();
-		id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
-		str = try _injector.getInstance( String ) catch(e:Exception) null;
-		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+		id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
+		str = try _injector.getInstance( String ) catch(e:Error) null;
+		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 	}
 }
 
@@ -105,11 +106,11 @@ class DependencyOwnerChildWithAfterMapping extends SuperDependencyOwner
 	{
 		super();
 		@AfterMapping
-		id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
-		str = try _injector.getInstance( String ) catch(e:Exception) null;
-		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+		id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
+		str = try _injector.getInstance( String ) catch(e:Error) null;
+		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 	}
 }
 
@@ -136,12 +137,12 @@ class DependencyOwnerChildWithAfterMappingWrapped extends SuperDependencyOwner
 				@AfterMapping
 				var i = 0;
 				i++;
-				id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-				id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
+				id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+				id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
 			}
-			str = try _injector.getInstance( String ) catch(e:Exception) null;
-			name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-			one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+			str = try _injector.getInstance( String ) catch(e:Error) null;
+			name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+			one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 		}
 		wrapper(uselessArg);
 	}
@@ -168,10 +169,10 @@ class DependencyOwnerChildWithAfterMappingCapturated extends SuperDependencyOwne
 			@AfterMapping
 			{}
 		}
-		id = try _injector.getInstance( Interface, "id" ) catch(e:Exception) null;
-		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Exception) null;
-		str = try _injector.getInstance( String ) catch(e:Exception) null;
-		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Exception) null;
-		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Exception) null;
+		id = try _injector.getInstance( Interface, "id" ) catch(e:Error) null;
+		id2 = try _injector.getInstance( Interface, "id2" ) catch(e:Error) null;
+		str = try _injector.getInstance( String ) catch(e:Error) null;
+		name = try _injector.getInstanceWithClassName( "hex.di.mock.types.InterfaceWithGeneric<String>", "name" ) catch(e:Error) null;
+		one = try _injector.getInstanceWithClassName( "Void->Void", hex.di.mock.MockConstants.NAME_ONE ) catch(e:Error) null;
 	}
 }

@@ -1,16 +1,13 @@
 package hex.di.error;
 
-import hex.error.Exception;
 import haxe.PosInfos;
+using tink.CoreApi;
 
 /**
  * ...
  * @author Francis Bourre
  */
-class InjectorException extends Exception
+class InjectorException extends Error
 {
-	public function new( message : String, ?posInfos : PosInfos )
-    {
-        super( message, posInfos );
-    }
+    public function new ( message : String, ?posInfos : PosInfos ) super( code, message, pos );
 }

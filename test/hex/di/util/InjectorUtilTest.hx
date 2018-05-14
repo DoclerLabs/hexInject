@@ -234,103 +234,103 @@ private class MockDependencyInjector implements IDependencyInjector
 		
 	}
 	
-	public function hasMapping( type : Class<Dynamic>, name : String = '' ) : Bool 
+	public function hasMapping<T>( type : ClassRef<T>, ?name : MappingName ) : Bool
 	{
 		return false;
 	}
 	
-	public function hasDirectMapping( type : Class<Dynamic>, name:String = '' ) : Bool 
+	public function hasDirectMapping<T>( type : ClassRef<T>, ?name : MappingName) : Bool
 	{
 		return false;
 	}
 	
-	public function satisfies( type : Class<Dynamic>, name : String = '' ) : Bool 
+	public function satisfies<T>( type : ClassRef<T>, ?name : MappingName ) : Bool
 	{
 		return false;
 	}
 	
-	public function injectInto( target : Dynamic ) : Void 
+	public function injectInto( target : IInjectorAcceptor ) : Void
 	{
 		
 	}
 	
-	public function getInstance<T>( type : Class<T>, name : String = '', targetType : Class<Dynamic> = null ) : T 
+	public function getInstance<T>( type : ClassRef<T>, ?name : MappingName, targetType : Class<Dynamic> = null ) : T
 	{
 		return null;
 	}
 	
-	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
+	public function getInstanceWithClassName<T>( className : ClassName, ?name : MappingName, targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
 	{
 		this.instanceWithClassName = { className: className, name: name };
 		return null;
 	}
 	
-	public function getOrCreateNewInstance<T>( type : Class<Dynamic> ) : T 
+	public function getOrCreateNewInstance<T>( type : Class<T> ) : T
 	{
 		return null;
 	}
 	
-	public function instantiateUnmapped<T>( type : Class<Dynamic> ) : T 
+	public function instantiateUnmapped<T>( type : Class<T> ) : T
 	{
 		return null;
 	}
 	
-	public function destroyInstance( instance : Dynamic ) : Void 
+	public function destroyInstance<T>( instance : T ) : Void
 	{
 		
 	}
 	
-	public function mapToValue<T>( clazz : Class<T>, value : T, ?name : String = '' ) : Void 
+	public function mapToValue<T>( clazz : ClassRef<T>, value : T, ?name : MappingName ) : Void
 	{
 		
 	}
 	
-	public function mapToType<T>( clazz : Class<T>, type : Class<T>, name : String = '' ) : Void 
+	public function mapToType<T>( clazz : ClassRef<T>, type : Class<T>, ?name : MappingName ) : Void
 	{
 		
 	}
 	
-	public function mapToSingleton<T>( clazz : Class<T>, type : Class<T>, name : String = '' ) : Void 
+	public function mapToSingleton<T>( clazz : ClassRef<T>, type : Class<T>, ?name : MappingName ) : Void
 	{
 		
 	}
 	
-	public function unmap( type : Class<Dynamic>, name : String = '' ) : Void 
+	public function unmap<T>( type : ClassRef<T>, ?name : MappingName ) : Void 
 	{
 		
 	}
 
-	public function addListener( listener : IInjectorListener ) : Bool
+	public function addListener( listener: IInjectorListener ) : Bool
 	{
 		return false;
 	}
 
-	public function removeListener( listener : IInjectorListener ) : Bool
+	public function removeListener( listener: IInjectorListener ) : Bool
 	{
 		return false;
 	}
 	
-	public function getProvider<T>( className : String, name : String = '' ) : IDependencyProvider<T>
+	public function getProvider<T>( className : ClassName, ?name : MappingName ) : IDependencyProvider<T>
 	{
 		return null;
 	}
 	
-	public function mapClassNameToValue( className : String, value : Dynamic, ?name : String = '' ) : Void
+	public function mapClassNameToValue<T>( className : ClassName, value : T, ?name : MappingName ) : Void
 	{
 		this.mappedValue = { className: className, value: value, name: name };
 	}
 
-    public function mapClassNameToType( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+    public function mapClassNameToType<T>( className : ClassName, type : Class<T>, ?name : MappingName ) : Void
 	{
 		this.mappedType = { className: className, type: type, name: name };
 	}
 
-    public function mapClassNameToSingleton( className : String, type : Class<Dynamic>, name:String = '' ) : Void
+    public function mapClassNameToSingleton<T>( className : ClassName, type : Class<T>, ?name : MappingName ) : Void
 	{
 		this.mappedSingleton = { className: className, type: type, name: name };
 	}
 	
-	public function unmapClassName( className : String, name : String = '' ) : Void
+	public function unmapClassName( className : ClassName, ?name : MappingName ) : Void
 	{
 		this.instanceWithClassName = { className : className, name : name };
 	}
@@ -340,9 +340,9 @@ class ReportingInjector extends Injector
 {
 	public var mappedClassName:String;
 	
-	override public function mapClassName<T>(className:String, name:String = ''):InjectionMapping<T> 
+	override public function mapClassName<T>( className : ClassName, ?name : MappingName ) : InjectionMapping<T>
 	{
 		mappedClassName = className;
-		return super.mapClassName(className, name);
+		return super.mapClassName( className, name );
 	}
 }

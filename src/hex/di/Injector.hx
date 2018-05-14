@@ -4,7 +4,6 @@ import hex.collection.ArrayMap;
 import hex.di.IDependencyInjector;
 import hex.di.IInjectorListener;
 import hex.di.error.InjectorException;
-import hex.di.error.MissingClassDescriptionException;
 import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
@@ -55,22 +54,22 @@ class Injector
 		return this.trigger.disconnect( listener );
 	}
 
-	public function mapToValue<T>( clazz : Class<T>, value : T, ?name : String = '' ) : Void
+	public function mapToValue<T>( clazz : ClassRef<T>, value : T, ?name : MappingName ) : Void
 	{
 		this.map( clazz, name ).toValue( value );
 	}
 
-	public function mapToType<T>( clazz : Class<T>, type : Class<T>, name:String = '' ) : Void
+	public function mapToType<T>( clazz : ClassRef<T>, type : Class<T>, ?name:MappingName ) : Void
 	{
 		this.map( clazz, name ).toType( type );
 	}
 
-	public function mapToSingleton<T>( clazz : Class<T>, type : Class<T>, name:String = '' ) : Void
+	public function mapToSingleton<T>( clazz : ClassRef<T>, type : Class<T>, ?name:MappingName ) : Void
 	{
 		this.map( clazz, name ).toSingleton( type );
 	}
 
-    public function getInstance<T>( type : Class<T>, name : String = '', targetType : Class<Dynamic> = null ) : T
+    public function getInstance<T>( type : ClassRef<T>, ?name : MappingName, targetType : Class<Dynamic> = null ) : T
 	{
 		var mappingID = this._getMappingID( type, name );
 		var mapping = this._mapping[ mappingID ];
@@ -90,9 +89,9 @@ class Injector
 		}
 	}
 	
-	public function getInstanceWithClassName<T>( className : String, name : String = '', targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
+	public function getInstanceWithClassName<T>( className : ClassName, ?name : MappingName, targetType : Class<Dynamic> = null, shouldThrowAnError : Bool = true ) : T
 	{
-		var mappingID = className + '|' + name;
+		var mappingID = className | name;
 		var mapping = cast this._mapping[ mappingID ];
 		
 		if ( mapping != null )
@@ -114,9 +113,9 @@ class Injector
 		return null;
 	}
 	
-	public function getProvider<T>( className : String, name : String = '' ) : IDependencyProvider<T>
+	public function getProvider<T>( className : ClassName, ?name : MappingName ) : IDependencyProvider<T>
 	{
-		var mappingID = className + '|' + name;
+		var mappingID = className | name;
 		var mapping = cast this._mapping[ mappingID ];
 
 		if ( mapping != null )
@@ -125,7 +124,7 @@ class Injector
 		}
 		else if ( this._parentInjector != null )
 		{
-			return this._parentInjector.getInstance( Type.resolveClass( className.split( '<' )[ 0 ] ), name );
+			return this._parentInjector.getInstance( className, name );
 		}
 		else
 		{
@@ -155,7 +154,7 @@ class Injector
 
 		try
 		{
-			if ( instance.__ai != null )
+			if ( instance.acceptInjector != null )
 			{
 				this._applyInjection( instance, type );
 			}
@@ -172,12 +171,12 @@ class Injector
 		return instance;
 	}
 
-    public function getOrCreateNewInstance<T>( type : Class<T> ) : T
+    public function getOrCreateNewInstance<T>( type : ClassRef<T> ) : T
 	{
 		return this.satisfies( type ) ? this.getInstance( type ) : this.instantiateUnmapped( type );
 	}
 	
-	public function hasMapping<T>( type : Class<T>, name : String = '' ) : Bool
+	public function hasMapping<T>( type : ClassRef<T>, ?name : MappingName ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
 		
@@ -195,22 +194,22 @@ class Injector
 		}
 	}
 	
-	public function unmap<T>( type : Class<T>, name : String = '' ) : Void
+	public function unmap<T>( type : ClassRef<T>, ?name : MappingName ) : Void
 	{
 		this._unmap( this._getMappingID( type, name ) );
 	}
 	
-	public function unmapClassName( className : String, name : String = '' ) : Void
+	public function unmapClassName( className : ClassName, ?name : MappingName ) : Void
 	{
-		this._unmap( className + '|' + name );
+		this._unmap( className | name );
 	}
 	
-	public function hasDirectMapping( type : Class<Dynamic>, name : String = '' ) : Bool
+	public function hasDirectMapping( type : ClassRef<Dynamic>, ?name : MappingName ) : Bool
 	{
 		return this._mapping[ this._getMappingID( type, name ) ] != null;
 	}
 
-    public function satisfies( type : Class<Dynamic>, name : String = '' ) : Bool
+    public function satisfies( type : ClassRef<Dynamic>, ?name : MappingName ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
 		var mapping = cast this._mapping[ mappingID ];
@@ -229,26 +228,16 @@ class Injector
 		}
 	}
 
-	public function satisfiesDirectly( type : Class<Dynamic>, name : String = '' ) : Bool
+	public function satisfiesDirectly( type : ClassRef<Dynamic>, ?name : MappingName ) : Bool
 	{
 		var mappingID = this._getMappingID( type, name );
 		var mapping = cast this._mapping[ mappingID ];
 		return ( mapping != null ) ? mapping.provider != null : false;
 	}
 
-    public function injectInto( target : Dynamic ) : Void
+    public function injectInto( target : IInjectorAcceptor ) : Void
 	{
-		var targetType = Type.getClass( target );
-		if ( target.__ai != null )
-		{
-			this._applyInjection( target, targetType );
-		}
-		else
-		{
-			throw new MissingClassDescriptionException( "Injector is missing a class description to inject into an instance of '" +
-														ClassUtil.getClassName( target ) + 
-														"'. This class should implement IInjectorContainer" );
-		}
+		this._applyInjection( target, Type.getClass( target ) );
 	}
 
     public function destroyInstance( instance : Dynamic ) : Void
@@ -260,7 +249,7 @@ class Injector
 		}
 	}
 
-	public function map<T>( type : Class<T>, name : String = '' ) : InjectionMapping<T>
+	public function map<T>( type : ClassRef<T>, ?name : MappingName ) : InjectionMapping<T>
 	{
 		var mappingID = this._getMappingID( type, name );
 
@@ -270,7 +259,7 @@ class Injector
 		}
 		else
 		{
-			return this._createMapping( name, mappingID );
+			return this._createMapping( mappingID );
 		}
 	}
 
@@ -296,9 +285,9 @@ class Injector
 		#end
 	}
 	
-	public function mapClassName<T>( className : String, name : String = '' ) : InjectionMapping<T>
+	public function mapClassName<T>( className : ClassName, ?name : MappingName ) : InjectionMapping<T>
 	{
-		var mappingID = className + '|' + name;
+		var mappingID = className | name;
 		
 		if ( this._mapping[ mappingID ] != null )
 		{
@@ -306,21 +295,21 @@ class Injector
 		}
 		else
 		{
-			return this._createMapping( name, mappingID );
+			return this._createMapping( mappingID );
 		}
 	}
 	
-	public function mapClassNameToValue<T>( className : String, value : T, ?name : String = '' ) : Void
+	public function mapClassNameToValue<T>( className : ClassName, value : T, ?name : MappingName ) : Void
 	{
 		this.mapClassName( className, name ).toValue( value );
 	}
 
-    public function mapClassNameToType<T>( className : String, type : Class<T>, name:String = '' ) : Void
+    public function mapClassNameToType<T>( className : ClassName, type : Class<T>, ?name : MappingName ) : Void
 	{
 		this.mapClassName( className, name ).toType( type );
 	}
 
-    public function mapClassNameToSingleton<T>( className : String, type : Class<T>, name:String = '' ) : Void
+    public function mapClassNameToSingleton<T>( className : ClassName, type : Class<T>, ?name : MappingName ) : Void
 	{
 		this.mapClassName( className, name ).toSingleton( type );
 	}
@@ -345,7 +334,7 @@ class Injector
 		}
 	}
 
-	function _createMapping<T>( name : String, mappingID : String ) : InjectionMapping<T>
+	function _createMapping<T>( mappingID : String ) : InjectionMapping<T>
 	{
 		if ( this._processedMapping[ mappingID ] )
 		{
@@ -361,17 +350,17 @@ class Injector
 		return mapping;
 	}
 	
-	function _applyInjection( target : Dynamic, targetType : Class<Dynamic> ) : Void
+	function _applyInjection( target : IInjectorAcceptor, targetType : Class<Dynamic> ) : Void
 	{
 		#if !macro
 		this.trigger.onPreConstruct( this, target, targetType );
 		#end
 
-		target.__ai( this.getInstanceWithClassName, targetType );
+		target.acceptInjector( this );
 		
 		try
 		{
-			if ( target.__ap != null )
+			if ( untyped target.__ap != null )
 			{
 				this._managedObjects.put( target,  target );
 			}
@@ -387,21 +376,8 @@ class Injector
 	}
 	
 	//
-	inline function _getMappingID( type : Class<Dynamic>, name : String = '' ) : String
+	inline function _getMappingID( type : ClassName, name : MappingName ) : String
 	{
-		#if neko
-		var className = "";
-		try
-		{
-			className = Type.getClassName( type );
-		}
-		catch ( e : Dynamic )
-		{
-			
-		}
-		return className + '|' + name;
-		#else
-		return Type.getClassName( type ) + '|' + name;
-		#end
+		return type | name;
 	}
 }

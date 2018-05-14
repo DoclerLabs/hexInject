@@ -7,9 +7,13 @@ import haxe.macro.ExprTools;
 import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
 import hex.error.PrivateConstructorException;
-import hex.util.MacroUtil;
 import hex.util.TinkHelper;
 using Lambda;
+
+#if macro
+using tink.MacroApi;
+#end
+
 
 /**
  * ...
@@ -110,7 +114,7 @@ class MappingChecker
 		var m = metas	
 						.filter( function(m) return m.name == _annotation )
 						.map( _parse )
-						.map( function(e) return e.type + '|' + e.name );
+						.map( function(e) return (e.type:ClassName) | (e.name:MappingName) );
 			
 		Context.getLocalClass().get().meta.remove( _annotation );
 
@@ -145,18 +149,24 @@ class MappingChecker
 							if ( !isDynamic )
 							{
 								var p = Context.currentPos();
+								var localClass = Context.getLocalClass().toString().resolve();
 								var isInstance = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:MappingDefinition, p ) );
 								var isArray = Context.unify( Context.resolveType( arg.type, p ), Context.resolveType( macro:Array<MappingDefinition>, p ) );
+								
 
 								if ( a.length == 0 )
 								{
-									if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
-									if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+									//if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ) ); } );
+									//if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i { arg.name }, Type.resolveClass( $v { Context.getLocalClass().toString() } ) ); } );
+									if ( isInstance ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( [$i{arg.name}], $localClass ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { var __injectInto__ = this.__map( $i{arg.name}, $localClass ); } );
 								}
 								else
 								{
-									if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
-									if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+									//if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], Type.resolveClass( $v {Context.getLocalClass().toString()} ), __injectInto__ ); } );
+									//if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i { arg.name }, Type.resolveClass( $v { Context.getLocalClass().toString() } ), __injectInto__ ); } );
+									if ( isInstance ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( [$i{arg.name}], $localClass, __injectInto__ ); } );
+									if ( isArray ) a.push( macro  @:mergeBlock { __injectInto__ = this.__map( $i{arg.name}, $localClass, __injectInto__ ); } );
 								}
 							}
 						}
@@ -225,7 +235,7 @@ class MappingChecker
 	public static function matchForClassName<T>( className : String, mappings : Array<MappingDefinition> ) : Bool
 	{
 		var dependencies = MappingChecker._dependencies.get( className );
-		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
 	
@@ -236,7 +246,7 @@ class MappingChecker
 		
 		for ( dep in dependencies )
 		{
-			if ( !Lambda.exists( mappings, function(e) return (e.fromType + '|' + (e.withName == null?"":e.withName)) == dep ) ) 
+			if ( !Lambda.exists( mappings, function(e) return e.fromType | e.withName == dep ) ) 
 			{
 				result.push( dep );
 			}
@@ -246,16 +256,16 @@ class MappingChecker
 	}
 #end
 
-	public static function filter<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
+	public static function filter<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Array<MappingDefinition>
 	{
-		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
-		return mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		var dependencies : Array<String> = classReference.__DEP__;
+		return mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 	}
 	
-	public static function match<T>( classReference : Class<T>, mappings : Array<MappingDefinition> ) : Bool
+	public static function match<T>( classReference : Dynamic, mappings : Array<MappingDefinition> ) : Bool
 	{
-		var dependencies : Array<String> = Reflect.getProperty( classReference, DEPENDENCY );
-		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType + '|' + (e.withName==null?"":e.withName) ) != -1 );
+		var dependencies : Array<String> = classReference.__DEP__;
+		var filtered = mappings.filter( function(e) return dependencies.indexOf( e.fromType | e.withName ) != -1 );
 		return filtered.length == mappings.length && dependencies.length == mappings.length;
 	}
 }
