@@ -14,7 +14,7 @@ matrix:
 
 before_install:
   - echo $TRAVIS_BRANCH
-  - if [[ "$TRAVIS_BRANCH" != "master" ]]; then export DEPENDENCIES_BRANCH=$TRAVIS_BRANCH; else export DEPENDENCIES_BRANCH=master; fi
+  - export DEPENDENCIES_BRANCH=$TRAVIS_BRANCH
   - echo $TRAVIS_TAG
   - if [[ "$TRAVIS_TAG" != "" ]]; then export DEPENDENCIES_BRANCH=$TRAVIS_TAG; fi
   - echo $DEPENDENCIES_BRANCH
@@ -34,28 +34,28 @@ install:
   - haxelib newrepo
   - export BRANCH_REF=$DEPENDENCIES_BRANCH
 # hexLog
-  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexLog.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
+  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexLog.git $DEPENDENCIES_BRANCH --heads | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=master; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexLog.git ./hexlog
   - haxelib dev hexlog ./hexlog
 # hexCore
-  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexCore.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
+  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexCore.git $DEPENDENCIES_BRANCH --heads | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=master; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexCore.git ./hexcore
   - haxelib install ./hexcore/haxelib.json --always
   - haxelib dev hexcore ./hexcore
 # hexUnit
-  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexUnit.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
+  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexUnit.git $DEPENDENCIES_BRANCH --heads | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=master; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexUnit.git ./hexunit
   - haxelib dev hexunit ./hexunit
 # hexReflection
-  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexReflection.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
+  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexReflection.git $DEPENDENCIES_BRANCH --heads | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=master; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexReflection.git ./hexreflection
   - haxelib dev hexreflection ./hexreflection
 # hexAnnotation
-  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexAnnotation.git $DEPENDENCIES_BRANCH | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=develop; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
+  - if [[ $( git ls-remote https://github.com/DoclerLabs/hexAnnotation.git $DEPENDENCIES_BRANCH --heads | wc -l ) == "0" ]]; then export DEPENDENCIES_BRANCH=master; else export DEPENDENCIES_BRANCH=$BRANCH_REF; fi
   - echo Checking out $DEPENDENCIES_BRANCH
   - git clone --recursive -b $DEPENDENCIES_BRANCH https://github.com/DoclerLabs/hexAnnotation.git ./hexannotation
   - haxelib dev hexannotation ./hexannotation

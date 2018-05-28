@@ -24,7 +24,8 @@ class InjectionMapping<T>
         this._injector			= injector;
         this._mappingID 		= mappingID;
     }
-
+	
+    @:keep
     public function getResult( target : Class<Dynamic> ) : Dynamic
     {
         if ( this.provider == null )
