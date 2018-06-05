@@ -111,10 +111,12 @@ class MappingChecker
 
 		
 		var metas = Context.getLocalClass().get().meta.get();
-		var m = metas	
+		var parsedDeps = metas	
 						.filter( function(m) return m.name == _annotation )
-						.map( _parse )
-						.map( function(e) return (e.type:ClassName) | (e.name:MappingName) );
+						.map( _parse );
+						
+		var runtimeDeps = parsedDeps.map( function(e) return macro ($v{e.type}:hex.di.ClassName) | ($v{e.name}:hex.di.MappingName) );
+		var compiletimeDeps = parsedDeps.map( function(e) return (e.type:ClassName) | (e.name:MappingName) );
 			
 		Context.getLocalClass().get().meta.remove( _annotation );
 
@@ -123,12 +125,12 @@ class MappingChecker
 		{
 			name:  MappingChecker.DEPENDENCY,
 			access:  [ Access.APublic, Access.AStatic ],
-			kind: FieldType.FVar( macro: Array<String>, macro $v{ m } ), 
+			kind: FieldType.FVar( macro: Array<String>, macro $a{ runtimeDeps } ), 
 			pos: Context.currentPos(),
 		});
 		
 		var className =  Context.getLocalClass().get().pack.concat([Context.getLocalClass().get().name]).join('.');
-		MappingChecker._dependencies.set( className, m );
+		MappingChecker._dependencies.set( className, compiletimeDeps );
 
 		for ( f in fields )
 		{
