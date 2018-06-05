@@ -124,7 +124,7 @@ class Injector
 		}
 		else if ( this._parentInjector != null )
 		{
-			return this._parentInjector.getInstance( className, name );
+			return this._parentInjector.getInstanceWithClassName( className, name );
 		}
 		else
 		{
