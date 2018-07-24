@@ -13,16 +13,16 @@ haxe:
 
 env:
   - HAXE_TARGET=cpp
-  - HAXE_TARGET=cs
+  #- HAXE_TARGET=cs
   - HAXE_TARGET=flash
-  - HAXE_TARGET=lua
+  #- HAXE_TARGET=lua
   - HAXE_TARGET=neko
   - HAXE_TARGET=node
   - HAXE_TARGET=php
   - HAXE_TARGET=php7
-  - HAXE_TARGET=python
+  #- HAXE_TARGET=python
   - HAXE_TARGET=js
-  - HAXE_TARGET=java
+  #- HAXE_TARGET=java
   - HAXE_TARGET=hl
 
 matrix:
