@@ -123,7 +123,10 @@ class MappingChecker
 		//append the expression as a field
 		fields.push(
 		{
-			name:  MappingChecker.DEPENDENCY,
+			name:  '__DEP__',
+			meta: [ { name: ":noCompletion", params: [], pos: Context.currentPos() },
+					{ name: ":keep", params: [], pos: Context.currentPos() }
+					],
 			access:  [ Access.APublic, Access.AStatic ],
 			kind: FieldType.FVar( macro: Array<String>, macro $a{ runtimeDeps } ), 
 			pos: Context.currentPos(),
