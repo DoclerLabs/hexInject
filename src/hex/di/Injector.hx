@@ -7,11 +7,12 @@ import hex.di.error.InjectorException;
 import hex.di.error.MissingMappingException;
 import hex.di.mapping.InjectionMapping;
 import hex.di.provider.IDependencyProvider;
-import hex.error.NullPointerException;
 import hex.event.ITrigger;
 import hex.event.ITriggerOwner;
 import hex.log.LogManager;
 import hex.util.ClassUtil;
+
+using hex.error.Error;
 
 /**
  * ...

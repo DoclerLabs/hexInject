@@ -6,9 +6,10 @@ import haxe.macro.Expr.Field;
 import haxe.macro.ExprTools;
 import haxe.macro.TypeTools;
 import hex.annotation.AnnotationReplaceBuilder;
-import hex.error.PrivateConstructorException;
 import hex.util.TinkHelper;
+
 using Lambda;
+using hex.error.Error;
 
 #if macro
 using tink.MacroApi;

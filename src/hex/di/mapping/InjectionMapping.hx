@@ -5,8 +5,9 @@ import hex.di.provider.ClassProvider;
 import hex.di.provider.IDependencyProvider;
 import hex.di.provider.SingletonProvider;
 import hex.di.provider.ValueProvider;
-import hex.error.NullPointerException;
 import hex.log.HexLog.getLogger;
+
+using hex.error.Error;
 
 /**
  * ...
