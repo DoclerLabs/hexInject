@@ -50,11 +50,11 @@ import hex.di.mock.types.Interface;
 import hex.di.mock.types.Interface2;
 import hex.di.mock.types.MockEnum;
 import hex.di.mock.types.MockTypedefImplementation;
-import hex.error.NullPointerException;
 import hex.log.ILogger;
 import hex.structures.Point;
 import hex.unittest.assertion.Assert;
 
+using hex.error.Error;
 
 /**
  * ...
