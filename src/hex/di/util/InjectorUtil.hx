@@ -9,6 +9,7 @@ import hex.error.PrivateConstructorException;
 import hex.util.MacroUtil;
 
 using haxe.macro.Tools;
+using hex.error.Error;
 
 /**
  * ...
@@ -16,7 +17,7 @@ using haxe.macro.Tools;
  */
 class InjectorUtil 
 {
-	/** @private */ function new() throw new hex.error.PrivateConstructorException();
+	/** @private */ function new() throw PrivateConstructorException();
 	
 	macro public static function getDependencyInstance<T>( 	injector : ExprOf<IDependencyInjector>, 
 															clazz : ExprOf<Dependency<T>>
