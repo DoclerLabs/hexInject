@@ -17,7 +17,7 @@ using hex.error.Error;
  */
 class InjectorUtil 
 {
-	/** @private */ function new() throw PrivateConstructorException();
+	/** @private */ function new() throw new PrivateConstructorException();
 	
 	macro public static function getDependencyInstance<T>( 	injector : ExprOf<IDependencyInjector>, 
 															clazz : ExprOf<Dependency<T>>
