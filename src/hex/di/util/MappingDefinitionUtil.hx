@@ -1,7 +1,9 @@
 package hex.di.util;
 
 import hex.di.mapping.MappingDefinition;
+
 using Lambda;
+using hex.error.Error;
 
 /**
  * ...
