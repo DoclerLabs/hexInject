@@ -11,7 +11,7 @@ using hex.error.Error;
  */
 class MappingDefinitionUtil 
 {
-	/** @private */ function new() throw new hex.error.PrivateConstructorException();
+	/** @private */ function new() throw new PrivateConstructorException();
 
 	public static function addToInjector<T>( mappings : Array<MappingDefinition>, target : IDependencyInjector, ?useMetadataOf : T ) : Void
 	{

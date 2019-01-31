@@ -32,8 +32,7 @@ class MappingChecker
 	static inline var _mapMethodName = '__map';
 	static inline var _injectIntoMethodName = '__injectInto';
 
-	/** @private */
-    function new()  throw new PrivateConstructorException();
+	/** @private */ function new() throw new PrivateConstructorException();
 	
 	static var _dependencies : Map<String, Array<String>> = new Map();
 
