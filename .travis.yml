@@ -48,7 +48,7 @@ before_install:
   - echo $DEPENDENCIES_BRANCH
 
 install:
-  - export nvm install 8
+  - nvm install 8
   - export BRANCH_REF=$DEPENDENCIES_BRANCH
   - haxelib install travix --always
 # hexLog
