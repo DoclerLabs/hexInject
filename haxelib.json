@@ -10,7 +10,6 @@
   "url": "https://github.com/DoclerLabs/hexInject",
   "dependencies": 
   {
-	"hexannotation": "1.0.0-alpha.7",
-	"hexcore": "git:https://github.com/CrazyFlasher/hexCore.git#f6f75dc768b7e05670d2914aa84bfca9f7b571b1"
+	"hexannotation": "1.0.0-alpha.7"
   }
 }
