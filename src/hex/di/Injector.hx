@@ -194,6 +194,23 @@ class Injector
 			return false;
 		}
 	}
+
+	public function hasMappingForClassName<T>( className : ClassName, ?name : MappingName ) : Bool
+	{
+		var mapping = this._mapping[ className | name ];
+
+		if ( mapping != null )
+		{
+			return true;
+		}
+
+		if ( this._parentInjector != null )
+		{
+			return this._parentInjector.hasMappingForClassName( className, name );
+		}
+
+		return false;
+	}
 	
 	public function unmap<T>( type : ClassRef<T>, ?name : MappingName ) : Void
 	{
