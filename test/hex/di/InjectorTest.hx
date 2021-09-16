@@ -860,6 +860,12 @@ class InjectorTest implements IInjectorListener
 	{
 		Assert.isFalse( this.injector.hasMapping( Clazz ),"" );
 	}
+
+	@Test( "Test 'hasMappingForClassName' returns false when mapping doesn't exist" )
+	public function testHasMappingForClassNameReturnsFalseWhenMappingDoesntExist() : Void
+	{
+		Assert.isFalse( this.injector.hasMappingForClassName( "Int" ),"" );
+	}
 	
 	@Test( "Test 'hasDirectMapping' returns false for parent mapping" )
 	public function testHasDirectMappingReturnsFalseForParentMapping() : Void
@@ -875,6 +881,15 @@ class InjectorTest implements IInjectorListener
 	{
 		this.injector.map( Clazz ).toType( Clazz );
 		Assert.isTrue( this.injector.hasMapping( Clazz ), "" );
+	}
+
+	@Test( "Test 'hasMapping' returns true for type local mapping" )
+	public function hasMappingReturnsTrueForTypeLocalMapping() : Void
+	{
+		var i:Int = 7;
+
+		this.injector.mapClassNameToValue( "Int", i );
+		Assert.isTrue( this.injector.hasMappingForClassName( Clazz ), "" );
 	}
 	
 	@Test( "Test 'hasMapping' returns true for value local mapping" )
